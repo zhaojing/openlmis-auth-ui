@@ -9,6 +9,14 @@ services:
     volumes:
       - '.:/app'
     env_file: .env
+    volumes_from:
+      - ui-components
+    depends_on:
+      - ui-components
+  ui-components:
+    image: openlmis/ui-components:latest
+    volumes:
+      - '/openlmis-ui-components'
   image:
     build: .
-    image: openlmis/requisition-ui
+    image: openlmis/auth-ui

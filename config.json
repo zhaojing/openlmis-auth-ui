@@ -2,33 +2,10 @@
   "app": {
     "src": "./src"
   },
-  "styleguide": {
-  	"src": "src/",
-  	"dest": "build/styleguide"
-  },
-  "docs": {
-    "src": "./docs",
-    "dest": "./build/docs"
-  },
-  "openlmisServerURL": "",
+  "orderedBuildDirectories": [
+    "/openlmis-ui-components"
+  ],
   "authServiceURL": "/",
-  "requisitionServiceURL": "/",
-  "fulfillmentServiceURL": "/",
-  "pageSize": 10,
-  "currencyCode": "USD",
-  "currencySymbol": "$",
-  "currencySymbolSide": "left",
-  "currencyDecimalPlaces": 2,
-  "groupingSeparator": ",",
-  "groupingSize": 3,
-  "decimalSeparator": ".",
   "authServerClientId": "user-client",
-  "authServerClientSecret": "changeme",
-  "applicationTitle": "OpenLMIS",
-  "applicationLoadingMessage": "Starting OpenLMIS",
-  "transifexProjectName": "openlmis-requisition-ui",
-  "defaultLanguage": "en",
-  "analyticsTrackingId": "UA-35478705-4",
-  "defaultDateFormat": "dd/MM/yyyy",
-  "defaultDatetimeFormat": "dd/MM/yyyy HH:mm:ss"
+  "authServerClientSecret": "changeme"
 }
