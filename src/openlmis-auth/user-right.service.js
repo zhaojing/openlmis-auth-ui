@@ -28,11 +28,11 @@
 		.module('openlmis-auth')
 	    .service('userRightService', service);
 
-    service.$inject = ['$resource', 'referencedataUrlFactory'];
+    service.$inject = ['$resource', 'openlmisUrlFactory'];
 
-    function service($resource, referencedataUrlFactory) {
+    function service($resource, openlmisUrlFactory) {
 
-        var resource = $resource(referencedataUrlFactory('/api/users/:userId/hasRight'), {}, {
+        var resource = $resource(openlmisUrlFactory('/api/users/:userId/hasRight'), {}, {
 	            hasRight: {
 	                method: 'GET'
 	            }

@@ -31,9 +31,8 @@
         'openlmis-modal',
         'openlmis-templates',
         'openlmis-urls',
-        'openlmis-user',
-        'referencedata-user',
-        'ui.router'
+        'ui.router',
+        'ngResource'
     ]);
 
 })();

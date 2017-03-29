@@ -15,20 +15,22 @@
 
 describe('userRightService', function() {
 
-    var $rootScope, $httpBackend, referencedataUrlFactoryMock, userRightService;
+    var $rootScope, $httpBackend, urlFactoryMock, userRightService;
 
     beforeEach(function() {
-        module('openlmis-auth', function($provide) {
-            referencedataUrlFactoryMock = jasmine.createSpy();
+        module('openlmis-urls', function($provide) {
+            urlFactoryMock = jasmine.createSpy();
 
-            $provide.factory('referencedataUrlFactory', function() {
-                return referencedataUrlFactoryMock;
+            $provide.factory('openlmisUrlFactory', function() {
+                return urlFactoryMock;
             });
 
-            referencedataUrlFactoryMock.andCallFake(function(parameter) {
+            urlFactoryMock.andCallFake(function(parameter) {
                 return parameter;
             });
         });
+
+        module('openlmis-auth');
 
         inject(function(_$httpBackend_, _$rootScope_, _userRightService_) {
             $rootScope = _$rootScope_;
@@ -47,7 +49,7 @@ describe('userRightService', function() {
                 facilityId = '4',
                 warehouseId = '5';
 
-            $httpBackend.when('GET', referencedataUrlFactoryMock('/api/users/' + userId +
+            $httpBackend.when('GET', urlFactoryMock('/api/users/' + userId +
                 '/hasRight?facilityId=' + facilityId +
                 '&programId=' + programId +
                 '&rightId=' + rightId +
@@ -69,7 +71,7 @@ describe('userRightService', function() {
                 userId = '1',
                 rightId = '2';
 
-            $httpBackend.when('GET', referencedataUrlFactoryMock('/api/users/' + userId +
+            $httpBackend.when('GET', urlFactoryMock('/api/users/' + userId +
                 '/hasRight?rightId=' + rightId)).respond(200, hasRight);
 
             userRightService.hasRight(userId, rightId).then(function(response) {

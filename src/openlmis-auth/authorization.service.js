@@ -48,7 +48,6 @@
         this.clearUser = clearUser;
         this.clearRights = clearRights;
         this.getAccessToken = getAccessToken;
-        this.getDetailedUser = getDetailedUser;
         this.getRights = getRights;
         this.getUser = getUser;
         this.hasRight = hasRight;
@@ -131,21 +130,6 @@
                 username: localStorageService.get(storageKeys.USERNAME),
                 user_id: localStorageService.get(storageKeys.USER_ID)
             };
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-auth.authorizationService
-         * @name getDetailedUser
-         *
-         * @description
-         * Retrieves detailed information about the user.
-         *
-         * @return {Object} the detailed information about the user
-         */
-        function getDetailedUser() {
-            var user = getUser();
-            return $injector.get('referencedataUserService').get(user.user_id);
         }
 
         /**
