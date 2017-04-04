@@ -13,21 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
+
 (function() {
 
     'use strict';
 
     /**
-     * @module openlmis-navigation
+     * @ngdoc directive
+     * @restrict E
+     * @name openlmis-logout.directive:openlmisLogout
      *
      * @description
-     * This module is responsible for managing navigation bar in the OpenLMIS.
+     * Provides logout button.
+     *
+     * @example
+     * <openlmis-logout />
      */
-    angular.module('openlmis-navigation', [
-        'openlmis-auth',
-        'openlmis-offline',
-        'openlmis-modal',
-        'mgcrea.ngStrap.dropdown'
-    ]);
+    angular
+        .module('openlmis-logout')
+        .directive('openlmisLogout', directive);
+
+    directive.$inject = [];
+
+    function directive() {
+        var directive = {
+            restrict: 'E',
+            replace: true,
+            controller: 'LogoutController',
+            controllerAs: 'vm',
+            templateUrl: 'openlmis-logout/logout.html'
+        };
+        return directive;
+    }
 
 })();

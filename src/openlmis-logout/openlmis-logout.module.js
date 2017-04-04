@@ -18,16 +18,12 @@
     'use strict';
 
     /**
-     * @module openlmis-navigation
+     * @module openlmis-logout
      *
      * @description
-     * This module is responsible for managing navigation bar in the OpenLMIS.
+     * This module is responsible for logging out from OpenLMIS.
      */
-    angular.module('openlmis-navigation', [
-        'openlmis-auth',
-        'openlmis-offline',
-        'openlmis-modal',
-        'mgcrea.ngStrap.dropdown'
+    angular.module('openlmis-logout', [
+        'openlmis-login'
     ]);
-
 })();
