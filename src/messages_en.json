@@ -177,7 +177,7 @@
   "label.username": "Username",
   "label.updateUser": "Update user",
   "label.users": "Users",
-  "label.verified": "Verified",
+  "label.emailVerified": "Email verified",
   "label.viewHistory": "View History",
   "label.yes": "Yes",
   "link.administration": "Administration",
