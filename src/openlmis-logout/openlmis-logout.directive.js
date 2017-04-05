@@ -13,7 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 (function() {
 
     'use strict';
@@ -35,17 +34,14 @@
         .module('openlmis-logout')
         .directive('openlmisLogout', directive);
 
-    directive.$inject = [];
-
     function directive() {
-        var directive = {
+        return {
             restrict: 'E',
             replace: true,
             controller: 'LogoutController',
             controllerAs: 'vm',
             templateUrl: 'openlmis-logout/logout.html'
         };
-        return directive;
     }
 
 })();
