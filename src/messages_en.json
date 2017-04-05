@@ -1,3 +1,4 @@
 {
-  "authLogin.logout.label": "Logout"
+  "authLogin.logout.label": "Logout",
+  "label.emailVerified": "Email verified"
 }
