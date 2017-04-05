@@ -13,9 +13,9 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 (function() {
-    "use strict";
+
+    'use strict';
 
     /**
      * @ngdoc controller
@@ -24,7 +24,6 @@
      * @description
      * Adds functionality that makes it possible for user to log out.
      */
-
     angular
         .module('openlmis-logout')
         .controller('LogoutController', LogoutController);
