@@ -27,7 +27,9 @@
      * Provides logout button.
      *
      * @example
-     * <openlmis-logout />
+     * ```
+     * <openlmis-logout/>
+     * ```
      */
     angular
         .module('openlmis-logout')
