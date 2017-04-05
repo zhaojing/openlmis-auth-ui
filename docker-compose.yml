@@ -19,4 +19,4 @@ services:
       - '/openlmis-ui-components'
   image:
     build: .
-    image: openlmis/auth-ui:4.0.1-SNAPSHOT
+    image: openlmis/auth-ui
