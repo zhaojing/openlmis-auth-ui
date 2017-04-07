@@ -98,7 +98,7 @@ describe('authStateRouter', function() {
         $rootScope.$broadcast('$stateChangeStart', createState('auth.login'), {},
             createState('somewhere'));
 
-        expect(stateSpy.go).toHaveBeenCalledWith('home');
+        expect(stateSpy.go).toHaveBeenCalledWith('openlmis.home');
     });
 
     it('should reload page on event:auth-loggedIn', function() {
@@ -117,7 +117,7 @@ describe('authStateRouter', function() {
         $rootScope.$broadcast('$stateChangeStart', createState('somewhere'));
         $rootScope.$broadcast('auth.login');
 
-        expect(stateSpy.go).toHaveBeenCalledWith('home');
+        expect(stateSpy.go).toHaveBeenCalledWith('openlmis.home');
     });
 
     it('should call alert if has no permission to enter state', function() {
