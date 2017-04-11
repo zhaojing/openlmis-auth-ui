@@ -1,0 +1,8 @@
+{
+  "openlmisLogin.appHeader": "Logistics Management Information System",
+  "openlmisLogin.forgotPassword": "Forgot password?",
+  "openlmisLogin.password": "Password",
+  "openlmisLogin.poweredBy": "Powered by ${openlmis}",
+  "openlmisLogin.signIn": "Sign in",
+  "openlmisLogin.username": "Username"
+}

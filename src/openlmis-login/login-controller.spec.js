@@ -59,25 +59,6 @@ describe("LoginController", function() {
         expect(vm.loginError).toEqual('user.login.error');
     });
 
-    it('should show error when username is missing', function() {
-        vm.username = undefined;
-        vm.doLogin();
-        expect(vm.loginError).toEqual('error.login.username');
-    });
-
-    it('should show error when username is only whitespaces', function() {
-        vm.username = "   ";
-        vm.doLogin();
-        expect(vm.loginError).toEqual('error.login.username');
-    });
-
-    it('should show error when password is missing', function() {
-        vm.username = "someUser";
-        vm.password = undefined;
-        vm.doLogin();
-        expect(vm.loginError).toEqual('error.login.password');
-    });
-
     it('should clear password on failed login attempt', function() {
         vm.username = "john";
         vm.password = "bad-password";

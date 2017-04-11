@@ -88,7 +88,7 @@ describe('ResetPasswordController', function() {
             deferred.reject();
             $rootScope.$apply();
 
-            expect(vm.error).toEqual('msg.change.password.failed');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordReset.failure');
         });
 
         it('should set error message if password are different', function() {
@@ -97,7 +97,7 @@ describe('ResetPasswordController', function() {
 
             vm.changePassword();
 
-            expect(vm.error).toEqual('error.password.mismatch');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordMismatch');
         });
 
         it('should set error message if password is too short', function() {
@@ -108,7 +108,7 @@ describe('ResetPasswordController', function() {
 
             vm.changePassword();
 
-            expect(vm.error).toEqual('error.password.short');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordTooShort');
         });
 
         it('should set error message if password is too short', function() {
@@ -119,7 +119,7 @@ describe('ResetPasswordController', function() {
 
             vm.changePassword();
 
-            expect(vm.error).toEqual('error.password.number');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordMustContainNumber');
         });
     });
 

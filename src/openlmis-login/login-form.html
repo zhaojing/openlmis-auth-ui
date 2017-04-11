@@ -1,29 +1,29 @@
 <div class="login-container">
     <div class="modal-login-header">
-        <h1>{{'label.app.header' | message}}</h1>
+        <h1>{{'openlmisLogin.appHeader' | message}}</h1>
         <openlmis-locale class="locale-container"/>
     </div>
 
     <div class="login-form">
-        <h2 id="signInLabel">{{'label.sign.in' | message}}</h2>
+        <h2 id="signInLabel">{{'openlmisLogin.signIn' | message}}</h2>
 
-        <form ng-controller="LoginController as vm">
+        <form ng-controller="LoginController as vm" ng-submit="vm.doLogin()">
             <div id="loginError" class="alert is-error" ng-if="vm.loginError">{{vm.loginError | message}}</div>
               <div class="form-group">
-                  <label for="login-username">{{'label.username' | message}}</label>
+                  <label for="login-username">{{'openlmisLogin.username' | message}}</label>
                   <input ng-model="vm.username" type="text" id="login-username" required autofocus/>
               </div>
               <div class="form-group">
-                  <label for="login-password">{{'label.password' | message}}</label>
+                  <label for="login-password">{{'openlmisLogin.password' | message}}</label>
                   <input ng-model="vm.password" type="password" id="login-password" required/>
               </div>
               <div class="button-group">
-                  <button class="primary" ng-click="vm.doLogin()" ng-disabled="vm.disableSignInButton">{{'button.sign.in' | message}}</button>
-                  <a id="forgotPasswordLink" ng-click="vm.goToForgotPassword()">{{'link.forgot.password' | message}}</a>
+                  <input type="submit" value="{{'openlmisLogin.signIn' | message}}"/>
+                  <a id="forgotPasswordLink" ng-click="vm.goToForgotPassword()">{{'openlmisLogin.forgotPassword' | message}}</a>
               </div>
         </form>
     </div>
     <div class="powered-by">
-        <a href="http://openlmis.org" target="_blank">{{'powered.by' | message:({openlmis:'OpenLMIS'})}}</a>
+        <a href="http://openlmis.org" target="_blank">{{'openlmisLogin.poweredBy' | message:({openlmis:'OpenLMIS'})}}</a>
     </div>
 </div>

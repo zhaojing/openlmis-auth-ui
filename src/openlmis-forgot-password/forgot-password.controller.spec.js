@@ -79,7 +79,7 @@ describe('ForgotPasswordController', function() {
             deferred.reject();
             $rootScope.$apply();
 
-            expect(vm.error).toEqual('msg.forgot.password.failed');
+            expect(vm.error).toEqual('openlmisForgotPassword.passwordResetFailure');
         });
 
         it('should set error message when email is not valid', function() {
@@ -87,7 +87,7 @@ describe('ForgotPasswordController', function() {
 
             vm.forgotPassword();
 
-            expect(vm.error).toEqual('user.email.invalid');
+            expect(vm.error).toEqual('openlmisForgotPassword.invalidEmail');
         });
     });
 

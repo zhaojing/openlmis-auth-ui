@@ -83,7 +83,7 @@
             } else if(toState.accessRights && !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired)) {
                 // checking rights to enter state
                 event.preventDefault();
-                alertService.error('error.authorization');
+                alertService.error('openlmisAuth.authorization.error');
             }
         }
 

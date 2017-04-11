@@ -50,13 +50,15 @@
         function forgotPassword() {
             if(validateEmail()) {
                 loginService.forgotPassword(vm.email).then(function() {
-                    alertService.success('email.sent.message', 'email.check.message')
-                        .then(redirectToLogin);
+                    alertService.success(
+                        'openlmisForgotPassword.resetPasswordAlert.title',
+                        'openlmisForgotPassword.resetPasswordAlert.message'
+                    ).then(redirectToLogin);
                 }, function() {
-                    vm.error = 'msg.forgot.password.failed';
+                    vm.error = 'openlmisForgotPassword.passwordResetFailure';
                 });
             } else {
-                vm.error = 'user.email.invalid';
+                vm.error = 'openlmisForgotPassword.invalidEmail';
             }
         }
 

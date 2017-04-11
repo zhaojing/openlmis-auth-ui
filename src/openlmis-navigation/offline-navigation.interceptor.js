@@ -36,7 +36,7 @@
             if(offlineService.isOffline() && !toState.isOffline){
                 event.preventDefault();
                 loadingModalService.close();
-                alertService.error('navigation.state.offline');
+                alertService.error('openlmisNavigation.notAvailableOffline');
             }
         }
     }

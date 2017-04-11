@@ -132,7 +132,7 @@ describe('accessTokenInterceptor', function() {
 
             provider.responseError(response);
 
-            expect(alertMock.error).toHaveBeenCalledWith('error.authorization');
+            expect(alertMock.error).toHaveBeenCalledWith('openlmisAuth.authorization.error');
         });
 
         it('should reject response', function() {

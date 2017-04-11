@@ -48,9 +48,10 @@
         function changePassword() {
             if(arePasswordsValid()) {
                 loginService.changePassword(vm.password, vm.token).then(function() {
-                    alertService.success('password.reset.success').then(redirectToLogin);
+                    alertService.success('openlmisResetPassword.passwordReset.success')
+                        .then(redirectToLogin);
                 }, function() {
-                    vm.error = 'msg.change.password.failed';
+                    vm.error = 'openlmisResetPassword.passwordReset.failure';
                 });
             }
         }
@@ -59,13 +60,13 @@
             var regex = /\d/g;
 
             if(vm.password !== vm.reenteredPassword) {
-                vm.error = 'error.password.mismatch';
+                vm.error = 'openlmisResetPassword.passwordMismatch';
                 return false;
             } else if(vm.password.length < 8) {
-                vm.error = 'error.password.short';
+                vm.error = 'openlmisResetPassword.passwordTooShort';
                 return false;
             } else if(!regex.test(vm.password)) {
-                vm.error = 'error.password.number';
+                vm.error = 'openlmisResetPassword.passwordMustContainNumber';
                 return false;
             }
             return true;

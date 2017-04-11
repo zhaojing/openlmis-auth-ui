@@ -39,28 +39,6 @@
         /**
          * @ngdoc method
          * @methodOf openlmis-login.controller:LoginController
-         * @name  validateLoginForm
-         *
-         * @description
-         * Checks username and password  variables, and returns true or shows an appropriate error message before the actual login request happens.
-         *
-         * @return {Boolean} true if login form is valid, false otherwise
-         */
-        function validateLoginForm() {
-            if (vm.username === undefined || vm.username.trim() === '') {
-                vm.loginError = 'error.login.username';
-                return false;
-            }
-            if (vm.password === undefined) {
-                vm.loginError = 'error.login.password';
-                return false;
-            }
-            return true;
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-login.controller:LoginController
          * @name doLogin
          *
          * @description
@@ -69,10 +47,6 @@
          * On success a 'auth.login' event is emitted.
          */
         function doLogin() {
-            if (!validateLoginForm()) {
-                return;
-            }
-
             vm.disableSignInButton = true;
             loginService.login(vm.username, vm.password).catch(function(){
                 vm.loginError = 'user.login.error';
