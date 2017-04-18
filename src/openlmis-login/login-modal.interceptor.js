@@ -79,7 +79,7 @@
          * Hides login modal and updates access token.
          */
         function onLoginModal() {
-            dialog.modal('hide');
+            if(dialog) dialog.modal('hide');
             dialog = undefined;
             dialogScope.$destroy();
 
