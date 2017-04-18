@@ -56,7 +56,7 @@ describe("LoginController", function() {
         vm.doLogin();
         $rootScope.$apply();
 
-        expect(vm.loginError).toEqual('user.login.error');
+        expect(vm.loginError).toEqual('openlmisLogin.invalidCredentials');
     });
 
     it('should clear password on failed login attempt', function() {
