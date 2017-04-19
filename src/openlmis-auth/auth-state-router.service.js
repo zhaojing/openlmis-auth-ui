@@ -55,7 +55,7 @@
                 if (savedToState) {
                     goToSavedState();
                 } else {
-                    $state.go('home');
+                    $state.go('openlmis.home');
                 }
             });
 
@@ -79,7 +79,7 @@
             } else if(authorizationService.isAuthenticated() && toState.name.indexOf('auth') == 0) {
                 // if authenticated and on login page
                 event.preventDefault();
-                $state.go('home');
+                $state.go('openlmis.home');
             } else if(toState.accessRights && !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired)) {
                 // checking rights to enter state
                 event.preventDefault();
