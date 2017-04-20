@@ -46,7 +46,7 @@ describe('authStateRouter', function() {
     it('will redirect user to login if auth token is not set and state is home', function() {
         authorizationServiceSpy.isAuthenticated.andReturn(false);
 
-        $rootScope.$broadcast('$stateChangeStart', createState('home'));
+        $rootScope.$broadcast('$stateChangeStart', createState('openlmis.home'));
 
         expect(stateSpy.go).toHaveBeenCalledWith('auth.login');
     });

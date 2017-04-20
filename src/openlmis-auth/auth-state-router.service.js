@@ -63,7 +63,7 @@
         }
 
         function reroute(event, toState, toParams, fromState, fromParams) {
-            if(!authorizationService.isAuthenticated() && toState.name.indexOf('auth') != 0 && toState.name.indexOf('home') != 0){
+            if(!authorizationService.isAuthenticated() && toState.name.indexOf('auth') != 0 && toState.name.indexOf('openlmis.home') != 0){
                 // if not authenticated and not on login page or home page
                 event.preventDefault();
                 loadingModalService.close();
@@ -72,7 +72,7 @@
                 }
                 savedToState = toState.name;
                 savedToParams = toParams;
-            } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('home') == 0){
+            } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') == 0){
                 // if not authenticated and on home page
                 event.preventDefault();
                 $state.go('auth.login');
