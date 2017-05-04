@@ -79,9 +79,15 @@
          * Hides login modal and updates access token.
          */
         function onLoginModal() {
-            if(dialog) dialog.modal('hide');
-            dialog = undefined;
-            dialogScope.$destroy();
+            if (dialog) {
+                dialog.modal('hide');
+                dialog = undefined;
+            }
+
+            if (dialogScope) {
+                dialogScope.$destroy();
+                dialogScope = undefined;
+            }
 
             if (noRetryRequest === true) {
                 $rootScope.$emit('event:auth-loggedIn');

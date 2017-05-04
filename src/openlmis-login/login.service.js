@@ -141,16 +141,18 @@
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                url: authUrl('/api/users/auth/logout')
+                url: authUrl('/api/users/auth/logout'),
+                ignoreAuthModule: true
             }).then(function() {
-
-                authorizationService.clearAccessToken();
-                authorizationService.clearUser();
-                authorizationService.clearRights();
-
+                clearUserData();
                 deferred.resolve();
-            }).catch(function(){
-                deferred.reject();
+            }, function(data) {
+                if (data.status === 401) {
+                    clearUserData();
+                    deferred.resolve();
+                } else {
+                    deferred.reject();
+                }
             });
             return deferred.promise;
         }
@@ -280,6 +282,12 @@
                 $rootScope.$emit('auth.login-modal');
             }
             deferred.resolve();
+        }
+
+        function clearUserData() {
+            authorizationService.clearAccessToken();
+            authorizationService.clearUser();
+            authorizationService.clearRights();
         }
     }
 

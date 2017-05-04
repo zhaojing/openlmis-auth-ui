@@ -152,46 +152,97 @@ describe('loginService', function() {
         });
     });
 
-    it('should clear user data on logout for online user', function(){
-        spyOn(authorizationService, 'clearAccessToken');
-        spyOn(authorizationService, 'clearUser');
-        spyOn(authorizationService, 'clearRights');
+    describe('logout', function() {
 
-        // Login a user
-        loginService.login('john', 'john-password');
-        httpBackend.flush();
-        $rootScope.$apply();
+        beforeEach(function() {
+            // Login a user
+            loginService.login('john', 'john-password');
+            httpBackend.flush();
+            $rootScope.$apply();
+        });
 
-        httpBackend.when('POST', '/api/users/auth/logout')
-        .respond(200);
+        it('should resolve promise if response status is 401', function() {
+            var resolved = false;
 
-        loginService.logout();
+            httpBackend.when('POST', '/api/users/auth/logout')
+            .respond(401);
 
-        httpBackend.flush();
-        $rootScope.$apply();
+            loginService.logout().then(function() {
+                resolved = true;
+            });
 
-        // User credentials are removed.
-        expect(authorizationService.clearAccessToken).toHaveBeenCalled();
-        expect(authorizationService.clearUser).toHaveBeenCalled();
-        expect(authorizationService.clearRights).toHaveBeenCalled();
+            httpBackend.flush();
+            $rootScope.$apply();
 
-    });
+            expect(resolved).toBe(true);
+        });
 
-    it('should clear user data on logout for offline user', function(){
-        spyOn(offlineService, 'isOffline').andReturn(true);
-        spyOn(authorizationService, 'clearAccessToken');
-        spyOn(authorizationService, 'clearUser');
-        spyOn(authorizationService, 'clearRights');
+        it('should clear user data on 401 response', function() {
+            spyOn(authorizationService, 'clearAccessToken');
+            spyOn(authorizationService, 'clearUser');
+            spyOn(authorizationService, 'clearRights');
 
-        loginService.login('john', 'john-password');
-        $rootScope.$apply();
+            // Login a user
+            loginService.login('john', 'john-password');
+            httpBackend.flush();
+            $rootScope.$apply();
 
-        loginService.logout();
-        $rootScope.$apply();
+            httpBackend.when('POST', '/api/users/auth/logout')
+            .respond(401);
 
-        expect(authorizationService.clearAccessToken).toHaveBeenCalled();
-        expect(authorizationService.clearUser).toHaveBeenCalled();
-        expect(authorizationService.clearRights).toHaveBeenCalled();
+            loginService.logout();
+
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            // User credentials are removed.
+            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
+            expect(authorizationService.clearUser).toHaveBeenCalled();
+            expect(authorizationService.clearRights).toHaveBeenCalled();
+        });
+
+        it('should clear user data on logout for online user', function(){
+            spyOn(authorizationService, 'clearAccessToken');
+            spyOn(authorizationService, 'clearUser');
+            spyOn(authorizationService, 'clearRights');
+
+            // Login a user
+            loginService.login('john', 'john-password');
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            httpBackend.when('POST', '/api/users/auth/logout')
+            .respond(200);
+
+            loginService.logout();
+
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            // User credentials are removed.
+            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
+            expect(authorizationService.clearUser).toHaveBeenCalled();
+            expect(authorizationService.clearRights).toHaveBeenCalled();
+
+        });
+
+        it('should clear user data on logout for offline user', function(){
+            spyOn(offlineService, 'isOffline').andReturn(true);
+            spyOn(authorizationService, 'clearAccessToken');
+            spyOn(authorizationService, 'clearUser');
+            spyOn(authorizationService, 'clearRights');
+
+            loginService.login('john', 'john-password');
+            $rootScope.$apply();
+
+            loginService.logout();
+            $rootScope.$apply();
+
+            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
+            expect(authorizationService.clearUser).toHaveBeenCalled();
+            expect(authorizationService.clearRights).toHaveBeenCalled();
+
+        });
 
     });
 
