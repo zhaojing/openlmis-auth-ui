@@ -182,7 +182,7 @@
 
         function sortStates(states) {
             angular.forEach(states, function(state) {
-                if(!state.priority) state.priority = 0;
+                if(!state.priority) state.priority = 10;
             });
             var sorted = $filter('orderBy')(states, ['-priority', 'name']);
             sorted.forEach(function(state) {
