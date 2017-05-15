@@ -2,11 +2,11 @@
   "openlmisForgotPassword.appHeader": "Logistics Management Information System",
   "openlmisForgotPassword.cancel": "Cancel",
   "openlmisForgotPassword.email": "Email",
-  "openlmisForgotPassword.forgotPassword": "Forgot password",
+  "openlmisForgotPassword.forgotPassword": "Forgot Password",
   "openlmisForgotPassword.invalidEmail": "Invalid email address format",
   "openlmisForgotPassword.passwordResetFailure": "Failed to reset password. No user with given email address assigned was found.",
   "openlmisForgotPassword.poweredBy": "Powered by ${openlmis}",
-  "openlmisForgotPassword.resetPassword.label": "Reset password",
+  "openlmisForgotPassword.resetPassword.label": "Reset Password",
   "openlmisForgotPassword.resetPassword.message": "Please provide your email address and we will send you a reset password link on your registered email.",
   "openlmisForgotPassword.resetPasswordAlert.message": "An email with a password reset token has been sent to the email address you provided.",
   "openlmisForgotPassword.resetPasswordAlert.title": "Email sent!"
