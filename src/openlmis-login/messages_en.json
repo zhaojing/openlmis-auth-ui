@@ -3,7 +3,7 @@
   "openlmisLogin.forgotPassword": "Forgot password?",
   "openlmisLogin.password": "Password",
   "openlmisLogin.poweredBy": "Powered by ${openlmis}",
-  "openlmisLogin.signIn": "Sign in",
+  "openlmisLogin.signIn": "Sign In",
   "openlmisLogin.username": "Username",
   "openlmisLogin.invalidCredentials": "The username or password you entered is incorrect. Please try again."
 }
