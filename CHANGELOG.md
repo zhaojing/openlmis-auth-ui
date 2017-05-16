@@ -1,3 +1,10 @@
+5.0.1 / Coming soon
+==================
+
+Bug fixes
+
+* [OLMIS-2445](https://openlmis.atlassian.net/browse/OLMIS-2445) - Button and title capitalization are consistent.
+
 5.0.0 / 2017-05-08
 ==================
 
