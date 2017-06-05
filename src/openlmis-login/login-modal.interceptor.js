@@ -67,7 +67,6 @@
                     className: 'login-modal'
                 });
             });
-            loadingModalService.close();
         }
 
         /**

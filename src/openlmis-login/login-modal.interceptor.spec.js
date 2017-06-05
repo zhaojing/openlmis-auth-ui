@@ -48,13 +48,6 @@ describe("LoginModalInterceptor", function() {
       expect(bootbox.dialog).toHaveBeenCalled();
   });
 
-  it('should close loading dialog on event:auth-loginRequired', function () {
-      $rootScope.$broadcast('event:auth-loginRequired');
-      $rootScope.$apply();
-
-      expect(loadingModalService.close).toHaveBeenCalled();
-  });
-
   it('should emit event:auth-loggedIn on auth.login-modal if no retry request', function () {
       $rootScope.$broadcast('event:auth-loginRequired', true);
       $rootScope.$apply();
