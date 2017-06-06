@@ -70,4 +70,11 @@ describe("LoginModalInterceptor", function() {
       expect(authService.loginConfirmed).toHaveBeenCalled();
   }));
 
+  it('should close loading dialog on event:auth-loginRequired', function () {
+      $rootScope.$broadcast('event:auth-loginRequired');
+      $rootScope.$apply();
+
+      expect(loadingModalService.close).toHaveBeenCalled();
+  });
+
 });

@@ -13,7 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 (function() {
 
     'use strict';
@@ -38,7 +37,7 @@
     function loginRequiredInterceptor($rootScope, $compile, bootbox, $templateRequest,
                                       loadingModalService, authService, accessTokenFactory) {
 
-        var noRetryRequest, dialog, dialogScope;
+        var noRetryRequest, dialog, dialogScope, wasLoadingModalOpened;
 
         $rootScope.$on('event:auth-loginRequired', onLoginRequired);
         $rootScope.$on('auth.login-modal', onLoginModal);
@@ -59,6 +58,7 @@
 
             if (dialogScope) dialogScope.$destroy();
             dialogScope = $rootScope.$new();
+            wasLoadingModalOpened = loadingModalService.isOpened ? true : false;
 
             $templateRequest('openlmis-login/login-form.html').then(function(html) {
                 dialog = bootbox.dialog({
@@ -67,6 +67,8 @@
                     className: 'login-modal'
                 });
             });
+
+            loadingModalService.close();
         }
 
         /**
@@ -78,6 +80,9 @@
          * Hides login modal and updates access token.
          */
         function onLoginModal() {
+            if (wasLoadingModalOpened) loadingModalService.open();
+            wasLoadingModalOpened = undefined;
+
             if (dialog) {
                 dialog.modal('hide');
                 dialog = undefined;

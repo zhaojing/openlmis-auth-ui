@@ -1,3 +1,10 @@
+5.0.2 / WIP
+===========
+
+Bug fixes
+
+* [OLMIS-2548](https://openlmis.atlassian.net/browse/OLMIS-2548): Fixed lack of loading modal after re-authenticating.
+
 5.0.1 / 2017-05-26
 ==================
 
