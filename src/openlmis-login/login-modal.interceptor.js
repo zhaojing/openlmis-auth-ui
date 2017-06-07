@@ -58,7 +58,7 @@
 
             if (dialogScope) dialogScope.$destroy();
             dialogScope = $rootScope.$new();
-            wasLoadingModalOpened = loadingModalService.isOpened ? true : false;
+            wasLoadingModalOpened = angular.copy(loadingModalService.isOpened);
 
             $templateRequest('openlmis-login/login-form.html').then(function(html) {
                 dialog = bootbox.dialog({
