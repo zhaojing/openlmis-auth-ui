@@ -69,14 +69,14 @@ describe("LoginController", function() {
         expect(vm.password).toBe(undefined);
     });
 
-    it('should clear password on successful login attempt', function() {
+    it('should not clear password on successful login attempt', function() {
         vm.username = "john";
-        vm.password = "john-password";
+        vm.password = "good-password";
 
         vm.doLogin();
         $rootScope.$apply();
 
-        expect(vm.password).toBe(undefined);
+        expect(vm.password).toBe('good-password');
     });
 
     it('should should go to forgot password state', function() {

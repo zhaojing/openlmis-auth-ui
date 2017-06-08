@@ -50,8 +50,6 @@
             vm.disableSignInButton = true;
             loginService.login(vm.username, vm.password).catch(function(){
                 vm.loginError = 'openlmisLogin.invalidCredentials';
-            }).finally(function(){
-                vm.disableSignInButton = false;
                 vm.password = undefined;
             });
         }

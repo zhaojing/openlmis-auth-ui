@@ -4,6 +4,8 @@
 Bug fixes
 
 * [OLMIS-2548](https://openlmis.atlassian.net/browse/OLMIS-2548): Fixed lack of loading modal after re-authenticating.
+* [OLMIS-2637](https://openlmis.atlassian.net/browse/OLMIS-2637): Red password error message will no
+longer show when logging in.
 
 5.0.1 / 2017-05-26
 ==================
