@@ -47,7 +47,6 @@
          * On success a 'auth.login' event is emitted.
          */
         function doLogin() {
-            vm.disableSignInButton = true;
             loginService.login(vm.username, vm.password).catch(function(){
                 vm.loginError = 'openlmisLogin.invalidCredentials';
                 vm.password = undefined;
