@@ -129,10 +129,13 @@ describe('accessTokenInterceptor', function() {
 
         it('should show error.atuhorization alert on 403 status', function() {
             response.status = 403;
+            response.data = {};
+            response.data.message = 'Test message';
 
             provider.responseError(response);
 
-            expect(alertMock.error).toHaveBeenCalledWith('openlmisAuth.authorization.error');
+            expect(alertMock.error)
+                .toHaveBeenCalledWith('openlmisAuth.authorization.error', 'Test message');
         });
 
         it('should reject response', function() {
