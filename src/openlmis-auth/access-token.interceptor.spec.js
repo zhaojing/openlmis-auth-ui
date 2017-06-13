@@ -127,7 +127,7 @@ describe('accessTokenInterceptor', function() {
 
         });
 
-        it('should show error.atuhorization alert on 403 status', function() {
+        it('should show error.authorization alert on 403 status', function() {
             response.status = 403;
             response.data = {message: 'Test message'};
 
@@ -135,6 +135,19 @@ describe('accessTokenInterceptor', function() {
 
             expect(alertMock.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
+        });
+
+        it('should not call with message when message is null on 403', function() {
+            response.status = 403;
+            response.data = {message: null};
+
+            provider.responseError(response);
+
+            expect(alertMock.error)
+                .not
+                .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
+            expect(alertMock.error)
+                .toHaveBeenCalledWith('openlmisAuth.authorization.error');
         });
 
         it('should reject response', function() {

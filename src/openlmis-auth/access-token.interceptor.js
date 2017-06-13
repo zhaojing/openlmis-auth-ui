@@ -88,8 +88,14 @@
                 authorizationService.clearUser();
                 authorizationService.clearRights();
             } else if (response.status === 403) {
-                $injector.get('alertService')
-                    .error('openlmisAuth.authorization.error', response.data.message);
+
+                if (response.data && response.data.message) {
+                    $injector.get('alertService')
+                        .error('openlmisAuth.authorization.error', response.data.message);
+                } else {
+                    $injector.get('alertService')
+                        .error('openlmisAuth.authorization.error');
+                }
             }
             return $q.reject(response);
         }
