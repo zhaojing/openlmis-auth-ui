@@ -16,16 +16,28 @@
 
 describe('LogoutController', function() {
 
-    var loginService, $state, $rootScope, $q, vm;
+    var loginService, $state, $rootScope, $q, vm, isOffline, confirmService;
 
     beforeEach(function() {
         module('openlmis-logout');
 
         inject(function($injector) {
-            $state = $injector.get('$state');
-            loginService = $injector.get('loginService');
             $q = $injector.get('$q');
             $rootScope = $injector.get('$rootScope');
+
+            loginService = $injector.get('loginService');
+            spyOn(loginService, 'logout').andReturn($q.when(true));
+            
+            $state = $injector.get('$state');
+            spyOn($state, 'go').andReturn();
+
+            isOffline = false;
+            offlineService = $injector.get('offlineService');
+            spyOn(offlineService, 'isOffline').andCallFake(function(){
+                return isOffline;
+            });
+
+            confirmService = $injector.get('confirmService');
 
             vm = $injector.get('$controller')('LogoutController', {});
         });
@@ -34,9 +46,6 @@ describe('LogoutController', function() {
     describe('logout', function() {
 
         beforeEach(function() {
-            spyOn(loginService, 'logout').andReturn($q.when(true));
-            spyOn($state, 'go').andReturn();
-
             vm.logout();
             $rootScope.$apply();
         });
@@ -52,5 +61,47 @@ describe('LogoutController', function() {
         it('should redirect to login page', function() {
             expect($state.go).toHaveBeenCalledWith('auth.login');
         });
+
+    });
+
+    describe('logout offline', function() {
+        var doesConfirm;
+
+        beforeEach(function(){
+            isOffline = true;
+
+            spyOn(confirmService, 'confirm').andCallFake(function(){
+                if(doesConfirm) {
+                    return $q.resolve();
+                } else {
+                    return $q.reject();
+                }
+            });
+
+        });
+
+        it('will show a confirmation modal if attempting to logout while offline', function(){
+            vm.logout();
+            $rootScope.$apply();
+
+            expect(confirmService.confirm).toHaveBeenCalled();
+        });
+
+        it('user will be logged out only if they confirm', function(){
+            
+            doesConfirm = false;
+            vm.logout();
+            $rootScope.$apply();
+            
+            expect(loginService.logout).not.toHaveBeenCalled();
+
+            doesConfirm = true;
+            vm.logout();
+            $rootScope.$apply();
+
+            expect(loginService.logout).toHaveBeenCalled();
+        });
+
+
     });
 });

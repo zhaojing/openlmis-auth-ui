@@ -1,3 +1,5 @@
 {
-    "openlmisLogout.logout": "Logout"
+    "openlmisLogout.logout": "Logout",
+    "openlmisLogout.offlineLogoutDescription": "",
+    "openlmisLogout.offlineLogout": ""
 }
