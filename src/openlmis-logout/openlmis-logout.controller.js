@@ -46,8 +46,7 @@
         function logout() {
             if(offlineService.isOffline()) {
                 confirmService.confirm(
-                    'openlmisLogout.offlineLogout',
-                    'openlmisLogout.offlineLogoutDescription',
+                    'openlmisLogout.offlineWarning',
                     'openlmisLogout.logout'
                 )
                 .then(doLogout);

@@ -1,5 +1,4 @@
 {
     "openlmisLogout.logout": "Logout",
-    "openlmisLogout.offlineLogoutDescription": "",
-    "openlmisLogout.offlineLogout": ""
+    "openlmisLogout.offlineWarning": "Logging out while offline means you won't be able to login again until you are online."
 }
