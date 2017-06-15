@@ -51,21 +51,13 @@
          *
          * @description
          * Makes an HTTP request to login the user while online.
-         * If user is offline it checks user credentials with those stored in local storage.
+         * 
          * This method returns a function that will return a promise with no value.
          *
          * @param {String} username The name of the person trying to login
          * @param {String} password The password the person is trying to login with
          */
         function login(username, password) {
-            if(offlineService.isOffline()) {
-                return loginOffline(username, password);
-            }
-            return loginOnline(username, password);
-        }
-
-
-        function loginOnline(username, password) {
             var deferred = $q.defer(),
                 httpPromise = $http({
                     method: 'POST',
@@ -81,7 +73,7 @@
                 authorizationService.setAccessToken(response.data.access_token);
                 getUserInfo(response.data.referenceDataUserId).then(function(referencedataUsername) {
                     getUserRights(response.data.referenceDataUserId).then(function(userRights) {
-                        authorizationService.saveOfflineUserData(username, password, response.data.referenceDataUserId, referencedataUsername, userRights);
+                        authorizationService.saveOfflineUserData(username, response.data.referenceDataUserId, referencedataUsername, userRights);
                         currencyService.getCurrencySettings().then(function() {
                             emitEventAndResolve(deferred);
                         }, function(){
@@ -105,29 +97,14 @@
             return deferred.promise;
         }
 
-        function loginOffline(username, password) {
-            var deferred = $q.defer(),
-                userData = authorizationService.getOfflineUserData(username);
-
-            if(userData && userData.password === authorizationService.hashPassword(password)) {
-                authorizationService.setUser(userData.id, userData.referencedataUsername);
-                authorizationService.setRights(userData.rights);
-                authorizationService.setAccessToken('token');
-                emitEventAndResolve(deferred);
-            } else {
-                deferred.reject();
-            }
-
-            return deferred.promise;
-        }
-
         /**
          * @ngdoc method
          * @methodOf openlmis-login.loginService
          * @name logout
          *
          * @description
-         * Calls the server, and removes from authorization service.
+         * Calls the server if online, then removes user data from
+         * authorization service.
          */
         function logout() {
             if(offlineService.isOffline()) {
@@ -158,15 +135,11 @@
         }
 
         function logoutOffline() {
-            var deferred = $q.defer();
-
             authorizationService.clearAccessToken();
             authorizationService.clearUser();
             authorizationService.clearRights();
 
-            deferred.resolve();
-
-            return deferred.promise;
+            return $q.resolve();
         }
 
         function getUserInfo(userId){

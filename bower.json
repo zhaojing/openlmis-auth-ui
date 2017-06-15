@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "angular-http-auth": "^1.5",
-    "angular-md5": "0.1.10"
+    "angular-http-auth": "^1.5"
   }
 }

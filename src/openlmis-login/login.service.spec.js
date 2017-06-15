@@ -121,16 +121,6 @@ describe('loginService', function() {
             expect(success).toBe(true);
         });
 
-        it('should get offline user data if user is offline', function() {
-            spyOn(offlineService, 'isOffline').andReturn(true);
-            spyOn(authorizationService, 'getOfflineUserData').andReturn($q.when());
-
-            loginService.login('john', 'john-password');
-            $rootScope.$apply();
-
-            expect(authorizationService.getOfflineUserData).toHaveBeenCalledWith('john');
-        });
-
         it('should get user data if user is online', function(){
             loginService.login('john', 'john-password');
             httpBackend.flush();
@@ -231,9 +221,6 @@ describe('loginService', function() {
             spyOn(authorizationService, 'clearAccessToken');
             spyOn(authorizationService, 'clearUser');
             spyOn(authorizationService, 'clearRights');
-
-            loginService.login('john', 'john-password');
-            $rootScope.$apply();
 
             loginService.logout();
             $rootScope.$apply();

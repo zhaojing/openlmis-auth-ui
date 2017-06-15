@@ -38,9 +38,9 @@
         'USER_ROLE_ASSIGNMENTS': 'ROLE_ASSIGNMENTS'
     };
 
-    service.$inject = ['$q', 'localStorageService', '$injector', '$filter', 'localStorageFactory', 'md5']
+    service.$inject = ['$q', 'localStorageService', '$injector', '$filter', 'localStorageFactory'];
 
-    function service($q, localStorageService, $injector, $filter, localStorageFactory, md5) {
+    function service($q, localStorageService, $injector, $filter, localStorageFactory) {
 
         var offlineUserData = localStorageFactory('userData');
 
@@ -59,7 +59,6 @@
         this.getRightByName = getRightByName;
         this.saveOfflineUserData = saveOfflineUserData;
         this.getOfflineUserData = getOfflineUserData;
-        this.hashPassword = hashPassword;
 
         /**
          * @ngdoc method
@@ -321,11 +320,10 @@
          * @param  {Array}  username name of offline user
          * @return {Object}          right which has the given name
          */
-        function saveOfflineUserData(username, password, userId, referencedataUsername, userRights) {
+        function saveOfflineUserData(username, userId, referencedataUsername, userRights) {
             if(offlineUserData.getBy('username', username)) offlineUserData.removeBy('username', username);
             offlineUserData.put({
                 username: username,
-                password: hashPassword(password),
                 id: userId,
                 referencedataUsername: referencedataUsername,
                 rights: userRights
@@ -347,20 +345,6 @@
             return offlineUserData.getBy('username', username);
         }
 
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-auth.authorizationService
-         * @name  hashPassword
-         *
-         * @description
-         * Returns hashed password.
-         *
-         * @param  {String} password offline user's password
-         * @return {Object}          hashed password
-         */
-        function hashPassword(password) {
-            return md5.createHash(password || '');
-        }
     }
 
 })();
