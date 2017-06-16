@@ -2,7 +2,7 @@
 ===========
 
 New functionality added in backwards-compatiable manner
-* [OLMIS-2553:]() Removed login offline functionality and added warning when logging out while offline.
+* [OLMIS-2553](https://openlmis.atlassian.net/browse/OLMIS-2553): Removed login offline functionality and added warning when logging out while offline.
 
 Bug fixes
 
