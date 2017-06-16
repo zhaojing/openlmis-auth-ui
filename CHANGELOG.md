@@ -1,6 +1,9 @@
 5.0.2 / WIP
 ===========
 
+New functionality added in backwards-compatiable manner
+* [OLMIS-2553:]() Removed login offline functionality and added warning when logging out while offline.
+
 Bug fixes
 
 * [OLMIS-2548](https://openlmis.atlassian.net/browse/OLMIS-2548): Fixed lack of loading modal after re-authenticating.
