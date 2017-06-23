@@ -24,12 +24,15 @@
      * @description
      * Controller that drives the login form.
      */
-    angular.module('openlmis-login')
-    .controller('LoginController', LoginController);
+    angular
+        .module('openlmis-login')
+        .controller('LoginController', LoginController);
 
-    LoginController.$inject = ['$state', 'bootbox', 'loginService', 'localStorageService'];
+    LoginController.$inject = [
+        '$state', 'bootbox', 'loginService', 'localStorageService', 'modalDeferred'
+    ];
 
-    function LoginController($state, bootbox, loginService, localStorageService) {
+    function LoginController($state, bootbox, loginService, localStorageService, modalDeferred) {
 
         var vm = this;
 
@@ -47,7 +50,7 @@
          * On success a 'auth.login' event is emitted.
          */
         function doLogin() {
-            loginService.login(vm.username, vm.password).catch(function(){
+            loginService.login(vm.username, vm.password).then(modalDeferred.resolve, function() {
                 vm.loginError = 'openlmisLogin.invalidCredentials';
                 vm.password = undefined;
             });
@@ -64,7 +67,6 @@
          * On success a 'auth.login' event is emitted.
          */
         function goToForgotPassword() {
-            bootbox.hideAll();
             $state.go('auth.forgotPassword');
         }
 

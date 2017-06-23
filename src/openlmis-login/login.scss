@@ -1,62 +1,46 @@
+.login-modal {
 
-.login-container {
-  background-image: linear-gradient(to bottom, $white 0%, $white 48%, $light-gray 100%);
-  border-radius: $border-radius;
+    .modal-content {
+        background-image: linear-gradient(to bottom, $white 0%, $white 48%, $light-gray 100%);
+        width: 700px;
+    }
 
-  .powered-by {
-    text-align: right;
-    padding: 0px 1em;
-    color: $gray;
-  }
-}
+    .modal-dialog {
+        margin-top: 15%;
+    }
 
-.login-form {
-  background-image: url("common/openlmis-logo-stacked.svg");
-  background-size: 40% auto;
-  background-position: 2em 45%;
-  background-repeat: no-repeat;
-  padding: 1em;
-  padding-left: 50%;
+    .modal-header {
+        border-bottom: 1px solid $light-gray;
+        border-radius: $border-radius $border-radius 0 0;
+        background-image: linear-gradient(to bottom, $white 30%, $light-gray 100%);
+        padding: 0.5em 1em !important;
+    }
 
-  & > form > fieldset,
-  & > .form-desc {
-    width: 100%;
-  }
-  & > form > .alert {
-    flex: initial;
-  }
-}
+    .modal-body {
+        background-image: url("common/openlmis-logo-stacked.svg");
+        background-size: 40% auto;
+        background-position: 2em 45%;
+        background-repeat: no-repeat;
+        padding: 1em 1em 1em 50% !important;
 
-.modal-login-header {
-  @include clearfix();
-  border-bottom: 1px solid $light-gray;
-  background-image: linear-gradient(to bottom, $white 30%, $light-gray 100%);
-  padding: 0.5em 1em;
-  display: flex;
-  align-items: baseline;
-  > *{
-    flex: 0 0 auto;
-  }
+        & > .form-desc,
+        & > form > fieldset {
+            width: 100%;
+        }
 
-  > h1 {
-    flex-grow: 1;
-    flex-shrink: 1;
-    padding: 0px;
-  }
-}
+        & > form > .alert {
+            flex: initial;
+        }
+    }
 
-.login-modal .modal-content {
-    position: absolute;
-    width: 50em;
-    top: 50%;
-    transform: translateY(-50%);
-}
+    .modal-footer {
+        border-top: none;
+        text-align: right;
+        padding: 0 !important;
+        margin: 0;
+        display: flex;
+        justify-content: flex-end;
 
-.login-modal .modal-body {
-    padding: 0em !important;
-}
-
-.login-modal .login-container {
-    border-radius: $border-radius;
-    border: 1px solid $white;
+        color: $gray;
+    }
 }

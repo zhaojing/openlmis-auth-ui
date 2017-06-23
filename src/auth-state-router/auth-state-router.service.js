@@ -19,27 +19,27 @@
 
     /**
      * @ngdoc service
-     * @name openlmis-auth.authStateRouter
+     * @name auth-state-router.authStateRouter
      *
      * @description
      * Functions for initialize/reroute state.
      */
     angular
-        .module('openlmis-auth')
+        .module('auth-state-router')
         .service('authStateRouter', router);
 
     router.$inject = ['$rootScope', '$state', 'authorizationService', 'alertService',
-        'loadingModalService'
+        'loadingModalService', 'loginModalService'
     ];
 
-    function router($rootScope, $state, authorizationService, alertService, loadingModalService) {
+    function router($rootScope, $state, authorizationService, alertService, loadingModalService, loginModalService) {
         var savedToState, savedToParams;
 
         this.initialize = initialize;
 
         /**
          * @ngdoc method
-         * @methodOf openlmis-auth.authStateRouter
+         * @methodOf auth-state-router.authStateRouter
          * @name initialize
          *
          * @description
@@ -50,16 +50,6 @@
          */
         function initialize() {
             $rootScope.$on('$stateChangeStart', reroute);
-
-            $rootScope.$on('auth.login', function(){
-                if (savedToState) {
-                    goToSavedState();
-                } else {
-                    $state.go('openlmis.home');
-                }
-            });
-
-            $rootScope.$on('event:auth-loggedIn', goToSavedState);
         }
 
         function reroute(event, toState, toParams, fromState, fromParams) {
@@ -68,10 +58,10 @@
                 event.preventDefault();
                 loadingModalService.close();
                 if (fromState.name.indexOf('auth.login') !== 0) {
-                    $rootScope.$emit('event:auth-loginRequired', true);
+                    loginModalService.open().then(function() {
+                        $state.go(toState.name, toParams)
+                    });
                 }
-                savedToState = toState.name;
-                savedToParams = toParams;
             } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') == 0){
                 // if not authenticated and on home page
                 event.preventDefault();

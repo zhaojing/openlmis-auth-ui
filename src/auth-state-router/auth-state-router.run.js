@@ -12,23 +12,18 @@
  * the GNU Affero General Public License along with this program. If not, see
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
-
 (function() {
 
     'use strict';
 
     angular
-        .module('openlmis-auth')
-        .run(run);
+        .module('auth-state-router')
+        .run(authStateRouterRun);
 
-    run.$inject = ['$rootScope', 'authorizationService'];
+    authStateRouterRun.$inject = ['authStateRouter'];
 
-    function run($rootScope, authorizationService) {
-        $rootScope.$watch(function(){
-            return authorizationService.isAuthenticated();
-        }, function(auth){
-            $rootScope.userIsAuthenticated = auth;
-        });
+    function authStateRouterRun(authStateRouter) {
+        authStateRouter.initialize();
     }
 
 })();

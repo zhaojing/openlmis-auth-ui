@@ -30,17 +30,13 @@
         .run(loginRequiredInterceptor);
 
     loginRequiredInterceptor.$inject = [
-        '$rootScope', '$compile', 'bootbox', '$templateRequest', 'loadingModalService',
-        'authService', 'accessTokenFactory'
+        '$rootScope', 'authService', 'accessTokenFactory', 'loginModalService'
     ];
 
-    function loginRequiredInterceptor($rootScope, $compile, bootbox, $templateRequest,
-                                      loadingModalService, authService, accessTokenFactory) {
-
-        var noRetryRequest, dialog, dialogScope, wasLoadingModalOpened;
+    function loginRequiredInterceptor($rootScope, authService, accessTokenFactory,
+                                      loginModalService) {
 
         $rootScope.$on('event:auth-loginRequired', onLoginRequired);
-        $rootScope.$on('auth.login-modal', onLoginModal);
 
         /**
          * @ngdoc method
@@ -54,53 +50,12 @@
          * @param {Boolean} noRetryRequest true if should no retry request
          */
         function onLoginRequired(event, _noRetryRequest_) {
-            noRetryRequest = _noRetryRequest_;
-
-            if (dialogScope) dialogScope.$destroy();
-            dialogScope = $rootScope.$new();
-            wasLoadingModalOpened = angular.copy(loadingModalService.isOpened);
-
-            $templateRequest('openlmis-login/login-form.html').then(function(html) {
-                dialog = bootbox.dialog({
-                    message: $compile(html)(dialogScope),
-                    closeButton: false,
-                    className: 'login-modal'
-                });
-            });
-
-            loadingModalService.close();
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-login.loginRequiredInterceptor
-         * @name onLoginModal
-         *
-         * @description
-         * Hides login modal and updates access token.
-         */
-        function onLoginModal() {
-            if (wasLoadingModalOpened) loadingModalService.open();
-            wasLoadingModalOpened = undefined;
-
-            if (dialog) {
-                dialog.modal('hide');
-                dialog = undefined;
-            }
-
-            if (dialogScope) {
-                dialogScope.$destroy();
-                dialogScope = undefined;
-            }
-
-            if (noRetryRequest === true) {
-                $rootScope.$emit('event:auth-loggedIn');
-            } else {
+            loginModalService.open().then(function() {
                 authService.loginConfirmed(null, function(config) {
                     config.url = accessTokenFactory.updateAccessToken(config.url);
                     return config;
                 });
-            }
+            });
         }
     }
 })();

@@ -28,7 +28,14 @@
         $stateProvider.state('auth.login', {
             isOffline: true,
             url: '/login',
-            templateUrl: 'openlmis-login/login-form.html'
+            onEnter: ['$state', 'loginModalService', function($state, loginModalService) {
+                loginModalService.open().then(function() {
+                    $state.go('openlmis.home');
+                });
+            }],
+            onExit: ['loginModalService', function(loginModalService) {
+                loginModalService.close();
+            }]
         });
 
     }

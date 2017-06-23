@@ -15,10 +15,10 @@
 
 describe('authStateRouter', function() {
 
-    var $rootScope, authorizationServiceSpy, stateSpy, alertSpy;
+    var $rootScope, loginModalService, authorizationServiceSpy, stateSpy, alertSpy;
 
     beforeEach(function() {
-        module('openlmis-auth', function($provide) {
+        module('auth-state-router', function($provide) {
             stateSpy = jasmine.createSpyObj('$state', ['go']);
             alertSpy = jasmine.createSpyObj('alertService', ['error']);
             authorizationServiceSpy = jasmine.createSpyObj('authorizationService', ['hasRights',
@@ -34,11 +34,14 @@ describe('authStateRouter', function() {
 
             $provide.factory('authorizationService', function() {
                 return authorizationServiceSpy;
-            })
+            });
         });
 
-        inject(function(_$rootScope_) {
-            $rootScope = _$rootScope_;
+        inject(function($injector) {
+            $rootScope = $injector.get('$rootScope');
+            loginModalService = $injector.get('loginModalService');
+
+            spyOn(loginModalService, 'open').andCallThrough();
             spyOn($rootScope, '$emit');
         });
     });
@@ -51,21 +54,12 @@ describe('authStateRouter', function() {
         expect(stateSpy.go).toHaveBeenCalledWith('auth.login');
     });
 
-    it('will call event event:auth-loginRequired if auth token is not set and state is not home', function() {
+    it('will open login modal if auth token is not set and state is not home', function() {
         authorizationServiceSpy.isAuthenticated.andReturn(false);
 
         $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {}, createState(''));
 
-        expect($rootScope.$emit).toHaveBeenCalledWith('event:auth-loginRequired', true);
-    });
-
-    it('will not call event event:auth-loginRequired if auth token is not set and state is not home and fromState is auth.login', function() {
-        authorizationServiceSpy.isAuthenticated.andReturn(false);
-
-        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {},
-            createState('auth.login'));
-
-        expect($rootScope.$emit).not.toHaveBeenCalled();
+        expect(loginModalService.open).toHaveBeenCalled();
     });
 
       it('should close loading dialog if auth token is not set and state is not home', inject(function (loadingModalService) {
@@ -97,25 +91,6 @@ describe('authStateRouter', function() {
 
         $rootScope.$broadcast('$stateChangeStart', createState('auth.login'), {},
             createState('somewhere'));
-
-        expect(stateSpy.go).toHaveBeenCalledWith('openlmis.home');
-    });
-
-    it('should reload page on event:auth-loggedIn', function() {
-        authorizationServiceSpy.isAuthenticated.andReturn(false);
-
-        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {}, createState(''));
-        $rootScope.$broadcast('event:auth-loggedIn');
-
-        expect(stateSpy.go).toHaveBeenCalledWith('somewhere', {});
-    });
-
-    it('should go to home page on auth.login event', function() {
-        authorizationServiceSpy.isAuthenticated.andReturn(true);
-        authorizationServiceSpy.hasRights.andReturn(true);
-
-        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'));
-        $rootScope.$broadcast('auth.login');
 
         expect(stateSpy.go).toHaveBeenCalledWith('openlmis.home');
     });

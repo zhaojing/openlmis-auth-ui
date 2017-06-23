@@ -15,9 +15,10 @@
 
 describe("LoginController", function() {
 
-    var $rootScope, $state, vm;
+    var $rootScope, $state, vm, modalDeferred;
 
     beforeEach(function() {
+
         module('openlmis-login');
 
         module(function($provide){
@@ -33,7 +34,11 @@ describe("LoginController", function() {
 
             spyOn($rootScope, '$emit');
 
-            vm = $controller("LoginController", {});
+            modalDeferred = $q.defer();
+
+            vm = $controller("LoginController", {
+                modalDeferred: modalDeferred
+            });
 
             spyOn(loginService, 'login').andCallFake(function(username, password) {
                 if(password == "bad-password"){
@@ -44,8 +49,6 @@ describe("LoginController", function() {
             });
         });
     });
-
-    var $rootScope, vm;
 
     it('should not login and show error when server returns error', function() {
         vm.username = "john";

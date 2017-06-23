@@ -1,29 +1,31 @@
-<div class="login-container">
-    <div class="modal-login-header">
-        <h1>{{'openlmisLogin.appHeader' | message}}</h1>
-        <openlmis-locale class="locale-container"/>
-    </div>
-
-    <div class="login-form">
-        <h2 id="signInLabel">{{'openlmisLogin.signIn' | message}}</h2>
-
-        <form ng-controller="LoginController as vm" ng-submit="vm.doLogin()">
-            <div id="loginError" class="alert is-error" ng-if="vm.loginError">{{vm.loginError | message}}</div>
-              <div class="form-group">
-                  <label for="login-username">{{'openlmisLogin.username' | message}}</label>
-                  <input ng-model="vm.username" type="text" id="login-username" required autofocus/>
-              </div>
-              <div class="form-group">
-                  <label for="login-password">{{'openlmisLogin.password' | message}}</label>
-                  <input ng-model="vm.password" type="password" id="login-password" required/>
-              </div>
-              <div class="button-group">
-                  <input type="submit" value="{{'openlmisLogin.signIn' | message}}"/>
-                  <a id="forgotPasswordLink" ng-click="vm.goToForgotPassword()">{{'openlmisLogin.forgotPassword' | message}}</a>
-              </div>
-        </form>
-    </div>
-    <div class="powered-by">
+<div class="modal login-modal" tabindex="-1" role="dialog" aria-hidden="true">
+<!--<span role="dialog" class="sr-only"></span>-->
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h1>{{'openlmisLogin.appHeader' | message}}</h1>
+          <openlmis-locale class="locale-container"/>
+      </div>
+      <div class="modal-body">
+          <form ng-submit="vm.doLogin()">
+              <div id="loginError" class="alert is-error" ng-if="vm.loginError">{{vm.loginError | message}}</div>
+                <div class="form-group">
+                    <label for="login-username">{{'openlmisLogin.username' | message}}</label>
+                    <input ng-model="vm.username" type="text" id="login-username" required autofocus/>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">{{'openlmisLogin.password' | message}}</label>
+                    <input ng-model="vm.password" type="password" id="login-password" required/>
+                </div>
+                <div class="button-group">
+                    <input type="submit" value="{{'openlmisLogin.signIn' | message}}"/>
+                    <a id="forgotPasswordLink" ng-click="vm.goToForgotPassword()">{{'openlmisLogin.forgotPassword' | message}}</a>
+                </div>
+          </form>
+      </div>
+      <div class="modal-footer">
         <a href="http://openlmis.org" target="_blank">{{'openlmisLogin.poweredBy' | message:({openlmis:'OpenLMIS'})}}</a>
+      </div>
     </div>
+  </div>
 </div>

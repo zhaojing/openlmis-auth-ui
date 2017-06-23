@@ -26,8 +26,7 @@
     function routes($stateProvider){
 
         $stateProvider.state('auth', {
-            abstract: true,
-            templateUrl: 'openlmis-auth/auth.html'
+            abstract: true
         });
 
     }

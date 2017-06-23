@@ -15,66 +15,44 @@
 
 describe("LoginModalInterceptor", function() {
 
-  var $rootScope, bootbox, $q, loadingModalService;
+    var $q, $rootScope, loginModalService, loginDeferred, authService;
 
-  beforeEach(function() {
-      module('openlmis-login');
+    beforeEach(function() {
+        module('openlmis-login');
 
-      var mockDependency = function () {
-        var deferred = $q.defer();
-        deferred.resolve('<div></div>');
-        return deferred.promise;
-      };
+        inject(function($injector) {
+            loginModalService = $injector.get('loginModalService');
+            authService = $injector.get('authService');
+            $rootScope = $injector.get('$rootScope');
+            $q = $injector.get('$q');
+        });
 
-      module(function ($provide) {
-        $provide.value('$templateRequest', mockDependency);
-      });
-  });
+        loginDeferred = $q.defer();
+        spyOn(loginModalService, 'open').andReturn(loginDeferred.promise);
+        spyOn(authService, 'loginConfirmed');
 
-  beforeEach(inject(function(_$rootScope_, _bootbox_, _$q_, _loadingModalService_) {
-      $rootScope = _$rootScope_;
-      bootbox = _bootbox_;
-      $q = _$q_;
-      loadingModalService = _loadingModalService_;
+        $rootScope.$broadcast('event:auth-loginRequired');
+    });
 
-      spyOn(bootbox, 'dialog').andReturn({modal: jasmine.createSpy('modal')});
-      spyOn(loadingModalService, 'close');
-  }));
+    it('should open login modal dialog on event:auth-loginRequired', function() {
+        $rootScope.$apply();
 
-  it('should open login modal dialog on event:auth-loginRequired', function () {
-      $rootScope.$broadcast('event:auth-loginRequired');
-      $rootScope.$apply();
+        expect(loginModalService.open).toHaveBeenCalled();
+    });
 
-      expect(bootbox.dialog).toHaveBeenCalled();
-  });
+    it('should inform authService that the login succeeded', function() {
+        loginDeferred.resolve();
+        $rootScope.$apply();
 
-  it('should emit event:auth-loggedIn on auth.login-modal if no retry request', function () {
-      $rootScope.$broadcast('event:auth-loginRequired', true);
-      $rootScope.$apply();
-      spyOn($rootScope, '$emit');
+        expect(authService.loginConfirmed).toHaveBeenCalled();
+    });
 
-      $rootScope.$broadcast('auth.login-modal');
-      $rootScope.$apply();
+    it('should not inform authService if login failed', function() {
+        loginDeferred.reject();
+        $rootScope.$apply();
 
-      expect($rootScope.$emit).toHaveBeenCalledWith('event:auth-loggedIn');
-  });
-
-  it('should call authService.loginConfirmed on auth.login-modal if retry request', inject(function (authService) {
-      $rootScope.$broadcast('event:auth-loginRequired');
-      $rootScope.$apply();
-      spyOn(authService, 'loginConfirmed');
-
-      $rootScope.$broadcast('auth.login-modal');
-      $rootScope.$apply();
-
-      expect(authService.loginConfirmed).toHaveBeenCalled();
-  }));
-
-  it('should close loading dialog on event:auth-loginRequired', function () {
-      $rootScope.$broadcast('event:auth-loginRequired');
-      $rootScope.$apply();
-
-      expect(loadingModalService.close).toHaveBeenCalled();
-  });
+        expect(loginModalService.open).toHaveBeenCalled();
+        expect(authService.loginConfirmed).not.toHaveBeenCalled();
+    });
 
 });
