@@ -28,15 +28,21 @@
         $stateProvider.state('auth.login', {
             isOffline: true,
             url: '/login',
-            onEnter: ['$state', 'loginModalService', function($state, loginModalService) {
-                loginModalService.open().then(function() {
-                    $state.go('openlmis.home');
-                });
-            }],
-            onExit: ['loginModalService', function(loginModalService) {
-                loginModalService.close();
-            }]
+            onEnter: onEnter,
+            onExit: onExit
         });
+
+        onEnter.$inject = ['$state', 'loginModalService'];
+        function onEnter($state, loginModalService) {
+            loginModalService.open().then(function() {
+                $state.go('openlmis.home');
+            });
+        }
+
+        onExit.$inject = ['loginModalService'];
+        function onExit(loginModalService) {
+            loginModalService.close();
+        }
 
     }
 
