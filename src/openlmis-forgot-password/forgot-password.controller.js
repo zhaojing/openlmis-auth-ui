@@ -29,15 +29,13 @@
         .module('openlmis-forgot-password')
         .controller('ForgotPasswordController', controller);
 
-    controller.$inject = ['$state', 'loginService', 'alertService'];
+    controller.$inject = ['loginService', 'alertService', 'modalDeferred'];
 
-    function controller($state, loginService, alertService) {
-
-        var EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            vm = this;
+    function controller(loginService, alertService, modalDeferred) {
+        var vm = this;
 
         vm.forgotPassword = forgotPassword;
-        vm.redirectToLogin = redirectToLogin;
+        vm.cancel = modalDeferred.reject;
 
         /**
          * @ngdoc method
@@ -48,34 +46,14 @@
          * Requests sending reset password token to email address given in form.
          */
         function forgotPassword() {
-            if(validateEmail()) {
-                loginService.forgotPassword(vm.email).then(function() {
-                    alertService.success(
-                        'openlmisForgotPassword.resetPasswordAlert.title',
-                        'openlmisForgotPassword.resetPasswordAlert.message'
-                    ).then(redirectToLogin);
-                }, function() {
-                    vm.error = 'openlmisForgotPassword.passwordResetFailure';
-                });
-            } else {
-                vm.error = 'openlmisForgotPassword.invalidEmail';
-            }
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-forgot-password.controller:ForgotPasswordController
-         * @name redirectToLogin
-         *
-         * @description
-         * Redirects to the login page.
-         */
-        function redirectToLogin(){
-            $state.go('auth.login');
-        }
-
-        function validateEmail() {
-            return EMAIL_REGEX.test(vm.email);
+            loginService.forgotPassword(vm.email).then(function() {
+                alertService.success(
+                    'openlmisForgotPassword.resetPasswordAlert.title',
+                    'openlmisForgotPassword.resetPasswordAlert.message'
+                ).then(modalDeferred.resolve);
+            }, function() {
+                vm.error = 'openlmisForgotPassword.passwordResetFailure';
+            });
         }
     }
 }());

@@ -46,7 +46,9 @@ describe('ResetPasswordController', function() {
             $q = _$q_;
             loginService = _loginService_;
 
-            vm = $controller('ResetPasswordController', {});
+            vm = $controller('ResetPasswordController', {
+                modalDeferred: $q.defer()
+            });
         });
     });
 

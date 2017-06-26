@@ -81,13 +81,4 @@ describe("LoginController", function() {
 
         expect(vm.password).toBe('good-password');
     });
-
-    it('should should go to forgot password state', function() {
-        var spy = jasmine.createSpy();
-        spyOn($state, 'go').andCallFake(spy);
-
-        vm.goToForgotPassword();
-
-        expect(spy).toHaveBeenCalledWith('auth.forgotPassword');
-    });
 });

@@ -27,10 +27,21 @@
 
         $stateProvider.state('auth.resetPassword', {
             url: '/resetPassword/:token',
-            templateUrl: 'openlmis-reset-password/reset-password.html',
-            controller: 'ResetPasswordController',
-            controllerAs: 'vm'
+            onEnter: onEnter,
+            onExit: onExit
         });
+
+        onEnter.$inject = ['$state', 'resetPasswordModalService'];
+        function onEnter($state, resetPasswordModalService) {
+            resetPasswordModalService.open().finally(function() {
+                $state.go('openlmis.home');
+            });
+        }
+
+        onExit.$inject = ['resetPasswordModalService'];
+        function onExit(resetPasswordModalService) {
+            resetPasswordModalService.close();
+        }
 
     }
 

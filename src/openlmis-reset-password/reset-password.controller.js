@@ -14,7 +14,8 @@
  */
 
 
-(function(){
+(function() {
+
     'use strict';
 
     /**
@@ -24,18 +25,19 @@
      * @description
      * Controller that drives the forgot password form.
      */
-    angular.module('openlmis-reset-password')
-    .controller('ResetPasswordController', ResetPasswordController);
+    angular
+        .module('openlmis-reset-password')
+        .controller('ResetPasswordController', ResetPasswordController);
 
-    ResetPasswordController.$inject = ['$state', '$stateParams', 'loginService', 'alertService'];
+    ResetPasswordController.$inject = [
+        '$stateParams', 'loginService', 'alertService', 'modalDeferred'
+    ];
 
-    function ResetPasswordController($state, $stateParams, loginService, alertService) {
-
+    function ResetPasswordController($stateParams, loginService, alertService, modalDeferred) {
         var vm = this;
 
         vm.changePassword = changePassword;
-
-        vm.token = $stateParams.token;
+        vm.cancel = modalDeferred.reject;
 
         /**
          * @ngdoc method
@@ -47,9 +49,9 @@
          */
         function changePassword() {
             if(arePasswordsValid()) {
-                loginService.changePassword(vm.password, vm.token).then(function() {
+                loginService.changePassword(vm.password, $stateParams.token).then(function() {
                     alertService.success('openlmisResetPassword.passwordReset.success')
-                        .then(redirectToLogin);
+                        .then(modalDeferred.resolve);
                 }, function() {
                     vm.error = 'openlmisResetPassword.passwordReset.failure';
                 });
@@ -70,10 +72,6 @@
                 return false;
             }
             return true;
-        }
-
-        function redirectToLogin() {
-            $state.go('auth.login');
         }
     }
 }());

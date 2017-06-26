@@ -16,88 +16,87 @@
 
 describe('ForgotPasswordController', function() {
 
-    var $rootScope, loginService, $q, $state, vm, alertSpy;
+    var vm, $q, $controller, modalDeferred;
 
     beforeEach(function() {
         module('openlmis-forgot-password');
 
-        module(function($provide) {
-            alertSpy = jasmine.createSpyObj('alertService', ['success']);
-            $provide.factory('alertService', function() {
-                return alertSpy;
-            });
-
-            loginServiceSpy = jasmine.createSpyObj('loginService', ['forgotPassword']);
-            $provide.factory('loginService', function() {
-                return loginServiceSpy;
-            });
+        inject(function($injector) {
+            $q = $injector.get('$q');
+            $controller = $injector.get('$controller');
         });
 
-        inject(function (_$rootScope_, $controller, _$q_, _$state_, _loginService_) {
-            $rootScope = _$rootScope_;
-            $q = _$q_;
-            $state = _$state_;
-            loginService = _loginService_;
+        modalDeferred = $q.defer();
 
-            vm = $controller('ForgotPasswordController', {});
+        vm = $controller('ForgotPasswordController', {
+            modalDeferred: modalDeferred
         });
     });
 
     describe('forgotPassword', function() {
-        it('should call forgot password from login service', function() {
-            var email = 'user@openlmis.org',
-                mailPassed = false,
-                alertSpyMethod = jasmine.createSpy();
 
-            vm.email = email;
+        var $rootScope, loginService, alertService, forgotPasswordDeferred, email;
 
-            loginService.forgotPassword.andCallFake(function(mail) {
-                if(mail === email) mailPassed = true;
-                return $q.when(true);
-            });
-            alertSpy.success.andCallFake(alertSpyMethod);
-
-            vm.forgotPassword();
-            $rootScope.$apply();
-
-            expect(mailPassed).toBe(true);
-            expect(alertSpyMethod).toHaveBeenCalled();
-        });
-
-        it('should set error message after rejecting forgot password call', function() {
-            var email = 'user@openlmis.org',
-                deferred = $q.defer();
-
-            vm.email = email;
-
-            loginService.forgotPassword.andCallFake(function() {
-                return deferred.promise;
+        beforeEach(function() {
+            inject(function($injector) {
+                $rootScope = $injector.get('$rootScope');
+                loginService = $injector.get('loginService');
+                alertService = $injector.get('alertService');
             });
 
+            forgotPasswordDeferred = $q.defer();
+
+            spyOn(loginService, 'forgotPassword').andReturn(forgotPasswordDeferred.promise);
+            spyOn(alertService, 'success').andReturn($q.when());
+
+            email = 'some-valid@email.com';
+            vm.email = email;
+        });
+
+        it('should call loginService', function() {
             vm.forgotPassword();
 
-            deferred.reject();
+            expect(loginService.forgotPassword).toHaveBeenCalledWith(email);
+        });
+
+        it('should show alert if password reset succeeded', function() {
+            vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
             $rootScope.$apply();
 
-            expect(vm.error).toEqual('openlmisForgotPassword.passwordResetFailure');
+            expect(alertService.success).toHaveBeenCalled();
         });
 
-        it('should set error message when email is not valid', function() {
-            var email = 'openlmis.org';
+        it('should close modal if alert was dismissed', function() {
+            spyOn(modalDeferred, 'resolve').andCallThrough();
 
             vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
+            $rootScope.$apply();
 
-            expect(vm.error).toEqual('openlmisForgotPassword.invalidEmail');
+            expect(modalDeferred.resolve).toHaveBeenCalled();
         });
+
+        it('should not show alert if password reset failed', function() {
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
+
+            expect(alertService.success).not.toHaveBeenCalled();
+        });
+
+        it('should set error if password reset failed', function() {
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
+
+            expect(vm.error).not.toBeUndefined();
+        });
+
     });
 
-    it('should redirect to login page', function() {
-        var stateGoSpy = jasmine.createSpy();
-        spyOn($state, 'go').andCallFake(stateGoSpy);
-
-        vm.redirectToLogin();
-
-        expect(stateGoSpy).toHaveBeenCalledWith('auth.login');
+    it('cancel should expose modal reject method', function() {
+        expect(vm.cancel).toBe(modalDeferred.reject);
     });
 
 });

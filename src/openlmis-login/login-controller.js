@@ -29,15 +29,14 @@
         .controller('LoginController', LoginController);
 
     LoginController.$inject = [
-        '$state', 'bootbox', 'loginService', 'localStorageService', 'modalDeferred'
+        'loginService', 'modalDeferred'
     ];
 
-    function LoginController($state, bootbox, loginService, localStorageService, modalDeferred) {
+    function LoginController(loginService, modalDeferred) {
 
         var vm = this;
 
         vm.doLogin = doLogin;
-        vm.goToForgotPassword = goToForgotPassword;
 
         /**
          * @ngdoc method
@@ -54,20 +53,6 @@
                 vm.loginError = 'openlmisLogin.invalidCredentials';
                 vm.password = undefined;
             });
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-login.controller:LoginController
-         * @name doLogin
-         *
-         * @description
-         * Takes username and .password variables and sends them to login service.
-         * On error response from the login service, loginError is set.
-         * On success a 'auth.login' event is emitted.
-         */
-        function goToForgotPassword() {
-            $state.go('auth.forgotPassword');
         }
 
     }
