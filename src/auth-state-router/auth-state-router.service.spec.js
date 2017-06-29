@@ -40,10 +40,10 @@ describe('authStateRouter', function() {
         inject(function($injector) {
             $rootScope = $injector.get('$rootScope');
             loginModalService = $injector.get('loginModalService');
-
-            spyOn(loginModalService, 'open').andCallThrough();
-            spyOn($rootScope, '$emit');
         });
+
+        spyOn(loginModalService, 'open').andCallThrough();
+        spyOn($rootScope, '$emit');
     });
 
     it('will redirect user to login if auth token is not set and state is home', function() {

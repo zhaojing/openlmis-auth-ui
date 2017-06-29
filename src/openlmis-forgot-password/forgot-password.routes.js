@@ -27,20 +27,21 @@
 
         $stateProvider.state('auth.forgotPassword', {
             url: '/forgotPassword',
-            onEnter: onEnter,
-            onExit: onExit
+            onEnter: onEnter
         });
 
-        onEnter.$inject = ['$state', 'forgotPasswordModalService'];
-        function onEnter($state, forgotPasswordModalService) {
-            forgotPasswordModalService.open().finally(function() {
+        onEnter.$inject = ['$state', 'openlmisModalService'];
+        function onEnter($state, openlmisModalService) {
+            openlmisModalService.createDialog({
+                backdrop  : 'static',
+                keyboard  : false,
+                templateUrl: 'openlmis-forgot-password/forgot-password.html',
+                controller: 'ForgotPasswordController',
+                controllerAs: 'vm',
+                show: true
+            }).promise.finally(function() {
                 $state.go('openlmis.home');
             });
-        }
-
-        onExit.$inject = ['forgotPasswordModalService'];
-        function onExit(forgotPasswordModalService) {
-            forgotPasswordModalService.close();
         }
 
     }

@@ -12,6 +12,7 @@
  * the GNU Affero General Public License along with this program. If not, see
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
+
 (function() {
 
     'use strict';
@@ -20,7 +21,9 @@
      * @module auth-state-router
      *
      * @description
-     * Provides state router to the application.
+     * Provides state router to the application. Every time the state is changed the router checks
+     * whether the user is authorized and opens a login modal prompting prompting the user for
+     * credentials if (s)he is not logged in.
      */
     angular.module('auth-state-router', [
         'openlmis-auth',

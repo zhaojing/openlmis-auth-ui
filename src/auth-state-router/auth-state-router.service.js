@@ -32,8 +32,8 @@
         'loadingModalService', 'loginModalService'
     ];
 
-    function router($rootScope, $state, authorizationService, alertService, loadingModalService, loginModalService) {
-        var savedToState, savedToParams;
+    function router($rootScope, $state, authorizationService, alertService, loadingModalService,
+                    loginModalService) {
 
         this.initialize = initialize;
 
@@ -43,30 +43,27 @@
          * @name initialize
          *
          * @description
-         * Add access token to url and change state.
-         *
-         * @param  {String} url A url string
-         * @return {String}     A url string with access_token url parameter added
+         * Initializes the state router.
          */
         function initialize() {
             $rootScope.$on('$stateChangeStart', reroute);
         }
 
         function reroute(event, toState, toParams, fromState, fromParams) {
-            if(!authorizationService.isAuthenticated() && toState.name.indexOf('auth') != 0 && toState.name.indexOf('openlmis.home') != 0){
+            if(!authorizationService.isAuthenticated() && toState.name.indexOf('auth') !== 0 && toState.name.indexOf('openlmis.home') !== 0) {
                 // if not authenticated and not on login page or home page
                 event.preventDefault();
                 loadingModalService.close();
                 if (fromState.name.indexOf('auth.login') !== 0) {
                     loginModalService.open().then(function() {
-                        $state.go(toState.name, toParams)
+                        $state.go(toState.name, toParams);
                     });
                 }
-            } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') == 0){
+            } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') === 0){
                 // if not authenticated and on home page
                 event.preventDefault();
                 $state.go('auth.login');
-            } else if(authorizationService.isAuthenticated() && toState.name.indexOf('auth') == 0) {
+            } else if(authorizationService.isAuthenticated() && toState.name.indexOf('auth') === 0) {
                 // if authenticated and on login page
                 event.preventDefault();
                 $state.go('openlmis.home');
@@ -76,13 +73,6 @@
                 alertService.error('openlmisAuth.authorization.error');
             }
         }
-
-        function goToSavedState() {
-            $state.go(savedToState, savedToParams);
-            savedToState = undefined;
-            savedToParams = undefined;
-        }
-
     }
 
 })();
