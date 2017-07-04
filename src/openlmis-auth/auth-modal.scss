@@ -3,11 +3,11 @@
 
     .modal-content {
         background-image: linear-gradient(to bottom, $white 0%, $white 48%, $light-gray 100%);
-        width: 700px;
     }
 
     .modal-dialog {
         margin-top: 15%;
+        width: 700px;
     }
 
     .modal-header {
