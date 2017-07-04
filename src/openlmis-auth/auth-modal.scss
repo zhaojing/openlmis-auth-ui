@@ -11,10 +11,16 @@
     }
 
     .modal-header {
+        align-items: center;
+        background-image: linear-gradient(to bottom, $white 30%, $light-gray 100%);
         border-bottom: 1px solid $light-gray;
         border-radius: $border-radius $border-radius 0 0;
-        background-image: linear-gradient(to bottom, $white 30%, $light-gray 100%);
+        display: flex;
         padding: 0.5em 1em !important;
+
+        & > h1 {
+            margin-right: auto;
+        }
     }
 
     .modal-body {
