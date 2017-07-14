@@ -44,10 +44,11 @@ describe("authorizationService", function() {
 
   describe('hasRight', function() {
     it('should return false if right name is undefined', function() {
-       var result = authorizationService.hasRight(undefined);
+       expect(function() {
+            authorizationService.hasRight(undefined);
+       }).toThrow(new Error("Right name is required"));
 
        expect(localStorageService.get).not.toHaveBeenCalled();
-       expect(result).toBe(false);
     })
   });
 

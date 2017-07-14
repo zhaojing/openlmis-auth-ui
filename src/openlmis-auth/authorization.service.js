@@ -206,7 +206,7 @@
          */
         function hasRight(rightName, details) {
             if (!rightName) {
-               return false;
+               throw "Right name is required";
             }
 
             var rights = $filter('filter')(getRights(), {
