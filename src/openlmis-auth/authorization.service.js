@@ -205,6 +205,10 @@
          * @return {Boolean}           true if the user has the right, false Otherwise
          */
         function hasRight(rightName, details) {
+            if (!rightName) {
+               return false;
+            }
+
             var rights = $filter('filter')(getRights(), {
                 name: rightName
             }, true);

@@ -35,12 +35,20 @@ describe("authorizationService", function() {
 
     localStorageService.clearAll();
     spyOn(localStorageService, 'remove');
+    spyOn(localStorageService, 'get');
 
     // Keep auth interceptor from running....
     spyOn($rootScope, '$on');
 
   }));
 
+  describe('hasRight', function() {
+    it('should return false if right name is undefined', function() {
+       var result = authorizationService.hasRight(undefined);
 
+       expect(localStorageService.get).not.toHaveBeenCalled();
+       expect(result).toBe(false);
+    })
+  });
 
 });
