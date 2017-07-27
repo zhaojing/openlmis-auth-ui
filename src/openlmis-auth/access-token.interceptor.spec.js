@@ -50,8 +50,6 @@ describe('accessTokenInterceptor', function() {
         it('should add token header', function() {
             var result = provider.request(config);
 
-            jasmine.log(result);
-
             expect(result.url).toEqual('some.url');
             expect(result.headers.Authorization).toEqual('Bearer SoMeAcCeSsToKeN');
         });
