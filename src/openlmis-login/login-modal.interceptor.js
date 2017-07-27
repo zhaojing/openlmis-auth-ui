@@ -52,7 +52,7 @@
         function onLoginRequired(event, _noRetryRequest_) {
             loginModalService.open().then(function() {
                 authService.loginConfirmed(null, function(config) {
-                    config.url = accessTokenFactory.updateAccessToken(config.url);
+                    config.headers.Authorization = accessTokenFactory.authHeader();
                     return config;
                 });
             });

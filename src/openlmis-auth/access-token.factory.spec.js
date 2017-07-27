@@ -71,4 +71,12 @@ describe('accessTokenFactory', function() {
 
         expect(updatedUri).toEqual(uri);
     }));
+
+    it('should create a token header', inject(function(authorizationService) {
+       spyOn(authorizationService, 'getAccessToken').andReturn('321');
+
+       var header = accessTokenFactory.authHeader();
+
+       expect(header).toEqual('Bearer 321');
+    }));
 });

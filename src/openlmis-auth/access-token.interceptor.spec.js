@@ -38,7 +38,8 @@ describe('accessTokenInterceptor', function() {
             authorizationServiceMock.isAuthenticated.andReturn(true);
 
             config = {
-                url: 'some.url'
+                url: 'some.url',
+                headers: { }
             };
         });
 
@@ -46,26 +47,31 @@ describe('accessTokenInterceptor', function() {
             expect(interceptors.indexOf('accessTokenInterceptor') > -1).toBe(true);
         });
 
-        it('should append token', function() {
+        it('should add token header', function() {
             var result = provider.request(config);
 
-            expect(result.url).toEqual('some.url&access_token=SoMeAcCeSsToKeN');
+            jasmine.log(result);
+
+            expect(result.url).toEqual('some.url');
+            expect(result.headers.Authorization).toEqual('Bearer SoMeAcCeSsToKeN');
         });
 
-        it('should not append token if requesting html file', function() {
+        it('should not add token if requesting html file', function() {
             config.url = 'some.html';
 
             var result = provider.request(config);
 
             expect(result.url).toEqual('some.html');
+            expect(result.headers.Authorization).not.toBeDefined();
         });
 
-        it('should not append token if user is not authenticated', function() {
+        it('should not add token if user is not authenticated', function() {
             authorizationServiceMock.isAuthenticated.andReturn(false);
 
             var result = provider.request(config);
 
             expect(result.url).toEqual('some.url');
+            expect(result.headers.Authorization).not.toBeDefined();
         });
 
         it('should check if user is authenticated', function() {
@@ -161,9 +167,12 @@ describe('accessTokenInterceptor', function() {
     });
 
     function mockAccessTokenFactory($provide) {
-        var accessTokenFactoryMock = jasmine.createSpyObj('accessTokenFactory', ['addAccessToken']);
+        var accessTokenFactoryMock = jasmine.createSpyObj('accessTokenFactory', ['addAccessToken', 'authHeader']);
         accessTokenFactoryMock.addAccessToken.andCallFake(function(url) {
             return url + '&access_token=SoMeAcCeSsToKeN';
+        });
+        accessTokenFactoryMock.authHeader.andCallFake(function() {
+            return 'Bearer SoMeAcCeSsToKeN';
         });
         $provide.factory('accessTokenFactory', function() {
             return accessTokenFactoryMock;

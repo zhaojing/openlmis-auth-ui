@@ -22,7 +22,7 @@
      * @name openlmis-auth.accessTokenFactory
      *
      * @description
-     * Functions for add/update access token.
+     * Functions for adding/updating the access token.
      */
     angular.module('openlmis-auth').factory('accessTokenFactory', accessTokenFactory);
 
@@ -32,7 +32,8 @@
         var factory = {
             updateAccessToken: updateAccessToken,
             updateQueryStringParameter: updateQueryStringParameter,
-            addAccessToken: addAccessToken
+            addAccessToken: addAccessToken,
+            authHeader: authHeader
         };
 
         /**
@@ -46,7 +47,7 @@
          * @param  {String} url A url string
          * @return {String}     A url string with access_token url parameter added
          */
-        function addAccessToken(url){
+        function addAccessToken(url) {
             if (url.indexOf('access_token=') === -1) {
                 var token = authorizationService.getAccessToken();
                 if (token) {
@@ -91,6 +92,21 @@
             }
             return uri;
         }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-auth.accessTokenFactory
+         * @name authHeader
+         *
+         * @description
+         * Returns an authorization header that can be used for authenticating with the backend.
+         *
+         * @return {String}    the header value, having a form of 'Bearer <token>'
+         */
+        function authHeader() {
+            return 'Bearer ' + authorizationService.getAccessToken();
+        }
+
         return factory;
     }
 

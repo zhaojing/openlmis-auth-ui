@@ -65,7 +65,7 @@
             if(openlmisUrlService.check(config.url) && authorizationService.isAuthenticated()
                     // we don't want to add the token to template requests
                     && !isHtml(config.url)) {
-                config.url = accessTokenFactory.addAccessToken(config.url);
+                config.headers.Authorization = accessTokenFactory.authHeader();
             }
             return config;
         }
