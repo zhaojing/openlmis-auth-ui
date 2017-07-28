@@ -1,6 +1,9 @@
 5.0.3 / Current Snapshot
 ===========
 
+Bug fixes and security updates:
+* [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): Made the component use an Authorization header instead of an access_token request parameter when calls to the backend are made.
+
 5.0.2 / 2017-06-22
 ===========
 
