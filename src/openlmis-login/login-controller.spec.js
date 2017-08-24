@@ -15,7 +15,7 @@
 
 describe("LoginController", function() {
 
-    var $rootScope, $state, vm, modalDeferred;
+    var $rootScope, $state, vm, modalDeferred, offline;
 
     beforeEach(function() {
 
@@ -41,13 +41,21 @@ describe("LoginController", function() {
             });
 
             spyOn(loginService, 'login').andCallFake(function(username, password) {
-                if(password == "bad-password"){
-                    return $q.reject();
+                if (offline) {
+                    return $q.reject({
+                        status: -1
+                    });
+                } else if (password == "bad-password") {
+                    return $q.reject({
+                        status: 400
+                    });
                 } else {
                     return $q.when();
                 }
             });
         });
+
+        offline = false;
     });
 
     it('should not login and show error when server returns error', function() {
@@ -80,5 +88,18 @@ describe("LoginController", function() {
         $rootScope.$apply();
 
         expect(vm.password).toBe('good-password');
+    });
+
+    it('should set proper message if request was send offline', function() {
+        vm.username = "john";
+        vm.password = "password";
+        offline = true;
+
+        spyOn(location, 'reload');
+
+        vm.doLogin();
+        $rootScope.$apply();
+
+        expect(vm.loginError).toEqual('openlmisLogin.cannotConnectToServer');
     });
 });

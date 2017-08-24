@@ -51,7 +51,7 @@
          *
          * @description
          * Makes an HTTP request to login the user while online.
-         * 
+         *
          * This method returns a function that will return a promise with no value.
          *
          * @param {String} username The name of the person trying to login
@@ -90,8 +90,8 @@
                     deferred.reject();
                 });
             });
-            httpPromise.catch(function(){
-                deferred.reject();
+            httpPromise.catch(function(response) {
+                deferred.reject(response);
             });
 
             return deferred.promise;
