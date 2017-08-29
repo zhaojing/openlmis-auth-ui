@@ -107,6 +107,7 @@
          * authorization service.
          */
         function logout() {
+            $rootScope.$emit('openlmis-auth.logout');
             if(offlineService.isOffline()) {
                 return logoutOffline();
             }
@@ -254,6 +255,7 @@
             } else {
                 $rootScope.$emit('auth.login-modal');
             }
+            $rootScope.$emit('openlmis-auth.login');
             deferred.resolve();
         }
 

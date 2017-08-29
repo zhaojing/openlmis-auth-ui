@@ -231,6 +231,24 @@ describe('loginService', function() {
 
         });
 
+        it('should emit a logout event', function() {
+            loginService.logout();
+            $rootScope.$apply();
+
+            expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.logout');
+        });
+
+    });
+
+    it('should emit "openlmis-auth.login" event when successfully logged in', function(){
+        authorizationService.clearAccessToken();
+        spyOn(currencyService, 'getCurrencySettings').andReturn($q.when());
+
+        loginService.login('john', 'john-password');
+        httpBackend.flush();
+        $rootScope.$apply();
+
+        expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.login');
     });
 
     it('should emit "auth.login" event when logging in through auth page', function(){
