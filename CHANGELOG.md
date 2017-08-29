@@ -3,6 +3,7 @@
 
 Bug fixes and security updates:
 * [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): Made the component use an Authorization header instead of an access_token request parameter when calls to the backend are made.
+* [OLMIS-2867](https://openlmis.atlassian.net/browse/OLMIS-2867): Added message when user tries to log in while offline.
 
 5.0.2 / 2017-06-22
 ===========
