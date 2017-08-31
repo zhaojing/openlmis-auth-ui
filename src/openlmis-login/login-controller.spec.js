@@ -28,7 +28,7 @@ describe("LoginController", function() {
             });
         });
 
-        inject(function(_$rootScope_, $controller, $q, loginService, _$state_) {
+        inject(function(_$rootScope_, $controller, $q, loginService, _$state_, _loadingModalService_) {
             $rootScope = _$rootScope_;
             $state = _$state_;
 
@@ -53,6 +53,10 @@ describe("LoginController", function() {
                     return $q.when();
                 }
             });
+
+            loadingModalService = _loadingModalService_;
+            spyOn(loadingModalService, 'open');
+            spyOn(loadingModalService, 'close');
         });
 
         offline = false;
@@ -101,5 +105,13 @@ describe("LoginController", function() {
         $rootScope.$apply();
 
         expect(vm.loginError).toEqual('openlmisLogin.cannotConnectToServer');
+    });
+
+    it('shows a loading modal when attempting to login', function(){
+        vm.doLogin();
+        $rootScope.$apply();
+
+        expect(loadingModalService.open).toHaveBeenCalled();
+        expect(loadingModalService.close).toHaveBeenCalled();
     });
 });

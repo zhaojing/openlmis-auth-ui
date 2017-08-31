@@ -29,10 +29,10 @@
         .controller('LoginController', LoginController);
 
     LoginController.$inject = [
-        'loginService', 'modalDeferred'
+        'loginService', 'modalDeferred', 'loadingModalService'
     ];
 
-    function LoginController(loginService, modalDeferred) {
+    function LoginController(loginService, modalDeferred, loadingModalService) {
 
         var vm = this;
 
@@ -49,7 +49,9 @@
          * On success a 'auth.login' event is emitted.
          */
         function doLogin() {
-            loginService.login(vm.username, vm.password).then(modalDeferred.resolve, function(response) {
+            loadingModalService.open();
+            loginService.login(vm.username, vm.password)
+            .then(modalDeferred.resolve, function(response) {
                 if (response.status === 400) {
                     vm.loginError = 'openlmisLogin.invalidCredentials';
                 } else if (response.status === -1) {
@@ -58,6 +60,9 @@
                     vm.loginError = 'openlmisLogin.unknownServerError';
                 }
                 vm.password = undefined;
+            })
+            .finally(function(){
+                loadingModalService.close();
             });
         }
 
