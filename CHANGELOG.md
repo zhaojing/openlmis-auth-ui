@@ -5,6 +5,7 @@ New functionality added in backwards-compatiable manner
 * [OLMIS-3085:](https://openlmis.atlassian.net/browse/OLMIS-3085) Added standard login and logout events.
 
 Bug fixes and security updates:
+* [MW-348:](https://openlmis.atlassian.net/browse/MW-348) Added loading modal while logging in.
 * [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): Made the component use an Authorization header instead of an access_token request parameter when calls to the backend are made.
 * [OLMIS-2867](https://openlmis.atlassian.net/browse/OLMIS-2867): Added message when user tries to log in while offline.
 
