@@ -1,4 +1,4 @@
-5.0.3 / Current Snapshot
+5.0.3 / 2017-09-01
 ===========
 
 New functionality added in backwards-compatiable manner
