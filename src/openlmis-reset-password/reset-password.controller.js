@@ -50,7 +50,7 @@
             if(arePasswordsValid()) {
                 loginService.changePassword(vm.password, $stateParams.token).then(function() {
                     alertService.success('openlmisResetPassword.passwordReset.success')
-                        .then(modalDeferred.resolve);
+                        .finally(modalDeferred.resolve);
                 }, function() {
                     vm.error = 'openlmisResetPassword.passwordReset.failure';
                 });
