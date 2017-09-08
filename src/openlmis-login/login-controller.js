@@ -51,14 +51,8 @@
         function doLogin() {
             loadingModalService.open();
             loginService.login(vm.username, vm.password)
-            .then(modalDeferred.resolve, function(response) {
-                if (response.status === 400) {
-                    vm.loginError = 'openlmisLogin.invalidCredentials';
-                } else if (response.status === -1) {
-                    vm.loginError = 'openlmisLogin.cannotConnectToServer';
-                } else {
-                    vm.loginError = 'openlmisLogin.unknownServerError';
-                }
+            .catch(function(error) {
+                vm.loginError = error;
                 vm.password = undefined;
             })
             .finally(function(){

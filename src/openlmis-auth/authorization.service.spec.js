@@ -42,14 +42,76 @@ describe("authorizationService", function() {
 
   }));
 
-  describe('hasRight', function() {
+  ddescribe('hasRight', function() {
+
+    beforeEach(function(){
+      var mockRights = [{
+        id: "123",
+        name: 'EXAMPLE_RIGHT',
+        programCodes: [
+          'abc'
+        ],
+        programIds: [
+          "123"
+        ],
+        supervisoryNodeCodes: [
+          "nodeCode"
+        ],
+        supervisoryNodeIds: [
+          "nodeId"
+        ]
+      }];
+      localStorageService.get.andReturn(mockRights);
+    });
+
     it('should return false if right name is undefined', function() {
        expect(function() {
             authorizationService.hasRight(undefined);
        }).toThrow(new Error("Right name is required"));
 
        expect(localStorageService.get).not.toHaveBeenCalled();
-    })
+    });
+
+    it('will authorize user if they have the correct right name', function() {
+      expect(authorizationService.hasRight("fake")).toBe(false);
+      expect(authorizationService.hasRight('EXAMPLE_RIGHT')).toBe(true);
+    });
+    it('will authorize a user if given a right and program code', function() {
+      var hasRight = authorizationService.hasRight('EXAMPLE_RIGHT', {
+        programCode: 'abc'
+      });
+
+      expect(hasRight).toBe(true);
+    });
+    it('will authorize a user if given a right and program ID', function() {
+      var hasRight = authorizationService.hasRight('EXAMPLE_RIGHT', {
+        programId: '123'
+      });
+
+      expect(hasRight).toBe(true);
+    });
+    it('will authorize a user if given a right and supervisory node code', function() {
+      var hasRight = authorizationService.hasRight('EXAMPLE_RIGHT', {
+        supervisoryNodeCode: 'nodeCode'
+      });
+
+      expect(hasRight).toBe(true);
+    });
+    it('will authorize a user if given a right and supervisory node ID', function() {
+      var hasRight = authorizationService.hasRight('EXAMPLE_RIGHT', {
+        supervisoryNodeId: 'nodeId'
+      });
+
+      expect(hasRight).toBe(true);
+    });
+    it('will authorize a user if given a right, a program, and a facility', function() {
+      var hasRight = authorizationService.hasRight('EXAMPLE_RIGHT', {
+        supervisoryNodeCode: 'nodeCode',
+        programCode: 'abc'
+      });
+
+      expect(hasRight).toBe(true);
+    });
   });
 
 });

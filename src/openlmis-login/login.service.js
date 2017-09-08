@@ -29,10 +29,10 @@
         .service('loginService', loginService);
 
     loginService.$inject = ['$rootScope', '$q', '$http', 'authUrl', 'openlmisUrlFactory', 'authorizationService',
-                            'Right', '$state', 'currencyService', 'offlineService'];
+                            'Right', '$state', 'offlineService'];
 
     function loginService($rootScope, $q, $http, authUrl, openlmisUrlFactory, authorizationService,
-                            Right, $state, currencyService, offlineService) {
+                            Right, $state, offlineService) {
 
         this.login = login;
         this.logout = logout;
@@ -58,40 +58,35 @@
          * @param {String} password The password the person is trying to login with
          */
         function login(username, password) {
-            var deferred = $q.defer(),
-                httpPromise = $http({
-                    method: 'POST',
-                    url: authUrl('/api/oauth/token?grant_type=password'),
-                    data: 'username=' + username + '&password=' + password,
-                    headers: {
-                        'Authorization': authorizationHeader(),
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                });
+            var deferred = $q.defer();
 
-            httpPromise.then(function(response) {
+            if(offlineService.isOffline()) {
+                return $q.reject('openlmisLogin.cannotConnectToServer');
+            }
+
+            $http({
+                method: 'POST',
+                url: authUrl('/api/oauth/token?grant_type=password'),
+                data: 'username=' + username + '&password=' + password,
+                headers: {
+                    'Authorization': authorizationHeader(),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(function(response) {
+                var userId = response.data.referenceDataUserId;
                 authorizationService.setAccessToken(response.data.access_token);
-                getUserInfo(response.data.referenceDataUserId).then(function(referencedataUsername) {
-                    getUserRights(response.data.referenceDataUserId).then(function(userRights) {
-                        authorizationService.saveOfflineUserData(username, response.data.referenceDataUserId, referencedataUsername, userRights);
-                        currencyService.getCurrencySettings().then(function() {
-                            emitEventAndResolve(deferred);
-                        }, function(){
-                            currencyService.getCurrencySettingsFromConfig();
-                            emitEventAndResolve(deferred);
-                        });
-                        deferred.resolve();
-                    }, function(){
-                        authorizationService.clearAccessToken();
-                        deferred.reject();
-                    });
-                }, function(){
-                    authorizationService.clearAccessToken();
-                    deferred.reject();
-                });
-            });
-            httpPromise.catch(function(response) {
-                deferred.reject(response);
+                authorizationService.setUser(userId, username);
+                $rootScope.$emit('openlmis-auth.login');
+                deferred.resolve();
+            }).catch(function(response) {
+                if (response.status === 400) {
+                    deferred.reject('openlmisLogin.invalidCredentials');
+                } else if (response.status === -1) {
+                    deferred.reject('openlmisLogin.cannotConnectToServer');
+                } else {
+                    deferred.reject('openlmisLogin.unknownServerError');
+                }
             });
 
             return deferred.promise;
@@ -107,11 +102,25 @@
          * authorization service.
          */
         function logout() {
-            $rootScope.$emit('openlmis-auth.logout');
+            var deferred = $q.defer();
+
+            doLogout()
+            .finally(function() {
+                authorizationService.clearAccessToken();
+                authorizationService.clearUser();
+                $rootScope.$emit('openlmis-auth.logout');
+                deferred.resolve();
+            });
+
+            return deferred.promise;
+        }
+
+        function doLogout() {
             if(offlineService.isOffline()) {
-                return logoutOffline();
+                return $q.reject();
+            } else {
+                return logoutOnline();
             }
-            return logoutOnline();
         }
 
 
@@ -122,75 +131,14 @@
                 url: authUrl('/api/users/auth/logout'),
                 ignoreAuthModule: true
             }).then(function() {
-                clearUserData();
                 deferred.resolve();
             }, function(data) {
                 if (data.status === 401) {
-                    clearUserData();
                     deferred.resolve();
                 } else {
                     deferred.reject();
                 }
             });
-            return deferred.promise;
-        }
-
-        function logoutOffline() {
-            authorizationService.clearAccessToken();
-            authorizationService.clearUser();
-            authorizationService.clearRights();
-
-            return $q.resolve();
-        }
-
-        function getUserInfo(userId){
-            var deferred = $q.defer();
-            if(!authorizationService.isAuthenticated()) {
-                deferred.reject();
-            } else {
-                var userInfoURL = authUrl(
-                    '/api/users/' + userId
-                );
-                $http({
-                    method: 'GET',
-                    url: userInfoURL,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(function(response) {
-                    authorizationService.setUser(userId, response.data.username);
-                    //getUserRights(userId);
-                    deferred.resolve(response.data.username);
-                }).catch(function() {
-                    deferred.reject();
-                });
-            }
-            return deferred.promise;
-        }
-
-        function getUserRights(userId) {
-            var deferred = $q.defer();
-
-            if(!authorizationService.isAuthenticated()) {
-                deferred.reject();
-            } else {
-                var userRoleAssignmentsURL = openlmisUrlFactory(
-                    '/api/users/' + userId + '/roleAssignments'
-                );
-                $http({
-                    method: 'GET',
-                    url: userRoleAssignmentsURL,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(function(response) {
-                    var rights = Right.buildRights(response.data);
-                    authorizationService.setRights(rights);
-                    deferred.resolve(rights);
-                }).catch(function() {
-                    deferred.reject();
-                });
-            }
             return deferred.promise;
         }
 
@@ -247,22 +195,6 @@
                     'Content-Type': 'application/json'
                 }
             });
-        }
-
-        function emitEventAndResolve (deferred) {
-            if ($state.is('auth.login')) {
-                $rootScope.$emit('auth.login');
-            } else {
-                $rootScope.$emit('auth.login-modal');
-            }
-            $rootScope.$emit('openlmis-auth.login');
-            deferred.resolve();
-        }
-
-        function clearUserData() {
-            authorizationService.clearAccessToken();
-            authorizationService.clearUser();
-            authorizationService.clearRights();
         }
     }
 

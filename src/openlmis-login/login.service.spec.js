@@ -13,84 +13,42 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('loginService', function() {
+describe('openlmis-login.loginService', function() {
 
-    var $rootScope, httpBackend, loginService, authorizationService, Right, $state, $q,
-        currencyService, offlineService;
+    var $rootScope, httpBackend, loginService, authorizationService, $q, offlineService;
 
-    beforeEach(function() {
-        module('openlmis-login');
+    beforeEach(module('openlmis-login'));
 
-        module(function($provide){
-            $provide.factory('authUrl', function(pathFactory){
-                return function(url){
-                    return pathFactory('', url);
-                };
-            });
-            $provide.factory('openlmisUrlFactory', function(pathFactory){
-               return function(url){
-                   return pathFactory('', url);
-               };
-            });
+    beforeEach(inject(function(_$rootScope_, _loginService_, _authorizationService_, _$q_, _offlineService_) {
+        $rootScope = _$rootScope_;
+        loginService = _loginService_;
+        $q = _$q_;
 
-            // Turn off AuthToken
-            $provide.factory('accessTokenInterceptor', function(){
-                return {};
-            });
+        authorizationService = _authorizationService_;
+        spyOn(authorizationService, 'setAccessToken').andCallThrough();
+        spyOn(authorizationService, 'clearAccessToken').andCallThrough();
 
-            Right = jasmine.createSpyObj('Right', ['buildRights']);
-            $provide.factory('Right', function() {
-                return Right;
-            });
+        spyOn(authorizationService, 'setUser');
+        spyOn(authorizationService, 'clearUser');
+        
+        offlineService = _offlineService_;
+        spyOn(offlineService, 'checkConnection').andReturn(false);
+    }));
+
+    beforeEach(inject(function(_$httpBackend_) {
+        httpBackend = _$httpBackend_;
+        httpBackend.when('POST', '/api/oauth/token?grant_type=password')
+        .respond(function(method, url, data){
+            if(data.indexOf('bad-password') >= 0 ){
+                return [400];
+            } else {
+                return [200, {
+                    'access_token': 'access_token',
+                    'referenceDataUserId': 'userId'
+                }];
+            }
         });
-
-        module(function($stateProvider){
-            $stateProvider.state('home', {});
-            $stateProvider.state('somewhere', {});
-        });
-
-        inject(function(_$httpBackend_, _$rootScope_, _loginService_, _authorizationService_,
-        _$state_, _$q_, _currencyService_, _offlineService_){
-            httpBackend = _$httpBackend_;
-            $rootScope = _$rootScope_;
-            loginService = _loginService_;
-            authorizationService = _authorizationService_;
-            $state = _$state_;
-            $q = _$q_;
-            currencyService = _currencyService_;
-            offlineService = _offlineService_;
-
-            httpBackend.when('POST', '/api/oauth/token?grant_type=password')
-            .respond(function(method, url, data){
-                if(data.indexOf('bad-password') >= 0 ){
-                    return [400];
-                } else {
-                    return [200,{
-                        'access_token': '4b06a35c-9684-4f8c-b9d0-ce2c6cd685de',
-                        'token_type': 'bearer',
-                        'expires_in': 1733,
-                        'scope': 'read write',
-                        'referenceDataUserId': '35316636-6264-6331-2d34-3933322d3462'
-                    }];
-                }
-            });
-
-            httpBackend.when('GET', '/api/users/35316636-6264-6331-2d34-3933322d3462')
-            .respond(200, {
-                'referenceDataUserId': '35316636-6264-6331-2d34-3933322d3462',
-                'username': 'admin',
-                'password': '$2a$10$4IZfidcJzbR5Krvj87ZJdOZvuQoD/kvPAJe549rUNoP3N3uH0Lq2G',
-                'email': 'test@openlmis.org',
-                'role': 'ADMIN'
-            });
-
-            httpBackend.when('GET', '/api/users/35316636-6264-6331-2d34-3933322d3462/roleAssignments')
-            .respond(200, {});
-
-            spyOn($rootScope, '$emit');
-            spyOn(offlineService, 'checkConnection').andCallThrough();
-        });
-    });
+    }));
 
     describe('login', function() {
         it('should reject bad logins', function() {
@@ -106,9 +64,35 @@ describe('loginService', function() {
             expect(error).toBe(true);
         });
 
+        it('returns an error message for bad logins', function(){
+            var message;
+            loginService.login('john', 'bad-password')
+            .catch(function(error){
+                message = error;
+            });
+
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            expect(message).toBe('openlmisLogin.invalidCredentials');
+        });
+
+        it('returns an error if offline', function() {
+            spyOn(offlineService, 'isOffline').andReturn(true);
+
+            var message;
+            loginService.login('john', 'john-password')
+            .catch(function(error) {
+                message = error;
+            });
+
+            $rootScope.$apply();
+
+            expect(message).toEqual('openlmisLogin.cannotConnectToServer'); 
+        });
+
         it('should resolve successful logins', function() {
             var success = false;
-            spyOn(currencyService, 'getCurrencySettings').andReturn($q.when());
 
             loginService.login('john', 'john-password')
             .then(function(){
@@ -121,42 +105,82 @@ describe('loginService', function() {
             expect(success).toBe(true);
         });
 
-        it('should get user data if user is online', function(){
-            loginService.login('john', 'john-password');
-            httpBackend.flush();
-            $rootScope.$apply();
-
-            var user = authorizationService.getUser();
-
-            expect(user.user_id).toBe('35316636-6264-6331-2d34-3933322d3462');
-        });
-
-        it('should save offline user data if user is online', function(){
-            spyOn(authorizationService, 'saveOfflineUserData');
+        it('should emit "openlmis-auth.login" event when successfully logged in', function() {
+            var success = false;
+            $rootScope.$on('openlmis-auth.login', function(){
+                success = true;
+            });
 
             loginService.login('john', 'john-password');
             httpBackend.flush();
             $rootScope.$apply();
 
-            expect(authorizationService.saveOfflineUserData).toHaveBeenCalled();
+            expect(success).toBe(true);
         });
+
+        it('should set access token when login is successful', function() {            
+            loginService.login('john', 'john-password');
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            expect(authorizationService.setAccessToken).toHaveBeenCalledWith('access_token');
+        });
+
+        it('should set basic user data when login is successful', function() {
+            loginService.login('john', 'john-password');
+            httpBackend.flush();
+            $rootScope.$apply();
+
+            expect(authorizationService.setUser).toHaveBeenCalledWith('userId', 'john');
+        });
+
     });
 
     describe('logout', function() {
 
-        beforeEach(function() {
-            // Login a user
-            loginService.login('john', 'john-password');
-            httpBackend.flush();
+        it('always emits a logout event', function() {
+            var success = false;
+            $rootScope.$on('openlmis-auth.logout', function() {
+                success = true;
+            });
+
+            loginService.logout();
             $rootScope.$apply();
+
+            expect(success).toBe(true);
+        });
+
+        it('always clears the access token', function(){
+            loginService.logout();
+            $rootScope.$apply();
+
+            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
+        });
+
+        it('always clears user data', function() {
+            loginService.logout();
+            $rootScope.$apply();
+
+            expect(authorizationService.clearUser).toHaveBeenCalled();
+        });
+
+        it('should logout while offline', function() {
+            spyOn(offlineService, 'isOffline').andReturn(true);
+
+            var success = false;
+            loginService.logout().then(function(){
+                success = true;
+            });
+            $rootScope.$apply();
+
+            expect(success).toBe(true);
         });
 
         it('should resolve promise if response status is 401', function() {
-            var resolved = false;
-
             httpBackend.when('POST', '/api/users/auth/logout')
             .respond(401);
 
+            var resolved = false;
             loginService.logout().then(function() {
                 resolved = true;
             });
@@ -167,127 +191,7 @@ describe('loginService', function() {
             expect(resolved).toBe(true);
         });
 
-        it('should clear user data on 401 response', function() {
-            spyOn(authorizationService, 'clearAccessToken');
-            spyOn(authorizationService, 'clearUser');
-            spyOn(authorizationService, 'clearRights');
-
-            // Login a user
-            loginService.login('john', 'john-password');
-            httpBackend.flush();
-            $rootScope.$apply();
-
-            httpBackend.when('POST', '/api/users/auth/logout')
-            .respond(401);
-
-            loginService.logout();
-
-            httpBackend.flush();
-            $rootScope.$apply();
-
-            // User credentials are removed.
-            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
-            expect(authorizationService.clearUser).toHaveBeenCalled();
-            expect(authorizationService.clearRights).toHaveBeenCalled();
-        });
-
-        it('should clear user data on logout for online user', function(){
-            spyOn(authorizationService, 'clearAccessToken');
-            spyOn(authorizationService, 'clearUser');
-            spyOn(authorizationService, 'clearRights');
-
-            // Login a user
-            loginService.login('john', 'john-password');
-            httpBackend.flush();
-            $rootScope.$apply();
-
-            httpBackend.when('POST', '/api/users/auth/logout')
-            .respond(200);
-
-            loginService.logout();
-
-            httpBackend.flush();
-            $rootScope.$apply();
-
-            // User credentials are removed.
-            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
-            expect(authorizationService.clearUser).toHaveBeenCalled();
-            expect(authorizationService.clearRights).toHaveBeenCalled();
-
-        });
-
-        it('should clear user data on logout for offline user', function(){
-            spyOn(offlineService, 'isOffline').andReturn(true);
-            spyOn(authorizationService, 'clearAccessToken');
-            spyOn(authorizationService, 'clearUser');
-            spyOn(authorizationService, 'clearRights');
-
-            loginService.logout();
-            $rootScope.$apply();
-
-            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
-            expect(authorizationService.clearUser).toHaveBeenCalled();
-            expect(authorizationService.clearRights).toHaveBeenCalled();
-
-        });
-
-        it('should emit a logout event', function() {
-            loginService.logout();
-            $rootScope.$apply();
-
-            expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.logout');
-        });
-
     });
-
-    it('should emit "openlmis-auth.login" event when successfully logged in', function(){
-        authorizationService.clearAccessToken();
-        spyOn(currencyService, 'getCurrencySettings').andReturn($q.when());
-
-        loginService.login('john', 'john-password');
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.login');
-    });
-
-    it('should emit "auth.login" event when logging in through auth page', function(){
-        spyOn($state, 'is').andReturn('auth.login');
-        authorizationService.clearAccessToken();
-        spyOn(currencyService, 'getCurrencySettings').andReturn($q.when());
-
-        loginService.login('john', 'john-password');
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect($rootScope.$emit).toHaveBeenCalledWith('auth.login');
-    });
-
-    it('should emit "auth.login-modal" event when logging in through page other than auth', inject(function($rootScope){
-        authorizationService.clearAccessToken();
-        spyOn(currencyService, 'getCurrencySettings').andReturn($q.when());
-
-        $state.go('somewhere');
-        $rootScope.$apply();
-
-        loginService.login('john', 'john-password');
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect($rootScope.$emit).toHaveBeenCalledWith('auth.login-modal');
-    }));
-
-    it('should call getCurrencySettingsFromConfig when retrieve settings from refdata rejected', inject(function($rootScope){
-        authorizationService.clearAccessToken();
-        spyOn(currencyService, 'getCurrencySettings').andReturn($q.reject());
-        spyOn(currencyService, 'getCurrencySettingsFromConfig');
-
-        loginService.login('john', 'john-password');
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect(currencyService.getCurrencySettingsFromConfig).toHaveBeenCalled();
-    }));
 
     it('should call forgot password endpoint', inject(function() {
         var email = 'user@openlmis.org',
@@ -327,4 +231,5 @@ describe('loginService', function() {
 
         expect(spy).toHaveBeenCalled();
     }));
+
 });

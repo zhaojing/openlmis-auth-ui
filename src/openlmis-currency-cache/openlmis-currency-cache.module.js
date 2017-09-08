@@ -18,16 +18,15 @@
     'use strict';
 
     /**
-     * @module openlmis-login
+     * @module openlmis-currency-cache
      *
      * @description
-     * Provides base openlmis-login state and controller/service to handle logging.
+     * Makes the currency service check with the OpenLMIS Service to see what
+     * currency format is needed.
      */
-    angular.module('openlmis-login', [
-        'openlmis-auth',
-        'openlmis-offline',
-        'openlmis-locale',
-        'openlmis-modal',
+    angular.module('openlmis-currency-cache', [
+        'openlmis-currency',
+        'openlmis-local-storage',
         'ui.router'
     ]);
 
