@@ -13,33 +13,24 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe("authorizationService", function() {
+(function() {
 
-  beforeEach(module('openlmis-auth'));
+    'use strict';
 
-  var authorizationService, localStorageService;
+    /**
+     * @module openlmis-permissions
+     *
+     * @description
+     * Provides methods to get a user's permissions and rights.
+     *
+     * This module is intended to be used as part of the
+     * openlmis-auth.authorizationService. We recommend that you don't directly
+     * access these services.
+     */
+    angular.module('openlmis-permissions', [
+        'openlmis-urls',
+        'openlmis-local-storage',
+        'openlmis-config'
+    ]);
 
-  beforeEach(module(function($provide){
-    $provide.factory('authUrl', function(pathFactory){
-      return function(url){
-        return pathFactory('/', url);
-      }
-    })
-  }));
-
-  beforeEach(inject(function(_authorizationService_, _localStorageService_) {
-    authorizationService = _authorizationService_;
-    localStorageService = _localStorageService_;
-
-    localStorageService.clearAll();
-    spyOn(localStorageService, 'remove');
-    spyOn(localStorageService, 'get');
-
-    // Keep auth interceptor from running....
-    spyOn($rootScope, '$on'); // don't think this is needed....
-
-  }));
-
-  // Seriously — none of those tests checked main system functionality???
-
-});
+})();

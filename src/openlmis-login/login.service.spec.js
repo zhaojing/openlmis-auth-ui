@@ -32,7 +32,7 @@ describe('openlmis-login.loginService', function() {
         spyOn(authorizationService, 'clearUser');
         
         offlineService = _offlineService_;
-        spyOn(offlineService, 'checkConnection').andReturn(false);
+        spyOn(offlineService, 'isOffline').andReturn(false);
     }));
 
     beforeEach(inject(function(_$httpBackend_) {
@@ -78,7 +78,7 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('returns an error if offline', function() {
-            spyOn(offlineService, 'isOffline').andReturn(true);
+            offlineService.isOffline.andReturn(true);
 
             var message;
             loginService.login('john', 'john-password')
@@ -165,7 +165,7 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('should logout while offline', function() {
-            spyOn(offlineService, 'isOffline').andReturn(true);
+            offlineService.isOffline.andReturn(true);
 
             var success = false;
             loginService.logout().then(function(){

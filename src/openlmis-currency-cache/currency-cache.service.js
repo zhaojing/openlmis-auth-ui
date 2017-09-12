@@ -84,7 +84,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf referencedata-facilities-cache.facilityCacheService
+         * @methodOf openlmis-currency.currencyCacheService
          * @name pauseIfLoading
          *
          * @param {Object} event State change event from $stateChangeStart

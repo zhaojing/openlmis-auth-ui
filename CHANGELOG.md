@@ -1,3 +1,9 @@
+6.0.0 / In development
+======================
+
+New functionality
+* [OLMIS-2956:](https://openlmis.atlassian.net/browse/OLMIS-2956) Simplified login and authorization services by removing "user rights" functionality and moving to openlmis-referencedata-ui.
+
 5.0.3 / 2017-09-01
 ===========
 
