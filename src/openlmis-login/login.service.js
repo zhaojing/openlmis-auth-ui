@@ -29,10 +29,10 @@
         .service('loginService', loginService);
 
     loginService.$inject = ['$rootScope', '$q', '$http', 'authUrl', 'openlmisUrlFactory', 'authorizationService',
-                            'Right', '$state', 'offlineService'];
+                            '$state', 'offlineService'];
 
     function loginService($rootScope, $q, $http, authUrl, openlmisUrlFactory, authorizationService,
-                            Right, $state, offlineService) {
+                            $state, offlineService) {
 
         this.login = login;
         this.logout = logout;
