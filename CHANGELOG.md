@@ -4,6 +4,9 @@
 New functionality
 * [OLMIS-2956:](https://openlmis.atlassian.net/browse/OLMIS-2956) Simplified login and authorization services by removing "user rights" functionality and moving to openlmis-referencedata-ui.
 
+New functionality added in backwards-compatiable manner
+* [OLMIS-3141:](https://openlmis.atlassian.net/browse/OLMIS-3141) After user resets their password, they are redirected to the login screen. 
+
 5.0.3 / 2017-09-01
 ===========
 
