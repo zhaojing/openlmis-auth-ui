@@ -35,36 +35,57 @@
                             $state, offlineService) {
 
         this.login = login;
+        this.requestLogin = requestLogin;
         this.logout = logout;
+        this.requestLogout = requestLogout;
+
         this.forgotPassword = forgotPassword;
         this.changePassword = changePassword;
-
-        function authorizationHeader(){
-            var data = btoa('@@AUTH_SERVER_CLIENT_ID' + ':' + '@@AUTH_SERVER_CLIENT_SECRET');
-            return 'Basic ' + data;
-        }
 
         /**
          * @ngdoc method
          * @methodOf openlmis-login.loginService
          * @name login
          *
-         * @description
-         * Makes an HTTP request to login the user while online.
+         * @param {String} username The name of the person trying to login
+         * @param {String} password The password the person is trying to login with
          *
-         * This method returns a function that will return a promise with no value.
+         * @return {Promise} Returns promise from requestLogin
+         *
+         * @description
+         * Sets authorization service with basic user data and fires
+         * openlmis-auth.login when requestLogin is successful.
+         */
+        function login(username, password) {
+            return this.requestLogin(username, password)
+            .then(function(response) {
+                authorizationService.setAccessToken(response.accessToken);
+                authorizationService.setUser(response.userId, username);
+                $rootScope.$emit('openlmis-auth.login');
+            });
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-login.loginService
+         * @name requestLogin
          *
          * @param {String} username The name of the person trying to login
          * @param {String} password The password the person is trying to login with
+         *
+         * @return {Promise} Resolves when successful, rejects otherwise
+         *
+         * @description
+         * Calls the OpenLMIS oauth service, and returns an object with the user's
+         * access token and user id. If the call to OpenLMIS oauth is unsuccessful
+         * then the promise is rejected with an error message.
          */
-        function login(username, password) {
-            var deferred = $q.defer();
-
+        function requestLogin(username, password) {
             if(offlineService.isOffline()) {
                 return $q.reject('openlmisLogin.cannotConnectToServer');
             }
 
-            $http({
+            return $http({
                 method: 'POST',
                 url: authUrl('/api/oauth/token?grant_type=password'),
                 data: 'username=' + username + '&password=' + password,
@@ -74,22 +95,25 @@
                 }
             })
             .then(function(response) {
-                var userId = response.data.referenceDataUserId;
-                authorizationService.setAccessToken(response.data.access_token);
-                authorizationService.setUser(userId, username);
-                $rootScope.$emit('openlmis-auth.login');
-                deferred.resolve();
-            }).catch(function(response) {
+                return $q.resolve({
+                    userId: response.data.referenceDataUserId,
+                    accessToken: response.data.access_token
+                });
+            })
+            .catch(function(response) {
                 if (response.status === 400) {
-                    deferred.reject('openlmisLogin.invalidCredentials');
+                    return $q.reject('openlmisLogin.invalidCredentials');
                 } else if (response.status === -1) {
-                    deferred.reject('openlmisLogin.cannotConnectToServer');
+                    return $q.reject('openlmisLogin.cannotConnectToServer');
                 } else {
-                    deferred.reject('openlmisLogin.unknownServerError');
+                    return $q.reject('openlmisLogin.unknownServerError');
                 }
             });
+        }
 
-            return deferred.promise;
+        function authorizationHeader() {
+            var data = btoa('@@AUTH_SERVER_CLIENT_ID' + ':' + '@@AUTH_SERVER_CLIENT_SECRET');
+            return 'Basic ' + data;
         }
 
         /**
@@ -97,14 +121,19 @@
          * @methodOf openlmis-login.loginService
          * @name logout
          *
+         * @return {Promise} A resolved promise
+         *
          * @description
-         * Calls the server if online, then removes user data from
-         * authorization service.
+         * Attempts to logout through the OpenLMIS Auth Service, but will always
+         * clear the user data and access token, even if logout fails.
+         *
+         * The event openlmis-auth.logout is fired after values have been removed
+         * from the authorizationService.
          */
         function logout() {
             var deferred = $q.defer();
 
-            doLogout()
+            this.requestLogout()
             .finally(function() {
                 authorizationService.clearAccessToken();
                 authorizationService.clearUser();
@@ -115,31 +144,36 @@
             return deferred.promise;
         }
 
-        function doLogout() {
+        /**
+         * @ngdoc method
+         * @methodOf oepnlmis-login.loginService
+         * @name  requestLogout
+         * 
+         * @return {Promise} A promise that indicates if the user was logged out.
+         *
+         * @description
+         * Handles the request to the OpenLMIS Auth Service, and tries to end the
+         * user's session.
+         */
+        function requestLogout() {
             if(offlineService.isOffline()) {
                 return $q.reject();
-            } else {
-                return logoutOnline();
             }
-        }
 
-
-        function logoutOnline(){
-            var deferred = $q.defer();
-            $http({
+            return $http({
                 method: 'POST',
                 url: authUrl('/api/users/auth/logout'),
                 ignoreAuthModule: true
             }).then(function() {
-                deferred.resolve();
-            }, function(data) {
+                return $q.resolve();
+            })
+            .catch(function(data) {
                 if (data.status === 401) {
-                    deferred.resolve();
+                    return $q.resolve();
                 } else {
-                    deferred.reject();
+                    return $q.reject();
                 }
             });
-            return deferred.promise;
         }
 
         /**
