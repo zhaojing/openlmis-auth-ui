@@ -146,7 +146,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf oepnlmis-login.loginService
+         * @methodOf openlmis-login.loginService
          * @name  requestLogout
          * 
          * @return {Promise} A promise that indicates if the user was logged out.
