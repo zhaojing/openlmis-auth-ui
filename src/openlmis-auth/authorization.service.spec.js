@@ -13,33 +13,73 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe("authorizationService", function() {
+describe("openlmis-auth.authorizationService", function() {
+    var authorizationService;
 
-  beforeEach(module('openlmis-auth'));
+    beforeEach(module('openlmis-auth'));
 
-  var authorizationService, localStorageService;
+    beforeEach(inject(function(localStorageService) {
+        var fakeLocalStorage = {};
 
-  beforeEach(module(function($provide){
-    $provide.factory('authUrl', function(pathFactory){
-      return function(url){
-        return pathFactory('/', url);
-      }
-    })
-  }));
+        spyOn(localStorageService, 'add').andCallFake(function(key, value){
+            fakeLocalStorage[key] = value;
+        });
+        spyOn(localStorageService, 'remove').andCallFake(function(key){
+            fakeLocalStorage[key] = undefined
+        });
+        spyOn(localStorageService, 'get').andCallFake(function(key){
+            return fakeLocalStorage[key];
+        });
+    }));
 
-  beforeEach(inject(function(_authorizationService_, _localStorageService_) {
-    authorizationService = _authorizationService_;
-    localStorageService = _localStorageService_;
+    beforeEach(inject(function(_authorizationService_){
+        authorizationService = _authorizationService_;
+    }));
 
-    localStorageService.clearAll();
-    spyOn(localStorageService, 'remove');
-    spyOn(localStorageService, 'get');
+    it('will return authorized if the accessToken is set', function() {
+        expect(authorizationService.isAuthenticated()).toBe(false);
 
-    // Keep auth interceptor from running....
-    spyOn($rootScope, '$on'); // don't think this is needed....
+        authorizationService.setAccessToken('token');
 
-  }));
+        expect(authorizationService.isAuthenticated()).toBe(true);
+    });
 
-  // Seriously — none of those tests checked main system functionality???
+    it('getAccessToken will return the access token, set by setAccessToken', function() {
+        authorizationService.setAccessToken('token');
+
+        expect(authorizationService.getAccessToken()).toBe('token');
+    });
+
+    it('setAccessToken will not set a access token if it is falsy, and return false', function() {
+        var returnValue = authorizationService.setAccessToken();
+
+        expect(returnValue).toBe(false);
+        expect(authorizationService.getAccessToken()).toBe(false);
+    });
+
+    it('clearAccessToken will clear the access token', function(){
+        authorizationService.setAccessToken('token');
+
+        expect(authorizationService.getAccessToken()).toBe('token');
+
+        authorizationService.clearAccessToken();
+        expect(authorizationService.getAccessToken()).toBe(false);
+    });
+
+    it('getUser will return an object representing the current user, that is set by setUser', function() {
+        authorizationService.setUser('1234','test');
+
+        var user = authorizationService.getUser();
+        expect(user.user_id).toBe('1234');
+        expect(user.username).toBe('test');
+    });
+
+    it('clearUser will remove the user object', function() {
+        authorizationService.setUser('1234', 'test');
+        expect(authorizationService.getUser()).not.toBeUndefined();
+
+        authorizationService.clearUser();
+        expect(authorizationService.getUser()).toBe(false);
+    });
 
 });

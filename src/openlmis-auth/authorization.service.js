@@ -45,13 +45,33 @@
 
     function service($q, localStorageService, $injector, $filter) {
 
-        this.clearAccessToken = clearAccessToken;
-        this.clearUser = clearUser;
+        this.isAuthenticated = isAuthenticated;
+
         this.getAccessToken = getAccessToken;
+        this.setAccessToken = setAccessToken;
+        this.clearAccessToken = clearAccessToken;
+
         this.getUser = getUser;
         this.setUser = setUser;
-        this.isAuthenticated = isAuthenticated;
-        this.setAccessToken = setAccessToken;
+        this.clearUser = clearUser;
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-auth.authorizationService
+         * @name isAuthenticated
+         *
+         * @description
+         * Checks whether user is authenticated.
+         *
+         * @return {Boolean} true if the user is authenticated, false otherwise
+         */
+        function isAuthenticated() {
+            if(this.getAccessToken()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         /**
          * @ngdoc method
@@ -64,7 +84,13 @@
          * @return {String} the current access token
          */
         function getAccessToken() {
-            return localStorageService.get(storageKeys.ACCESS_TOKEN);
+            var accessToken = localStorageService.get(storageKeys.ACCESS_TOKEN);
+            
+            if(accessToken) {
+                return accessToken;
+            } else {
+                return false;
+            }
         }
 
         /**
@@ -78,7 +104,12 @@
          * @param {String} token the token to be stored
          */
         function setAccessToken(token) {
-            localStorageService.add(storageKeys.ACCESS_TOKEN, token);
+            if(token) {
+                localStorageService.add(storageKeys.ACCESS_TOKEN, token);
+                return true;
+            } else {
+                return false;
+            }
         }
 
         /**
@@ -90,21 +121,8 @@
          * Removed the stored token from the local storage.
          */
         function clearAccessToken() {
-            return localStorageService.remove(storageKeys.ACCESS_TOKEN);
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-auth.authorizationService
-         * @name isAuthenticated
-         *
-         * @description
-         * Checks whether user is authenticated.
-         *
-         * @return {Boolean} true if the user is authenticated, false otherwise
-         */
-        function isAuthenticated() {
-            return !!getAccessToken();
+            localStorageService.remove(storageKeys.ACCESS_TOKEN);
+            return true;
         }
 
         /**
@@ -118,10 +136,17 @@
          * @return {Object} the basic information about the user
          */
         function getUser() {
-            return {
-                username: localStorageService.get(storageKeys.USERNAME),
-                user_id: localStorageService.get(storageKeys.USER_ID)
-            };
+            var username = localStorageService.get(storageKeys.USERNAME),
+                user_id = localStorageService.get(storageKeys.USER_ID);
+
+            if(user_id && username) {
+                return {
+                    username: username,
+                    user_id: user_id
+                };
+            } else {
+                return false;
+            }
         }
 
         /**
@@ -136,8 +161,13 @@
          * @param {String} user_id  User ID for the current user
          */
         function setUser(user_id, username) {
-            localStorageService.add(storageKeys.USERNAME, username);
-            localStorageService.add(storageKeys.USER_ID, user_id);
+            if(!user_id || !username) {
+                return false;
+            } else {
+                localStorageService.add(storageKeys.USERNAME, username);
+                localStorageService.add(storageKeys.USER_ID, user_id);
+                return true;
+            }
         }
 
         /**
@@ -151,6 +181,7 @@
         function clearUser() {
             localStorageService.remove(storageKeys.USERNAME);
             localStorageService.remove(storageKeys.USER_ID);
+            return true;
         }
 
     }
