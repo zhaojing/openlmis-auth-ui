@@ -51,11 +51,11 @@
     service.$inject = ['$q', '$http', 'openlmisUrlFactory', 'localStorageService'];
 
     function service($q, $http, openlmisUrlFactory, localStorageService) {
-        var service = this;
+        var savedUserId;  // Used in service.load
 
-        service.hasPermission = hasPermission;
-        service.load = load;
-        service.empty = empty;
+        this.hasPermission = hasPermission;
+        this.load = load;
+        this.empty = empty;
 
         /**
          * @ngdoc method
@@ -85,7 +85,7 @@
 
             var deferred = $q.defer();
 
-            service.load(userId)
+            this.load(userId)
             .then(function(permissionsList) {
                 if(testPermissions(permissionsList, permission)) {
                     deferred.resolve();
@@ -139,17 +139,16 @@
          * The promise will be rejected if:
          * - The user isn't authenticated
          */
-        var savedUserId;
         function load(userId) {
             if(!userId) {
                 savedUserId = undefined;
-                service.empty();
+                this.empty();
                 return $q.reject();
             }
 
             if(userId !== savedUserId) {
                 savedUserId = userId;
-                service.empty();
+                this.empty();
             }
             
             return getCachedPermissions()
