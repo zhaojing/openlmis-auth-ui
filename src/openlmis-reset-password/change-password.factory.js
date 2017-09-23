@@ -36,7 +36,7 @@
         
         /**
          * @ngdoc method
-         * @methodOf openlmis-reset-password.
+         * @methodOf openlmis-reset-password.changePasswordFactory
          * @name changePasswordFactory
          *
          * @description
