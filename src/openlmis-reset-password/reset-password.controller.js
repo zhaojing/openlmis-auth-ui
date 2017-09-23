@@ -29,10 +29,10 @@
         .controller('ResetPasswordController', ResetPasswordController);
 
     ResetPasswordController.$inject = [
-        '$stateParams', 'loginService', 'alertService', 'modalDeferred'
+        '$stateParams', 'changePasswordFactory', 'alertService', 'modalDeferred'
     ];
 
-    function ResetPasswordController($stateParams, loginService, alertService, modalDeferred) {
+    function ResetPasswordController($stateParams, changePasswordFactory, alertService, modalDeferred) {
         var vm = this;
 
         vm.changePassword = changePassword;
@@ -48,7 +48,7 @@
          */
         function changePassword() {
             if(arePasswordsValid()) {
-                loginService.changePassword(vm.password, $stateParams.token).then(function() {
+                changePasswordFactory(vm.password, $stateParams.token).then(function() {
                     alertService.success('openlmisResetPassword.passwordReset.success')
                         .finally(modalDeferred.resolve);
                 }, function() {

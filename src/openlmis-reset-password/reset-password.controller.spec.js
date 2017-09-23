@@ -16,7 +16,7 @@
 
 describe('ResetPasswordController', function() {
 
-    var $rootScope, loginService, $q, alertService, vm, alertSpy, token;
+    var $rootScope, changePasswordFactory, $q, alertService, vm, alertSpy, token;
 
     beforeEach(function() {
         token = '1234';
@@ -35,16 +35,15 @@ describe('ResetPasswordController', function() {
                 return alertSpy;
             });
 
-            loginServiceSpy = jasmine.createSpyObj('loginService', ['changePassword']);
-            $provide.factory('loginService', function() {
-                return loginServiceSpy;
+            changePasswordFactory = jasmine.createSpy();
+            $provide.factory('changePasswordFactory', function() {
+                return changePasswordFactory;
             });
         });
 
-        inject(function (_$rootScope_, $controller, _$q_, _loginService_) {
+        inject(function (_$rootScope_, $controller, _$q_) {
             $rootScope = _$rootScope_;
             $q = _$q_;
-            loginService = _loginService_;
 
             vm = $controller('ResetPasswordController', {
                 modalDeferred: $q.defer()
@@ -53,7 +52,7 @@ describe('ResetPasswordController', function() {
     });
 
     describe('changePassword', function() {
-        it('should call change password from login service', function() {
+        it('should call change password factory', function() {
             var password = 'password123',
                 passwordPassed = false,
                 alertSpyMethod = jasmine.createSpy();
@@ -61,7 +60,7 @@ describe('ResetPasswordController', function() {
             vm.password = password;
             vm.reenteredPassword = password;
 
-            loginService.changePassword.andCallFake(function(pass, tk) {
+            changePasswordFactory.andCallFake(function(pass, tk) {
                 if(password === pass && tk === token) passwordPassed = true;
                 return $q.when(true);
             });
@@ -81,7 +80,7 @@ describe('ResetPasswordController', function() {
             vm.password = password;
             vm.reenteredPassword = password;
 
-            loginService.changePassword.andCallFake(function() {
+            changePasswordFactory.andCallFake(function() {
                 return deferred.promise;
             });
 
@@ -113,7 +112,7 @@ describe('ResetPasswordController', function() {
             expect(vm.error).toEqual('openlmisResetPassword.passwordTooShort');
         });
 
-        it('should set error message if password is too short', function() {
+        it('should set error message if password does not contain number', function() {
             var password = 'passwordWithoutNumber';
 
             vm.password = password;
