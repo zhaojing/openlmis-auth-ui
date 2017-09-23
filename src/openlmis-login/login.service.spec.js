@@ -209,43 +209,4 @@ describe('openlmis-login.loginService', function() {
 
     });
 
-    it('should call forgot password endpoint', inject(function() {
-        var email = 'user@openlmis.org',
-            spy = jasmine.createSpy();
-
-        httpBackend.when('POST', '/api/users/auth/forgotPassword?email=' + email)
-        .respond(200, {});
-
-        loginService.forgotPassword(email).then(spy);
-
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect(spy).toHaveBeenCalled();
-    }));
-
-    it('should call change password endpoint', inject(function() {
-        var data = {
-                token: '1234',
-                newPassword: 'secret1234'
-            },
-            spy = jasmine.createSpy();
-
-        httpBackend.when('POST', '/api/users/auth/changePassword')
-        .respond(function(method, url, body){
-            if(body === angular.toJson(data)){
-                return [200];
-            } else {
-                return [404];
-            }
-        });
-
-        loginService.changePassword(data.newPassword, data.token).then(spy);
-
-        httpBackend.flush();
-        $rootScope.$apply();
-
-        expect(spy).toHaveBeenCalled();
-    }));
-
 });

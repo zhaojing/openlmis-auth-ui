@@ -15,10 +15,15 @@
 
 describe('ForgotPasswordController', function() {
 
-    var vm, $q, $controller, modalDeferred;
+    var vm, $q, $controller, modalDeferred, forgotPasswordFactory;
 
     beforeEach(function() {
-        module('openlmis-forgot-password');
+        module('openlmis-forgot-password', function($provide) {
+            forgotPasswordFactory = jasmine.createSpy();
+            $provide.factory('forgotPasswordFactory', function(){
+                return forgotPasswordFactory;
+            });
+        });
 
         inject(function($injector) {
             $q = $injector.get('$q');
@@ -34,28 +39,27 @@ describe('ForgotPasswordController', function() {
 
     describe('forgotPassword', function() {
 
-        var $rootScope, loginService, alertService, forgotPasswordDeferred, email;
+        var $rootScope, alertService, forgotPasswordDeferred, email;
 
         beforeEach(function() {
             inject(function($injector) {
                 $rootScope = $injector.get('$rootScope');
-                loginService = $injector.get('loginService');
                 alertService = $injector.get('alertService');
             });
 
             forgotPasswordDeferred = $q.defer();
 
-            spyOn(loginService, 'forgotPassword').andReturn(forgotPasswordDeferred.promise);
+            forgotPasswordFactory.andReturn(forgotPasswordDeferred.promise);
             spyOn(alertService, 'success').andReturn($q.when());
 
             email = 'some-valid@email.com';
             vm.email = email;
         });
 
-        it('should call loginService', function() {
+        it('should call forgotPasswordFactory', function() {
             vm.forgotPassword();
 
-            expect(loginService.forgotPassword).toHaveBeenCalledWith(email);
+            expect(forgotPasswordFactory).toHaveBeenCalledWith(email);
         });
 
         it('should show alert if password reset succeeded', function() {

@@ -13,22 +13,22 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function() {
+describe('openlmis-forgot-password.forgotPasswordFactory', function() {
+	beforeEach(module('openlmis-forgot-password'));
 
-    'use strict';
+    it('should call forgot password endpoint', inject(function(forgotPasswordFactory, $rootScope, $httpBackend) {
+        var email = 'user@openlmis.org',
+            spy = jasmine.createSpy();
 
-    /**
-     * @module openlmis-forgot-password
-     *
-     * @description
-     * Provides workflow for a user to tell the OpenLMIS Service they forgot
-     * their password.
-     */
-    angular.module('openlmis-forgot-password', [
-        'ui.router',
-        'openlmis-urls',
-        'openlmis-modal',
-        'openlmis-config'
-    ]);
+        $httpBackend.when('POST', '/api/users/auth/forgotPassword?email=' + email)
+        .respond(200, {});
 
-})();
+        forgotPasswordFactory(email).then(spy);
+
+        $httpBackend.flush();
+        $rootScope.$apply();
+
+        expect(spy).toHaveBeenCalled();
+    }));
+
+});

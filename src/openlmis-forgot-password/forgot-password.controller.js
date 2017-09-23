@@ -28,9 +28,9 @@
         .module('openlmis-forgot-password')
         .controller('ForgotPasswordController', controller);
 
-    controller.$inject = ['loginService', 'alertService', 'modalDeferred'];
+    controller.$inject = ['forgotPasswordFactory', 'alertService', 'modalDeferred'];
 
-    function controller(loginService, alertService, modalDeferred) {
+    function controller(forgotPasswordFactory, alertService, modalDeferred) {
         var vm = this;
 
         vm.forgotPassword = forgotPassword;
@@ -45,12 +45,15 @@
          * Requests sending reset password token to email address given in form.
          */
         function forgotPassword() {
-            loginService.forgotPassword(vm.email).then(function() {
+            forgotPasswordFactory(vm.email)
+            .then(function() {
                 alertService.success(
                     'openlmisForgotPassword.resetPasswordAlert.title',
                     'openlmisForgotPassword.resetPasswordAlert.message'
-                ).then(modalDeferred.resolve);
-            }, function() {
+                )
+                .then(modalDeferred.resolve);
+            })
+            .catch(function() {
                 vm.error = 'openlmisForgotPassword.passwordResetFailure';
             });
         }

@@ -39,9 +39,6 @@
         this.logout = logout;
         this.requestLogout = requestLogout;
 
-        this.forgotPassword = forgotPassword;
-        this.changePassword = changePassword;
-
         /**
          * @ngdoc method
          * @methodOf openlmis-login.loginService
@@ -172,61 +169,6 @@
                     return $q.resolve();
                 } else {
                     return $q.reject();
-                }
-            });
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-login.loginService
-         * @name forgotPassword
-         *
-         * @description
-         * Calls the server that sends message with reset password link to given email address.
-         *
-         * @param  {String}  email Mail address where reset password link will be sent
-         * @return {Promise}       Forgot password promise
-         */
-        function forgotPassword(email) {
-            var forgotPasswordURL = openlmisUrlFactory('/api/users/auth/forgotPassword?email=' + email);
-
-            return $http({
-                method: 'POST',
-                url: forgotPasswordURL,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-login.loginService
-         * @name changePassword
-         *
-         * @description
-         * Calls the server that changes user account password.
-         *
-         * @param  {String}  newPassword New password for user account
-         * @param  {String}  token       Token that identifies user
-         * @return {Promise}             Resolves when password is changed successfully.
-         */
-        function changePassword(newPassword, token) {
-            var changePasswordURL = openlmisUrlFactory('/api/users/auth/changePassword'),
-                data = {
-                    token: token,
-                    newPassword: newPassword
-                };
-
-            if(authorizationService.isAuthenticated())
-                authorizationService.clearAccessToken();
-
-            return $http({
-                method: 'POST',
-                url: changePasswordURL,
-                data: data,
-                headers: {
-                    'Content-Type': 'application/json'
                 }
             });
         }

@@ -24,8 +24,9 @@
      * This module manages reset password screen.
      */
     angular.module('openlmis-reset-password', [
-        'openlmis-login',
         'openlmis-modal',
+        'openlmis-urls',
+        'openlmis-config',
         'ui.router'
     ]);
 
