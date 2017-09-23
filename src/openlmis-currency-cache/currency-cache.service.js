@@ -78,6 +78,7 @@
                 })
                 .finally(function() {
                     deferred.resolve();
+                    cachingPromise = undefined;
                 });
             }
         }
