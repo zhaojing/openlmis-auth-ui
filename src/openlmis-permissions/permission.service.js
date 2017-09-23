@@ -63,7 +63,7 @@
          * @name hasPermission
          *
          * @param  {String} userId User to get test permission for
-         * @param  {Object} permissionTest Object representing a permission
+         * @param  {Object} permission Object representing a permission
          * @return {Promise} A promise that resolves a if there is a match
          *
          * @description
@@ -74,20 +74,20 @@
          * If the permission object that is tested against doesn't have a
          * 'right' property, then it is immedately rejected.
          */
-        function hasPermission(userId, permissionTest) {
-            if(!permissionTest) {
+        function hasPermission(userId, permission) {
+            if(!permission) {
                 return $q.reject();
             }
 
-            if(!permissionTest.hasOwnProperty('right')) {
+            if(!permission.hasOwnProperty('right')) {
                 return $q.reject();
             }
 
             var deferred = $q.defer();
 
             service.load(userId)
-            .then(function(permissions) {
-                if(testPermissions(permissions, permissionTest)) {
+            .then(function(permissionsList) {
+                if(testPermissions(permissionsList, permission)) {
                     deferred.resolve();
                 } else {
                     deferred.reject();
@@ -100,10 +100,10 @@
             return deferred.promise;
         }
 
-        function testPermissions(permissions, permissionTest) {
+        function testPermissions(permissionsList, permission) {
             var i = 0;
-            for(i; i < permissions.length; i++) {
-                if(permissionMatch(permissions[i], permissionTest.right, permissionTest.facilityId, permissionTest.programId)) {
+            for(i; i < permissionsList.length; i++) {
+                if(permissionMatch(permissionsList[i], permission.right, permission.facilityId, permission.programId)) {
                     return true;
                 }
             }
