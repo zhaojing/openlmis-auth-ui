@@ -25,9 +25,9 @@
      * currency format is needed.
      */
     angular.module('openlmis-currency-cache', [
+        'openlmis-loading',
         'openlmis-currency',
-        'openlmis-local-storage',
-        'ui.router'
+        'openlmis-local-storage'
     ]);
 
 })();

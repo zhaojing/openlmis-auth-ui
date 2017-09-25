@@ -3,6 +3,7 @@
     "src": "./src"
   },
   "orderedBuildDirectories": [
+    "/openlmis-ui-layout",
     "/openlmis-ui-components"
   ],
   "authServiceURL": "/",

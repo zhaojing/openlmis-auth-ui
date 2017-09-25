@@ -28,32 +28,16 @@
         .service('currencyCacheService', service)
         .run(initCurrencyCache);
 
-    initCurrencyCache.$inject = ['currencyCacheService'];
+    initCurrencyCache.$inject = ['$rootScope', 'currencyCacheService'];
 
-    function initCurrencyCache(currencyCacheService) {
-        currencyCacheService.initialize();
+    function initCurrencyCache($rootScope, currencyCacheService) {
+        $rootScope.$on('openlmis-auth.login', currencyCacheService.setCurrencySettings);
     };
 
-    service.$inject = ['$q', '$rootScope', 'currencyService', '$urlRouter'];
+    service.$inject = ['currencyService', 'loadingService'];
 
-    function service($q, $rootScope, currencyService, $urlRouter) {
-        var cachingPromise;
-
-        this.initialize = initialize;
+    function service(currencyService, loadingService) {
         this.setCurrencySettings = setCurrencySettings;
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-currency.currencyCacheService
-         * @name initialize
-         *
-         * @description
-         * Sets up listenters for events in the service.
-         */
-        function initialize() {
-            $rootScope.$on('openlmis-auth.login', this.setCurrencySettings);
-            $rootScope.$on('$stateChangeStart', pauseIfLoading);
-        }
 
         /**
          * @ngdoc method
@@ -68,40 +52,12 @@
          * block state changes while the facility list is being downloaded.
          */
         function setCurrencySettings() {
-            if(!cachingPromise) {
-                var deferred = $q.defer();
-                cachingPromise = deferred.promise;
+            var promise = currencyService.getCurrencySettings()
+            .catch(function(){
+                return currencyService.getCurrencySettingsFromConfig();
+            });
 
-                currencyService.getCurrencySettings()
-                .catch(function(){
-                    currencyService.getCurrencySettingsFromConfig();
-                })
-                .finally(function() {
-                    deferred.resolve();
-                    cachingPromise = undefined;
-                });
-            }
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf openlmis-currency.currencyCacheService
-         * @name pauseIfLoading
-         *
-         * @param {Object} event State change event from $stateChangeStart
-         *
-         * @description
-         * Cancels any state changes while the caching promise is loading. After
-         * loading is complete, the browser is directed to the current state.
-         */
-        function pauseIfLoading(event) {
-            if(cachingPromise) {
-                event.preventDefault();
-
-                cachingPromise.then(function() {
-                    $urlRouter.sync();
-                });
-            }
+            loadingService.register('openlmis-currency-cache.set', promise)
         }
     }
 

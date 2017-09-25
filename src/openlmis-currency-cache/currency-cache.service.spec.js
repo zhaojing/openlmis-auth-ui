@@ -14,16 +14,15 @@
  */
 
 describe('openlmis-currency-cache.currencyCacheService', function() {
-
     var $rootScope, currencyService;
 
     beforeEach(module('openlmis-currency-cache'));
 
-    beforeEach(inject(function(_$rootScope_){
+    beforeEach(inject(function(_$rootScope_) {
         $rootScope = _$rootScope_;
     }));
 
-    beforeEach(inject(function(_currencyService_, $q){
+    beforeEach(inject(function(_currencyService_, $q) {
         currencyService = _currencyService_;
         
         spyOn(currencyService, 'getCurrencySettings')

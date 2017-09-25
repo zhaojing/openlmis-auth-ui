@@ -11,12 +11,18 @@ services:
     env_file: .env
     volumes_from:
       - ui-components
+      - ui-layout
     depends_on:
       - ui-components
+      - ui-layout
   ui-components:
     image: openlmis/ui-components:5.2.0-SNAPSHOT
     volumes:
       - '/openlmis-ui-components'
+  ui-layout:
+    image: openlmis/ui-layout:5.0.3-SNAPSHOT
+    volumes:
+      - '/openlmis-ui-layout'
   image:
     build: .
     image: openlmis/auth-ui
