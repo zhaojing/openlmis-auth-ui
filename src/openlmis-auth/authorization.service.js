@@ -81,7 +81,7 @@
          * @description
          * Retrieves the current access token.
          *
-         * @return {String} the current access token
+         * @return {String} the current access token, or false if not set
          */
         function getAccessToken() {
             var accessToken = localStorageService.get(storageKeys.ACCESS_TOKEN);
@@ -101,7 +101,8 @@
          * @description
          * Sets the access token.
          *
-         * @param {String} token the token to be stored
+         * @param  {String} token the token to be stored
+         * @return {Boolean}      true if successfully stored
          */
         function setAccessToken(token) {
             if(token) {
@@ -119,6 +120,8 @@
          *
          * @description
          * Removed the stored token from the local storage.
+         *
+         * @return {Boolean} true if successfully removed
          */
         function clearAccessToken() {
             localStorageService.remove(storageKeys.ACCESS_TOKEN);
@@ -159,6 +162,8 @@
          *
          * @param {String} username Username for the current user
          * @param {String} user_id  User ID for the current user
+         *
+         * @return {Boolean} true if values are provided and stored successfully
          */
         function setUser(user_id, username) {
             if(!user_id || !username) {
@@ -177,6 +182,8 @@
          *
          * @description
          * Removes the username and user ID from the local storage.
+         *
+         * @return {Boolean} true if user information successfully removed
          */
         function clearUser() {
             localStorageService.remove(storageKeys.USERNAME);
