@@ -18,16 +18,14 @@ describe('ForgotPasswordController', function() {
     var vm, $q, $controller, modalDeferred, forgotPasswordFactory;
 
     beforeEach(function() {
-        module('openlmis-forgot-password', function($provide) {
-            forgotPasswordFactory = jasmine.createSpy();
-            $provide.factory('forgotPasswordFactory', function(){
-                return forgotPasswordFactory;
-            });
-        });
+        module('openlmis-forgot-password');
 
         inject(function($injector) {
             $q = $injector.get('$q');
             $controller = $injector.get('$controller');
+
+            forgotPasswordFactory = $injector.get('forgotPasswordFactory');
+            spyOn(forgotPasswordFactory, 'sendResetEmail');
         });
 
         modalDeferred = $q.defer();
@@ -49,7 +47,7 @@ describe('ForgotPasswordController', function() {
 
             forgotPasswordDeferred = $q.defer();
 
-            forgotPasswordFactory.andReturn(forgotPasswordDeferred.promise);
+            forgotPasswordFactory.sendResetEmail.andReturn(forgotPasswordDeferred.promise);
             spyOn(alertService, 'success').andReturn($q.when());
 
             email = 'some-valid@email.com';
@@ -59,7 +57,7 @@ describe('ForgotPasswordController', function() {
         it('should call forgotPasswordFactory', function() {
             vm.forgotPassword();
 
-            expect(forgotPasswordFactory).toHaveBeenCalledWith(email);
+            expect(forgotPasswordFactory.sendResetEmail).toHaveBeenCalledWith(email);
         });
 
         it('should show alert if password reset succeeded', function() {

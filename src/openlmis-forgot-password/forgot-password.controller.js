@@ -45,7 +45,7 @@
          * Requests sending reset password token to email address given in form.
          */
         function forgotPassword() {
-            forgotPasswordFactory(vm.email)
+            forgotPasswordFactory.sendResetEmail(vm.email)
             .then(function() {
                 alertService.success(
                     'openlmisForgotPassword.resetPasswordAlert.title',

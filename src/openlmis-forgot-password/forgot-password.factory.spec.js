@@ -16,14 +16,14 @@
 describe('openlmis-forgot-password.forgotPasswordFactory', function() {
 	beforeEach(module('openlmis-forgot-password'));
 
-    it('should call forgot password endpoint', inject(function(forgotPasswordFactory, $rootScope, $httpBackend) {
+    it('sendResetEmail should call forgot password endpoint', inject(function(forgotPasswordFactory, $rootScope, $httpBackend) {
         var email = 'user@openlmis.org',
             spy = jasmine.createSpy();
 
         $httpBackend.when('POST', '/api/users/auth/forgotPassword?email=' + email)
         .respond(200, {});
 
-        forgotPasswordFactory(email).then(spy);
+        forgotPasswordFactory.sendResetEmail(email).then(spy);
 
         $httpBackend.flush();
         $rootScope.$apply();

@@ -34,16 +34,14 @@ describe('ResetPasswordController', function() {
             $provide.factory('alertService', function() {
                 return alertSpy;
             });
-
-            changePasswordFactory = jasmine.createSpy();
-            $provide.factory('changePasswordFactory', function() {
-                return changePasswordFactory;
-            });
         });
 
-        inject(function (_$rootScope_, $controller, _$q_) {
+        inject(function (_$rootScope_, _changePasswordFactory_, $controller, _$q_) {
             $rootScope = _$rootScope_;
             $q = _$q_;
+
+            changePasswordFactory = _changePasswordFactory_;
+            spyOn(changePasswordFactory, 'changePassword');
 
             vm = $controller('ResetPasswordController', {
                 modalDeferred: $q.defer()
@@ -60,7 +58,7 @@ describe('ResetPasswordController', function() {
             vm.password = password;
             vm.reenteredPassword = password;
 
-            changePasswordFactory.andCallFake(function(pass, tk) {
+            changePasswordFactory.changePassword.andCallFake(function(pass, tk) {
                 if(password === pass && tk === token) passwordPassed = true;
                 return $q.when(true);
             });
@@ -80,7 +78,7 @@ describe('ResetPasswordController', function() {
             vm.password = password;
             vm.reenteredPassword = password;
 
-            changePasswordFactory.andCallFake(function() {
+            changePasswordFactory.changePassword.andCallFake(function() {
                 return deferred.promise;
             });
 

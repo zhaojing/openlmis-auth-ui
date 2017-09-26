@@ -31,21 +31,23 @@
     factory.$inject = ['openlmisUrlFactory', '$http'];
 
     function factory(openlmisUrlFactory, $http) {
-        return forgotPassword;
+        return {
+            sendResetEmail: sendResetEmail
+        };
         
         /**
          * @ngdoc method
          * @methodOf openlmis-forgot-password.forgotPasswordFactory
-         * @name forgotPasswordFactory
-         *
-         * @param  {String}  email Mail address where reset password link will be sent
-         * @return {Promise}       Forgot password promise
+         * @name sendResetEmail
          *
          * @description
          * Calls the server that sends message with reset password link to given
          * email address.
+         *
+         * @param  {String}  email Mail address where reset password link will be sent
+         * @return {Promise}       Forgot password promise
          */
-        function forgotPassword(email) {
+        function sendResetEmail(email) {
             var forgotPasswordURL = openlmisUrlFactory('/api/users/auth/forgotPassword?email=' + email);
 
             return $http({

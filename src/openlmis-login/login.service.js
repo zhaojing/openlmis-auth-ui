@@ -44,14 +44,14 @@
          * @methodOf openlmis-login.loginService
          * @name login
          *
-         * @param {String} username The name of the person trying to login
-         * @param {String} password The password the person is trying to login with
-         *
-         * @return {Promise} Returns promise from requestLogin
-         *
          * @description
          * Sets authorization service with basic user data and fires
          * openlmis-auth.login when requestLogin is successful.
+         *
+         * @param {String} username The username of the person trying to login
+         * @param {String} password The password the person is trying to login with
+         *
+         * @return {Promise} Returns promise from requestLogin
          */
         function login(username, password) {
             return this.requestLogin(username, password)
@@ -67,15 +67,15 @@
          * @methodOf openlmis-login.loginService
          * @name requestLogin
          *
-         * @param {String} username The name of the person trying to login
-         * @param {String} password The password the person is trying to login with
-         *
-         * @return {Promise} Resolves when successful, rejects otherwise
-         *
          * @description
          * Calls the OpenLMIS oauth service, and returns an object with the user's
          * access token and user id. If the call to OpenLMIS oauth is unsuccessful
          * then the promise is rejected with an error message.
+         *
+         * @param {String} username The name of the person trying to login
+         * @param {String} password The password the person is trying to login with
+         *
+         * @return {Promise} Resolves when successful, rejects otherwise
          */
         function requestLogin(username, password) {
             if(offlineService.isOffline()) {
@@ -118,14 +118,14 @@
          * @methodOf openlmis-login.loginService
          * @name logout
          *
-         * @return {Promise} A resolved promise
-         *
          * @description
          * Attempts to logout through the OpenLMIS Auth Service, but will always
          * clear the user data and access token, even if logout fails.
          *
          * The event openlmis-auth.logout is fired after values have been removed
          * from the authorizationService.
+         *
+         * @return {Promise} A resolved promise
          */
         function logout() {
             var deferred = $q.defer();
@@ -145,12 +145,12 @@
          * @ngdoc method
          * @methodOf openlmis-login.loginService
          * @name  requestLogout
-         * 
-         * @return {Promise} A promise that indicates if the user was logged out.
          *
          * @description
          * Handles the request to the OpenLMIS Auth Service, and tries to end the
          * user's session.
+         * 
+         * @return {Promise} A promise that indicates if the user was logged out.
          */
         function requestLogout() {
             if(offlineService.isOffline()) {

@@ -32,7 +32,9 @@
     factory.$inject = ['openlmisUrlFactory', '$http'];
 
     function factory(openlmisUrlFactory, $http) {
-        return changePassword;
+        return {
+            changePassword: changePassword
+        };
         
         /**
          * @ngdoc method

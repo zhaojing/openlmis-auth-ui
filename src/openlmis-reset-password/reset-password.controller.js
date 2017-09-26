@@ -48,7 +48,7 @@
          */
         function changePassword() {
             if(arePasswordsValid()) {
-                changePasswordFactory(vm.password, $stateParams.token).then(function() {
+                changePasswordFactory.changePassword(vm.password, $stateParams.token).then(function() {
                     alertService.success('openlmisResetPassword.passwordReset.success')
                         .finally(modalDeferred.resolve);
                 }, function() {

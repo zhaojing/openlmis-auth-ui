@@ -42,7 +42,7 @@ describe('openlmis-reset-password.changePasswordFactory', function() {
 
     it('will resolve for successful requests', function() {
         spy = jasmine.createSpy();
-        changePasswordFactory('password', 'token').then(spy);
+        changePasswordFactory.changePassword('password', 'token').then(spy);
 
         $httpBackend.flush();
         $rootScope.$apply();
@@ -52,7 +52,7 @@ describe('openlmis-reset-password.changePasswordFactory', function() {
 
     it('will reject for failed requests', function() {
         spy = jasmine.createSpy();
-        changePasswordFactory('password', 'incorrect token').catch(spy);
+        changePasswordFactory.changePassword('password', 'incorrect token').catch(spy);
 
         $httpBackend.flush();
         $rootScope.$apply();
