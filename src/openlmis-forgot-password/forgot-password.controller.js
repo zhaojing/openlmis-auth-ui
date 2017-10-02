@@ -49,7 +49,6 @@
             loadingModalService.open();
             forgotPasswordFactory.sendResetEmail(vm.email)
             .then(function() {
-                loadingModalService.close();
                 alertService.success(
                     'openlmisForgotPassword.resetPasswordAlert.title',
                     'openlmisForgotPassword.resetPasswordAlert.message'
@@ -57,9 +56,9 @@
                 .then(modalDeferred.resolve);
             })
             .catch(function() {
-                loadingModalService.close();
                 vm.error = 'openlmisForgotPassword.passwordResetFailure';
-            });
+            })
+            .finally(loadingModalService.close);
         }
     }
 }());
