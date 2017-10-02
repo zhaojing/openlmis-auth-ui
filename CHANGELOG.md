@@ -5,7 +5,10 @@ New functionality
 * [OLMIS-2956:](https://openlmis.atlassian.net/browse/OLMIS-2956) Simplified login and authorization services by removing "user rights" functionality and moving to openlmis-referencedata-ui.
 
 New functionality added in backwards-compatiable manner
-* [OLMIS-3141:](https://openlmis.atlassian.net/browse/OLMIS-3141) After user resets their password, they are redirected to the login screen. 
+* [OLMIS-3141:](https://openlmis.atlassian.net/browse/OLMIS-3141) After user resets their password, they are redirected to the login screen.
+
+Bug fixes which are backwards-compatible:
+* [OLMIS-3140](https://openlmis.atlassian.net/browse/OLMIS-3140): Added loading icon on forgot password modal.
 
 5.0.3 / 2017-09-01
 ===========
@@ -14,7 +17,7 @@ New functionality added in backwards-compatiable manner
 * [OLMIS-3085:](https://openlmis.atlassian.net/browse/OLMIS-3085) Added standard login and logout events.
 
 Bug fixes and security updates:
-* [OLMIS-3124](https://openlmis.atlassian.net/browse/OLMIS-3124): Removed openlmis-download directive and moved it to openlmis-ui-components 
+* [OLMIS-3124](https://openlmis.atlassian.net/browse/OLMIS-3124): Removed openlmis-download directive and moved it to openlmis-ui-components
 * [MW-348:](https://openlmis.atlassian.net/browse/MW-348) Added loading modal while logging in.
 * [OLMIS-2871](https://openlmis.atlassian.net/browse/OLMIS-2871): Made the component use an Authorization header instead of an access_token request parameter when calls to the backend are made.
 * [OLMIS-2867](https://openlmis.atlassian.net/browse/OLMIS-2867): Added message when user tries to log in while offline.

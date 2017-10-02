@@ -15,7 +15,7 @@
 
 describe('ForgotPasswordController', function() {
 
-    var vm, $q, $controller, modalDeferred, forgotPasswordFactory;
+    var vm, $q, $controller, modalDeferred, forgotPasswordFactory, loadingModalService;
 
     beforeEach(function() {
         module('openlmis-forgot-password');
@@ -23,12 +23,15 @@ describe('ForgotPasswordController', function() {
         inject(function($injector) {
             $q = $injector.get('$q');
             $controller = $injector.get('$controller');
-
             forgotPasswordFactory = $injector.get('forgotPasswordFactory');
-            spyOn(forgotPasswordFactory, 'sendResetEmail');
+            loadingModalService = $injector.get('loadingModalService');
         });
 
         modalDeferred = $q.defer();
+
+        spyOn(forgotPasswordFactory, 'sendResetEmail');
+        spyOn(loadingModalService, 'open').andReturn(true);
+        spyOn(loadingModalService, 'close').andReturn(true);
 
         vm = $controller('ForgotPasswordController', {
             modalDeferred: modalDeferred
@@ -52,6 +55,12 @@ describe('ForgotPasswordController', function() {
 
             email = 'some-valid@email.com';
             vm.email = email;
+        });
+
+        it('should open loading modal', function() {
+            vm.forgotPassword();
+
+            expect(loadingModalService.open).toHaveBeenCalled();
         });
 
         it('should call forgotPasswordFactory', function() {
@@ -94,6 +103,21 @@ describe('ForgotPasswordController', function() {
             expect(vm.error).not.toBeUndefined();
         });
 
+        it('should close loading modal on reject', function() {
+            vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
+            $rootScope.$apply();
+
+            expect(loadingModalService.close).toHaveBeenCalled();
+        });
+
+        it('should close loading modal on resolve', function() {
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
+
+            expect(loadingModalService.close).toHaveBeenCalled();
+        });
     });
 
     it('cancel should expose modal reject method', function() {
