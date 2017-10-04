@@ -39,11 +39,16 @@
                 resetPassword: {
                     method: 'POST',
                     url: openlmisUrlFactory('/api/users/auth/passwordReset')
+                },
+                sendResetEmail: {
+                    method: 'POST',
+                    url: openlmisUrlFactory('/api/users/auth/forgotPassword')
                 }
             });
 
         this.saveUser = saveUser;
         this.resetPassword = resetPassword;
+        this.sendResetEmail = sendResetEmail;
 
         /**
          * @ngdoc method
@@ -64,6 +69,12 @@
             return resource.resetPassword(undefined, {
                 username: username,
                 newPassword: newPassword
+            }).$promise;
+        }
+
+        function sendResetEmail(email) {
+            return resource.sendResetEmail({
+                email: email
             }).$promise;
         }
     }
