@@ -30,8 +30,8 @@
         'openlmis-modal',
         'openlmis-templates',
         'openlmis-urls',
-        'ui.router',
-        'ngResource'
+        'ui.router'
+        // 'ngResource'
     ]);
 
 })();
