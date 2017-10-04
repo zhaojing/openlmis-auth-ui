@@ -23,7 +23,6 @@
      * Provides service for communicating with the auth user endpoint.
      */
     angular.module('auth-user', [
-        'auth',
         'openlmis-urls'
     ]);
 
