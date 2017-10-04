@@ -82,4 +82,14 @@ describe("openlmis-auth.authorizationService", function() {
         expect(authorizationService.getUser()).toBe(false);
     });
 
+    describe('hasRight', function() {
+        it('should return false if right name is undefined', inject(function(localStorageService) {
+            expect(function() {
+                authorizationService.hasRight(undefined);
+            }).toThrow(new Error("Right name is required"));
+
+            expect(localStorageService.get).not.toHaveBeenCalled();
+        }));
+    });
+
 });
