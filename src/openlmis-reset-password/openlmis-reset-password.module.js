@@ -27,6 +27,7 @@
         'openlmis-modal',
         'openlmis-urls',
         'openlmis-config',
+        'openlmis-templates',
         'ui.router'
     ]);
 
