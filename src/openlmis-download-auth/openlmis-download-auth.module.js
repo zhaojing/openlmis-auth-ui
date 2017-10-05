@@ -23,7 +23,6 @@
      * Extends the download module with an authentication behavior.
      */
     angular.module('openlmis-download-auth', [
-        'auth',
         'openlmis-download'
     ]);
 
