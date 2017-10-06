@@ -6,6 +6,7 @@ New functionality
 
 New functionality added in backwards-compatiable manner
 * [OLMIS-3141:](https://openlmis.atlassian.net/browse/OLMIS-3141) After user resets their password, they are redirected to the login screen.
+* [OLMIS-3283:](https://openlmis.atlassian.net/browse/OLMIS-3283) Added a "Show password" option on password reset screen.
 
 Bug fixes which are backwards-compatible:
 * [OLMIS-3140](https://openlmis.atlassian.net/browse/OLMIS-3140): Added loading icon on forgot password modal.
