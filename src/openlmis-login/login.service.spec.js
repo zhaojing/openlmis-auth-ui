@@ -35,9 +35,9 @@ describe('openlmis-login.loginService', function() {
         spyOn(offlineService, 'isOffline').andReturn(false);
     }));
 
-    beforeEach(inject(function(_$httpBackend_) {
+    beforeEach(inject(function(_$httpBackend_, authUrl) {
         httpBackend = _$httpBackend_;
-        httpBackend.when('POST', '/api/oauth/token?grant_type=password')
+        httpBackend.when('POST', authUrl('/api/oauth/token?grant_type=password'))
         .respond(function(method, url, data){
             if(data.indexOf('bad-password') >= 0 ){
                 return [400];
@@ -184,8 +184,8 @@ describe('openlmis-login.loginService', function() {
             expect(success).toBe(true);
         });
 
-        it('should resolve promise if response status is 401', function() {
-            httpBackend.when('POST', '/api/users/auth/logout')
+        it('should resolve promise if response status is 401', inject(function(authUrl) {
+            httpBackend.when('POST', authUrl('/api/users/auth/logout'))
             .respond(401);
 
             var resolved = false;
@@ -197,7 +197,7 @@ describe('openlmis-login.loginService', function() {
             $rootScope.$apply();
 
             expect(resolved).toBe(true);
-        });
+        }));
 
         it('calls requestLogout method', function(){
             spyOn(loginService, 'requestLogout').andReturn($q.reject());

@@ -24,13 +24,13 @@ describe('openlmis-reset-password.changePasswordFactory', function() {
         $rootScope = _$rootScope_;
     }));
 
-    beforeEach(function(){
+    beforeEach(inject(function(openlmisUrlFactory){
         var data = {
                 token: 'token',
                 newPassword: 'password'
             };
 
-        $httpBackend.when('POST', '/api/users/auth/changePassword')
+        $httpBackend.when('POST', openlmisUrlFactory('/api/users/auth/changePassword'))
         .respond(function(method, url, body){
             if(body === angular.toJson(data)){
                 return [200];
@@ -38,7 +38,7 @@ describe('openlmis-reset-password.changePasswordFactory', function() {
                 return [404];
             }
         });
-    });
+    }));
 
     it('will resolve for successful requests', function() {
         spy = jasmine.createSpy();
