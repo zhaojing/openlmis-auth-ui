@@ -44,7 +44,7 @@ describe("LoginController", function() {
                 if (password == "bad-password") {
                     return $q.reject("error");
                 } else {
-                    return $q.when();
+                    return $q.resolve();
                 }
             });
 
@@ -92,5 +92,26 @@ describe("LoginController", function() {
 
         expect(loadingModalService.open).toHaveBeenCalled();
         expect(loadingModalService.close).toHaveBeenCalled();
+    });
+
+    it('will resolve modalDeferred promise if login is successful', function($controller) {
+        var spy = jasmine.createSpy('modalDeferredSpy');
+        modalDeferred.promise.then(spy);
+
+        vm.username = "john";
+        vm.password = "bad-password";
+
+        vm.doLogin();
+        $rootScope.$apply();
+
+        expect(spy).not.toHaveBeenCalled();
+
+        vm.username = "john";
+        vm.password = "good-password";
+
+        vm.doLogin();
+        $rootScope.$apply();
+
+        expect(spy).toHaveBeenCalled();
     });
 });

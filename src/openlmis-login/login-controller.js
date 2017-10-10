@@ -51,6 +51,7 @@
         function doLogin() {
             loadingModalService.open();
             loginService.login(vm.username, vm.password)
+            .then(modalDeferred.resolve)
             .catch(function(error) {
                 vm.loginError = error;
                 vm.password = undefined;
