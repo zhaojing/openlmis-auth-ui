@@ -115,8 +115,7 @@
          */
         function setAccessToken(token) {
             if(token) {
-                localStorageService.add(storageKeys.ACCESS_TOKEN, token);
-                return true;
+                return localStorageService.add(storageKeys.ACCESS_TOKEN, token);
             } else {
                 return false;
             }
@@ -133,8 +132,7 @@
          * @return {Boolean} true if successfully removed
          */
         function clearAccessToken() {
-            localStorageService.remove(storageKeys.ACCESS_TOKEN);
-            return true;
+            return localStorageService.remove(storageKeys.ACCESS_TOKEN);
         }
 
         /**
@@ -175,12 +173,15 @@
          * @return {Boolean} true if values are provided and stored successfully
          */
         function setUser(user_id, username) {
+            var savedUserID,
+                savedUsername
             if(!user_id || !username) {
                 return false;
             } else {
-                localStorageService.add(storageKeys.USERNAME, username);
-                localStorageService.add(storageKeys.USER_ID, user_id);
-                return true;
+                savedUserID = localStorageService.add(storageKeys.USER_ID, user_id);
+                savedUsername = localStorageService.add(storageKeys.USERNAME, username);
+                
+                return savedUserID && savedUsername;
             }
         }
 
@@ -195,9 +196,10 @@
          * @return {Boolean} true if user information successfully removed
          */
         function clearUser() {
-            localStorageService.remove(storageKeys.USERNAME);
-            localStorageService.remove(storageKeys.USER_ID);
-            return true;
+            var usernameRemoved = localStorageService.remove(storageKeys.USERNAME),
+                userIdRemoved = localStorageService.remove(storageKeys.USER_ID);
+
+            return usernameRemoved && userIdRemoved;
         }
 
 
