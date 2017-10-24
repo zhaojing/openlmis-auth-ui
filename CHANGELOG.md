@@ -11,6 +11,10 @@ New functionality added in backwards-compatiable manner
 Bug fixes which are backwards-compatible:
 * [OLMIS-3140](https://openlmis.atlassian.net/browse/OLMIS-3140): Added loading icon on forgot password modal.
 
+Improvements:
+
+* Updated dev-ui version to 6.
+
 5.0.3 / 2017-09-01
 ===========
 
