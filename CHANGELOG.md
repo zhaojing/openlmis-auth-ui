@@ -1,5 +1,5 @@
-6.0.0 / In development
-======================
+6.0.0 / 2017-11-09
+==================
 
 New functionality
 * [OLMIS-2956:](https://openlmis.atlassian.net/browse/OLMIS-2956) Simplified login and authorization services by removing "user rights" functionality and moving to openlmis-referencedata-ui.
@@ -12,11 +12,10 @@ Bug fixes which are backwards-compatible:
 * [OLMIS-3140](https://openlmis.atlassian.net/browse/OLMIS-3140): Added loading icon on forgot password modal.
 
 Improvements:
-
 * Updated dev-ui version to 6.
 
 5.0.3 / 2017-09-01
-===========
+==================
 
 New functionality added in backwards-compatiable manner
 * [OLMIS-3085:](https://openlmis.atlassian.net/browse/OLMIS-3085) Added standard login and logout events.
@@ -28,7 +27,7 @@ Bug fixes and security updates:
 * [OLMIS-2867](https://openlmis.atlassian.net/browse/OLMIS-2867): Added message when user tries to log in while offline.
 
 5.0.2 / 2017-06-22
-===========
+==================
 
 New functionality added in backwards-compatiable manner
 * [OLMIS-2553](https://openlmis.atlassian.net/browse/OLMIS-2553): Removed login offline functionality and added warning when logging out while offline.
