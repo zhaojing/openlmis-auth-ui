@@ -23,7 +23,7 @@
                         <input ng-model="vm.password" type="password" id="login-password" required/>
                     </div>
                     <div class="button-group">
-                        <input type="submit" value="{{'openlmisLogin.signIn' | message}}"/>
+                        <input id="login-button" type="submit" value="{{'openlmisLogin.signIn' | message}}"/>
                         <a id="forgotPasswordLink" ui-sref="auth.forgotPassword">
                             {{'openlmisLogin.forgotPassword' | message}}
                         </a>
