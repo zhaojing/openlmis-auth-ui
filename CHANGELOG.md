@@ -1,9 +1,3 @@
-6.0.1 / Work in Progress
-========================
-
-Improvements:
-* [MW-715:](https://openlmis.atlassian.net/browse/MW-715) Improved performance of the navigationStateService.
-
 6.0.0 / 2017-11-09
 ==================
 

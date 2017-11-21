@@ -127,12 +127,9 @@
          *
          */
 		function shouldDisplay(state) {
-            if (!state.hasOwnProperty('$shouldDisplay')) {
-            state.$shouldDisplay = state.showInNavigation && (!state.accessRights ||
+			return state.showInNavigation && (!state.accessRights ||
                 authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
                 (!state.abstract || hasChildren(state, true));
-            }
-            return state.$shouldDisplay;
 		}
 
         function initialize() {
