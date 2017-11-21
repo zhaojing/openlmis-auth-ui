@@ -123,6 +123,13 @@ describe('navigationStateService', function() {
             expect(service.shouldDisplay(states[3])).toBe(true);
         });
 
+        it('should ask authorizationService once for the same state', function() {
+            service.shouldDisplay(states[1]);
+            service.shouldDisplay(states[1]);
+
+            expect(authorizationService.hasRights.calls.length).toBe(1);
+        });
+
     });
 
     describe('hasChildren', function() {
