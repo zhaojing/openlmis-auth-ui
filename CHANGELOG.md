@@ -2,7 +2,7 @@
 ========================
 
 Improvements:
-* [MW-715:](https://openlmis.atlassian.net/browse/MW-715) Improved performance of the navigationStateService.
+* [OLMIS-3657:](https://openlmis.atlassian.net/browse/OLMIS-3657) Improved performance of the navigationStateService.
 
 6.0.0 / 2017-11-09
 ==================
