@@ -1,5 +1,5 @@
-6.0.1 / Work in Progress
-========================
+6.0.1 / 2017-11-23
+==================
 
 Improvements:
 * [OLMIS-3657:](https://openlmis.atlassian.net/browse/OLMIS-3657) Improved performance of the navigationStateService.
