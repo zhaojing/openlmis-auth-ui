@@ -15,29 +15,20 @@
 
 describe('openlmis-login.loginService', function() {
 
-    var $rootScope, httpBackend, loginService, authorizationService, $q, offlineService;
+    beforeEach(function() {
+        module('openlmis-login');
 
-    beforeEach(module('openlmis-login'));
+        inject(function($injector) {
+            $q = $injector.get('$q');
+            authUrl = $injector.get('authUrl');
+            $rootScope = $injector.get('$rootScope');
+            $httpBackend = $injector.get('$httpBackend');
+            loginService = $injector.get('loginService');
+            offlineService = $injector.get('offlineService');
+            authorizationService = $injector.get('authorizationService');
+        });
 
-    beforeEach(inject(function(_$rootScope_, _loginService_, _authorizationService_, _$q_, _offlineService_) {
-        $rootScope = _$rootScope_;
-        loginService = _loginService_;
-        $q = _$q_;
-
-        authorizationService = _authorizationService_;
-        spyOn(authorizationService, 'setAccessToken').andCallThrough();
-        spyOn(authorizationService, 'clearAccessToken').andCallThrough();
-
-        spyOn(authorizationService, 'setUser');
-        spyOn(authorizationService, 'clearUser');
-        
-        offlineService = _offlineService_;
-        spyOn(offlineService, 'isOffline').andReturn(false);
-    }));
-
-    beforeEach(inject(function(_$httpBackend_, authUrl) {
-        httpBackend = _$httpBackend_;
-        httpBackend.when('POST', authUrl('/api/oauth/token?grant_type=password'))
+        $httpBackend.when('POST', authUrl('/api/oauth/token?grant_type=password'))
         .respond(function(method, url, data){
             if(data.indexOf('bad-password') >= 0 ){
                 return [400];
@@ -48,7 +39,14 @@ describe('openlmis-login.loginService', function() {
                 }];
             }
         });
-    }));
+
+        spyOn(authorizationService, 'setAccessToken').andCallThrough();
+        spyOn(authorizationService, 'clearAccessToken').andCallThrough();
+
+        spyOn(authorizationService, 'setUser');
+        spyOn(authorizationService, 'clearUser');
+        spyOn(offlineService, 'isOffline').andReturn(false);
+    });
 
     describe('login', function() {
         it('should reject bad logins', function() {
@@ -58,7 +56,7 @@ describe('openlmis-login.loginService', function() {
                 error = true;
             });
 
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(error).toBe(true);
@@ -71,7 +69,7 @@ describe('openlmis-login.loginService', function() {
                 message = error;
             });
 
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(message).toBe('openlmisLogin.invalidCredentials');
@@ -88,7 +86,7 @@ describe('openlmis-login.loginService', function() {
 
             $rootScope.$apply();
 
-            expect(message).toEqual('openlmisLogin.cannotConnectToServer'); 
+            expect(message).toEqual('openlmisLogin.cannotConnectToServer');
         });
 
         it('should resolve successful logins', function() {
@@ -99,7 +97,7 @@ describe('openlmis-login.loginService', function() {
                 success = true;
             });
 
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(success).toBe(true);
@@ -112,15 +110,15 @@ describe('openlmis-login.loginService', function() {
             });
 
             loginService.login('john', 'john-password');
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(success).toBe(true);
         });
 
-        it('should set access token when login is successful', function() {            
+        it('should set access token when login is successful', function() {
             loginService.login('john', 'john-password');
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(authorizationService.setAccessToken).toHaveBeenCalledWith('access_token');
@@ -128,7 +126,7 @@ describe('openlmis-login.loginService', function() {
 
         it('should set basic user data when login is successful', function() {
             loginService.login('john', 'john-password');
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(authorizationService.setUser).toHaveBeenCalledWith('userId', 'john');
@@ -146,6 +144,11 @@ describe('openlmis-login.loginService', function() {
 
     describe('logout', function() {
 
+        beforeEach(function() {
+            $httpBackend.when('POST', authUrl('/api/users/auth/logout'))
+            .respond(400);
+        });
+
         it('always emits a logout event', function() {
             var success = false;
             $rootScope.$on('openlmis-auth.logout', function() {
@@ -153,6 +156,7 @@ describe('openlmis-login.loginService', function() {
             });
 
             loginService.logout();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(success).toBe(true);
@@ -160,6 +164,7 @@ describe('openlmis-login.loginService', function() {
 
         it('always clears the access token', function(){
             loginService.logout();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(authorizationService.clearAccessToken).toHaveBeenCalled();
@@ -167,6 +172,7 @@ describe('openlmis-login.loginService', function() {
 
         it('always clears user data', function() {
             loginService.logout();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(authorizationService.clearUser).toHaveBeenCalled();
@@ -185,7 +191,7 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('should resolve promise if response status is 401', inject(function(authUrl) {
-            httpBackend.when('POST', authUrl('/api/users/auth/logout'))
+            $httpBackend.when('POST', authUrl('/api/users/auth/logout'))
             .respond(401);
 
             var resolved = false;
@@ -193,7 +199,7 @@ describe('openlmis-login.loginService', function() {
                 resolved = true;
             });
 
-            httpBackend.flush();
+            $httpBackend.flush();
             $rootScope.$apply();
 
             expect(resolved).toBe(true);
