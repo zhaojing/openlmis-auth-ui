@@ -33,7 +33,7 @@
      */
     angular
         .module('openlmis-auth')
-        .service('authorizationService', service);
+        .service('authorizationService', service)
 
     var storageKeys = {
         'ACCESS_TOKEN': 'ACCESS_TOKEN',
@@ -42,9 +42,9 @@
         'USER_ROLE_ASSIGNMENTS': 'ROLE_ASSIGNMENTS'
     };
 
-    service.$inject = ['localStorageService', '$filter'];
+    service.$inject = ['$q', 'localStorageService', '$injector', '$filter'];
 
-    function service(localStorageService, $filter) {
+    function service($q, localStorageService, $injector, $filter) {
 
         this.isAuthenticated = isAuthenticated;
 
@@ -174,7 +174,7 @@
          */
         function setUser(user_id, username) {
             var savedUserID,
-                savedUsername;
+                savedUsername
             if(!user_id || !username) {
                 return false;
             } else {
