@@ -24,7 +24,7 @@
      * @description
      * This service is responsible for storing user authentication details,
      * such as the current user's id, name, and access token.
-     * 
+     *
      * This service only stores information, other services and factories are
      * responsible for writing user information to the authorizationService.
      *
@@ -42,9 +42,9 @@
         'USER_ROLE_ASSIGNMENTS': 'ROLE_ASSIGNMENTS'
     };
 
-    service.$inject = ['$q', 'localStorageService', '$injector', '$filter'];
+    service.$inject = ['$q', 'localStorageService', '$injector', '$filter', 'AuthUser'];
 
-    function service($q, localStorageService, $injector, $filter) {
+    function service($q, localStorageService, $injector, $filter, AuthUser) {
 
         this.isAuthenticated = isAuthenticated;
 
@@ -59,7 +59,7 @@
         this.getRights = getRights;
         this.setRights = setRights;
         this.clearRights = clearRights;
-        
+
         this.hasRight = hasRight;
         this.hasRights = hasRights;
         this.getRightByName = getRightByName;
@@ -94,7 +94,7 @@
          */
         function getAccessToken() {
             var accessToken = localStorageService.get(storageKeys.ACCESS_TOKEN);
-            
+
             if(accessToken) {
                 return accessToken;
             } else {
@@ -150,10 +150,7 @@
                 user_id = localStorageService.get(storageKeys.USER_ID);
 
             if(user_id && username) {
-                return {
-                    username: username,
-                    user_id: user_id
-                };
+                return new AuthUser(user_id, username);
             } else {
                 return false;
             }
@@ -180,7 +177,7 @@
             } else {
                 savedUserID = localStorageService.add(storageKeys.USER_ID, user_id);
                 savedUsername = localStorageService.add(storageKeys.USERNAME, username);
-                
+
                 return savedUserID && savedUsername;
             }
         }
