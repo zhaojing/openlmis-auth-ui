@@ -28,8 +28,6 @@
         .module('openlmis-auth')
         .factory('AuthUser', AuthUser);
 
-    AuthUser.$inject = [];
-
     function AuthUser() {
 
         return AuthUser;
