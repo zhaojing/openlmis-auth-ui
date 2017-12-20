@@ -57,7 +57,7 @@
             return this.requestLogin(username, password)
             .then(function(response) {
                 authorizationService.setAccessToken(response.accessToken);
-                authorizationService.setUser(response.userId, username);
+                authorizationService.setUser(response.userId, response.username);
                 $rootScope.$emit('openlmis-auth.login');
             });
         }
@@ -94,6 +94,7 @@
             .then(function(response) {
                 return $q.resolve({
                     userId: response.data.referenceDataUserId,
+                    username: response.data.username,
                     accessToken: response.data.access_token
                 });
             })

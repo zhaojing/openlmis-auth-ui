@@ -35,7 +35,8 @@ describe('openlmis-login.loginService', function() {
             } else {
                 return [200, {
                     'access_token': 'access_token',
-                    'referenceDataUserId': 'userId'
+                    'referenceDataUserId': 'userId',
+                    'username': 'john'
                 }];
             }
         });
