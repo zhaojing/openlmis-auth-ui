@@ -1,4 +1,10 @@
-6.0.2 / 2017-11-23
+6.0.2 / WIP
+===========
+
+Improvements:
+* [OLMIS-3828](https://openlmis.atlassian.net/browse/OLMIS-3828): Added API Keys module.
+
+6.0.1 / 2017-11-23
 ==================
 
 Improvements:
