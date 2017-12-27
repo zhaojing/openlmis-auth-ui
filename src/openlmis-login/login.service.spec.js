@@ -15,6 +15,8 @@
 
 describe('openlmis-login.loginService', function() {
 
+    var $q, authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService;
+
     beforeEach(function() {
         module('openlmis-login');
 
@@ -29,8 +31,8 @@ describe('openlmis-login.loginService', function() {
         });
 
         $httpBackend.when('POST', authUrl('/api/oauth/token?grant_type=password'))
-        .respond(function(method, url, data){
-            if(data.indexOf('bad-password') >= 0 ){
+        .respond(function(method, url, data) {
+            if (data.indexOf('bad-password') >= 0 ){
                 return [400];
             } else {
                 return [200, {
@@ -91,17 +93,22 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('should resolve successful logins', function() {
-            var success = false;
+            var result;
 
             loginService.login('john', 'john-password')
-            .then(function(){
-                success = true;
+            .then(function(response) {
+                result = response;
             });
 
             $httpBackend.flush();
             $rootScope.$apply();
 
-            expect(success).toBe(true);
+            expect(result).toEqual({
+                userId : 'userId',
+                username : 'john',
+                accessToken : 'access_token'
+            });
+
         });
 
         it('should emit "openlmis-auth.login" event when successfully logged in', function() {
@@ -140,7 +147,6 @@ describe('openlmis-login.loginService', function() {
 
             expect(loginService.requestLogin).toHaveBeenCalled();
         });
-
     });
 
     describe('logout', function() {

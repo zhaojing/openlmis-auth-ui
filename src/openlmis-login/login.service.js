@@ -50,7 +50,6 @@
          *
          * @param {String} username The username of the person trying to login
          * @param {String} password The password the person is trying to login with
-         *
          * @return {Promise} Returns promise from requestLogin
          */
         function login(username, password) {
@@ -59,6 +58,7 @@
                 authorizationService.setAccessToken(response.accessToken);
                 authorizationService.setUser(response.userId, response.username);
                 $rootScope.$emit('openlmis-auth.login');
+                return response;
             });
         }
 
@@ -74,7 +74,6 @@
          *
          * @param {String} username The name of the person trying to login
          * @param {String} password The password the person is trying to login with
-         *
          * @return {Promise} Resolves when successful, rejects otherwise
          */
         function requestLogin(username, password) {
@@ -150,11 +149,11 @@
          * @description
          * Handles the request to the OpenLMIS Auth Service, and tries to end the
          * user's session.
-         * 
+         *
          * @return {Promise} A promise that indicates if the user was logged out.
          */
         function requestLogout() {
-            if(offlineService.isOffline()) {
+            if (offlineService.isOffline()) {
                 return $q.reject();
             }
 
@@ -162,7 +161,8 @@
                 method: 'POST',
                 url: authUrl('/api/users/auth/logout'),
                 ignoreAuthModule: true
-            }).then(function() {
+            })
+            .then(function() {
                 return $q.resolve();
             })
             .catch(function(data) {

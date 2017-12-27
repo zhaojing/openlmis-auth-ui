@@ -3,6 +3,7 @@
 
 Improvements:
 * [OLMIS-3828](https://openlmis.atlassian.net/browse/OLMIS-3828): Added API Keys module.
+* [OLMIS-3468](https://openlmis.atlassian.net/browse/OLMIS-3468): Login Service login method promise resolves to object with user name and user id.
 
 6.0.1 / 2017-11-23
 ==================
