@@ -35,9 +35,7 @@
                             $state, offlineService) {
 
         this.login = login;
-        this.requestLogin = requestLogin;
         this.logout = logout;
-        this.requestLogout = requestLogout;
 
         /**
          * @ngdoc method
@@ -53,7 +51,7 @@
          * @return {Promise} Returns promise from requestLogin
          */
         function login(username, password) {
-            return this.requestLogin(username, password)
+            return requestLogin(username, password)
             .then(function(response) {
                 authorizationService.setAccessToken(response.accessToken);
                 authorizationService.setUser(response.userId, response.username);
@@ -130,7 +128,7 @@
         function logout() {
             var deferred = $q.defer();
 
-            this.requestLogout()
+            requestLogout()
             .finally(function() {
                 authorizationService.clearAccessToken();
                 authorizationService.clearUser();

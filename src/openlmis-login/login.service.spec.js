@@ -139,14 +139,6 @@ describe('openlmis-login.loginService', function() {
 
             expect(authorizationService.setUser).toHaveBeenCalledWith('userId', 'john');
         });
-
-        it('login method calls requestLogin method', function(){
-            spyOn(loginService, 'requestLogin').andReturn($q.reject());
-
-            loginService.login('fake', 'arguments');
-
-            expect(loginService.requestLogin).toHaveBeenCalled();
-        });
     });
 
     describe('logout', function() {
@@ -211,14 +203,6 @@ describe('openlmis-login.loginService', function() {
 
             expect(resolved).toBe(true);
         }));
-
-        it('calls requestLogout method', function(){
-            spyOn(loginService, 'requestLogout').andReturn($q.reject());
-
-            loginService.logout();
-
-            expect(loginService.requestLogout).toHaveBeenCalled();
-        });
 
     });
 
