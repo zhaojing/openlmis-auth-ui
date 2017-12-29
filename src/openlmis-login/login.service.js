@@ -55,7 +55,6 @@
             .then(function(response) {
                 authorizationService.setAccessToken(response.accessToken);
                 authorizationService.setUser(response.userId, response.username);
-                $rootScope.$emit('openlmis-auth.login');
                 return response;
             });
         }
@@ -132,7 +131,6 @@
             .finally(function() {
                 authorizationService.clearAccessToken();
                 authorizationService.clearUser();
-                $rootScope.$emit('openlmis-auth.logout');
                 deferred.resolve();
             });
 

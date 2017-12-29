@@ -29,10 +29,10 @@
         .controller('LoginController', LoginController);
 
     LoginController.$inject = [
-        'loginService', 'modalDeferred', 'loadingModalService'
+        'loginService', 'modalDeferred', 'loadingModalService', '$rootScope'
     ];
 
-    function LoginController(loginService, modalDeferred, loadingModalService) {
+    function LoginController(loginService, modalDeferred, loadingModalService, $rootScope) {
 
         var vm = this;
 
@@ -51,7 +51,10 @@
         function doLogin() {
             loadingModalService.open();
             loginService.login(vm.username, vm.password)
-            .then(modalDeferred.resolve)
+            .then(function() {
+                $rootScope.$emit('openlmis-auth.login');
+                modalDeferred.resolve();
+            })
             .catch(function(error) {
                 vm.loginError = error;
                 vm.password = undefined;

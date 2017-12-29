@@ -15,103 +15,166 @@
 
 describe("LoginController", function() {
 
-    var $rootScope, $state, vm, modalDeferred;
+    var vm, $q, $rootScope, $controller, loginService, modalDeferred, loadingModalService;
 
     beforeEach(function() {
 
-        module('openlmis-login');
-
-        module(function($provide){
+        module('openlmis-login', function($provide){
             // Turn off AuthToken
-            $provide.factory('accessTokenInterceptor', function(){
+            $provide.factory('accessTokenInterceptor', function() {
                 return {};
             });
         });
 
-        inject(function(_$rootScope_, $controller, $q, loginService, _$state_, _loadingModalService_) {
-            $rootScope = _$rootScope_;
-            $state = _$state_;
+        inject(function($injector) {
+            $q = $injector.get('$q');
+            $rootScope = $injector.get('$rootScope');
+            $controller = $injector.get('$controller');
+            loginService = $injector.get('loginService');
+            loadingModalService = $injector.get('loadingModalService');
+        });
 
-            spyOn($rootScope, '$emit');
+        modalDeferred = $q.defer();
 
-            modalDeferred = $q.defer();
-
-            vm = $controller("LoginController", {
-                modalDeferred: modalDeferred
-            });
-
-            spyOn(loginService, 'login').andCallFake(function(username, password) {
-                if (password == "bad-password") {
-                    return $q.reject("error");
-                } else {
-                    return $q.resolve();
-                }
-            });
-
-            loadingModalService = _loadingModalService_;
-            spyOn(loadingModalService, 'open');
-            spyOn(loadingModalService, 'close');
+        vm = $controller("LoginController", {
+            modalDeferred: modalDeferred
         });
     });
 
-    it('should not login and show error when server returns error', function() {
-        vm.username = "john";
-        vm.password = "bad-password";
+    describe('doLogin', function() {
 
-        spyOn(location, 'reload');
+        var username, validPassword, invalidPassword;
 
-        vm.doLogin();
-        $rootScope.$apply();
+        beforeEach(function() {
+            spyOn(loginService, 'login');
+            spyOn(loadingModalService, 'open');
+            spyOn(loadingModalService, 'close');
 
-        expect(vm.loginError).toEqual('error');
-    });
+            username = 'john';
+            validPassword = 'good-password';
+            invalidPassword = 'bad-password';
+        });
 
-    it('should clear password on failed login attempt', function() {
-        vm.username = "john";
-        vm.password = "bad-password";
+        it('should not login and show error when server returns error', function() {
+            loginService.login.andReturn($q.reject('error'));
 
-        vm.doLogin();
-        $rootScope.$apply();
+            vm.username = username;
+            vm.password = invalidPassword;
 
-        expect(vm.password).toBe(undefined);
-    });
+            vm.doLogin();
+            $rootScope.$apply();
 
-    it('should not clear password on successful login attempt', function() {
-        vm.username = "john";
-        vm.password = "good-password";
+            expect(loginService.login).toHaveBeenCalledWith(username, invalidPassword);
+            expect(vm.loginError).toEqual('error');
+        });
 
-        vm.doLogin();
-        $rootScope.$apply();
+        it('should clear password on failed login attempt', function() {
+            loginService.login.andReturn($q.reject());
 
-        expect(vm.password).toBe('good-password');
-    });
+            vm.username = username;
+            vm.password = invalidPassword;
 
-    it('shows a loading modal when attempting to login', function(){
-        vm.doLogin();
-        $rootScope.$apply();
+            vm.doLogin();
+            $rootScope.$apply();
 
-        expect(loadingModalService.open).toHaveBeenCalled();
-        expect(loadingModalService.close).toHaveBeenCalled();
-    });
+            expect(loginService.login).toHaveBeenCalledWith(username, invalidPassword);
+            expect(vm.password).toBe(undefined);
+        });
 
-    it('will resolve modalDeferred promise if login is successful', function($controller) {
-        var spy = jasmine.createSpy('modalDeferredSpy');
-        modalDeferred.promise.then(spy);
+        it('should not clear password on successful login attempt', function() {
+            loginService.login.andReturn($q.resolve());
 
-        vm.username = "john";
-        vm.password = "bad-password";
+            vm.username = username;
+            vm.password = validPassword;
 
-        vm.doLogin();
-        $rootScope.$apply();
+            vm.doLogin();
+            $rootScope.$apply();
 
-        expect(spy).not.toHaveBeenCalled();
+            expect(loginService.login).toHaveBeenCalledWith(username, validPassword);
+            expect(vm.password).toBe(validPassword);
+        });
 
-        vm.username = "john";
-        vm.password = "good-password";
+        it('should open loading modal', function() {
+            loginService.login.andReturn($q.resolve());
 
-        vm.doLogin();
-        $rootScope.$apply();
+            vm.doLogin();
+            $rootScope.$apply();
 
-        expect(spy).toHaveBeenCalled();
+            expect(loadingModalService.open).toHaveBeenCalled();
+        });
+
+        it('should close loading modal after successful login', function() {
+            loginService.login.andReturn($q.resolve());
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(loadingModalService.close).toHaveBeenCalled();
+        });
+
+        it('should close loading modal after failed login', function() {
+            loginService.login.andReturn($q.reject());
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(loadingModalService.close).toHaveBeenCalled();
+        });
+
+        it('will resolve modalDeferred promise if login is successful', function($controller) {
+            var resolved;
+            modalDeferred.promise.then(function() {
+                resolved = true;
+            });
+
+            loginService.login.andReturn($q.reject());
+            vm.username = username;
+            vm.password = invalidPassword;
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(resolved).not.toBe(true);
+
+            loginService.login.andReturn($q.resolve());
+            vm.password = validPassword;
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(resolved).toBe(true);
+        });
+
+        it('should emit "openlmis-auth.login" event when successfully logged in', function() {
+            var success = false;
+            $rootScope.$on('openlmis-auth.login', function(){
+                success = true;
+            });
+
+            loginService.login.andReturn($q.resolve());
+            vm.username = username;
+            vm.password = validPassword;
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(success).toBe(true);
+        });
+
+        it('should not emit "openlmis-auth.login" event when login failed', function() {
+            var success = true;
+            $rootScope.$on('openlmis-auth.login', function(){
+                success = false;
+            });
+
+            loginService.login.andReturn($q.reject());
+            vm.username = username;
+            vm.password = invalidPassword;
+
+            vm.doLogin();
+            $rootScope.$apply();
+
+            expect(success).toBe(true);
+        });
     });
 });

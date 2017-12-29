@@ -16,92 +16,113 @@
 
 describe('LogoutController', function() {
 
-    var loginService, $state, $rootScope, $q, vm, isOffline, confirmService;
+    var vm, loginService, $state, $rootScope, $q, confirmService, offlineService, $controller;
 
     beforeEach(function() {
         module('openlmis-logout');
 
         inject(function($injector) {
             $q = $injector.get('$q');
-            $rootScope = $injector.get('$rootScope');
-
-            loginService = $injector.get('loginService');
-            spyOn(loginService, 'logout').andReturn($q.when(true));
-            
             $state = $injector.get('$state');
-            spyOn($state, 'go').andReturn();
-
-            isOffline = false;
+            $rootScope = $injector.get('$rootScope');
+            $controller = $injector.get('$controller');
+            loginService = $injector.get('loginService');
             offlineService = $injector.get('offlineService');
-            spyOn(offlineService, 'isOffline').andCallFake(function(){
-                return isOffline;
-            });
-
             confirmService = $injector.get('confirmService');
-
-            vm = $injector.get('$controller')('LogoutController', {});
         });
+
+        vm = $controller('LogoutController', {});
     });
 
     describe('logout', function() {
 
         beforeEach(function() {
+            spyOn($state, 'go');
+            spyOn($rootScope, '$emit');
+            spyOn(loginService, 'logout');
+            spyOn(confirmService, 'confirm');
+            spyOn(offlineService, 'isOffline');
+        });
+
+        it('should be able to log out when online', function() {
+            offlineService.isOffline.andReturn(false);
+            loginService.logout.andReturn($q.resolve());
+
             vm.logout();
             $rootScope.$apply();
-        });
 
-        it('should expose logout method', function() {
-            expect(angular.isFunction(vm.logout)).toBe(true);
-        });
-
-        it('should call login service', function() {
+            expect(offlineService.isOffline).toHaveBeenCalled();
+            expect(confirmService.confirm).not.toHaveBeenCalled();
             expect(loginService.logout).toHaveBeenCalled();
-        });
-
-        it('should redirect to login page', function() {
+            expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.logout');
             expect($state.go).toHaveBeenCalledWith('auth.login');
         });
 
-    });
+        it('should fail to log out online if login service rejects', function() {
+            offlineService.isOffline.andReturn(false);
+            loginService.logout.andReturn($q.reject());
 
-    describe('logout offline', function() {
-        var doesConfirm;
-
-        beforeEach(function(){
-            isOffline = true;
-
-            spyOn(confirmService, 'confirm').andCallFake(function(){
-                if(doesConfirm) {
-                    return $q.resolve();
-                } else {
-                    return $q.reject();
-                }
-            });
-
-        });
-
-        it('will show a confirmation modal if attempting to logout while offline', function(){
             vm.logout();
             $rootScope.$apply();
 
-            expect(confirmService.confirm).toHaveBeenCalled();
-        });
-
-        it('user will be logged out only if they confirm', function(){
-            
-            doesConfirm = false;
-            vm.logout();
-            $rootScope.$apply();
-            
-            expect(loginService.logout).not.toHaveBeenCalled();
-
-            doesConfirm = true;
-            vm.logout();
-            $rootScope.$apply();
-
+            expect(offlineService.isOffline).toHaveBeenCalled();
+            expect(confirmService.confirm).not.toHaveBeenCalled();
             expect(loginService.logout).toHaveBeenCalled();
+            expect($rootScope.$emit).not.toHaveBeenCalled();
+            expect($state.go).not.toHaveBeenCalled();
         });
 
+        it('should be able to log out when offline', function() {
+            offlineService.isOffline.andReturn(true);
+            confirmService.confirm.andReturn($q.resolve());
+            loginService.logout.andReturn($q.resolve());
 
+            vm.logout();
+            $rootScope.$apply();
+
+            expect(offlineService.isOffline).toHaveBeenCalled();
+            expect(confirmService.confirm).toHaveBeenCalledWith(
+                'openlmisLogout.offlineWarning',
+                'openlmisLogout.logout'
+            );
+            expect(loginService.logout).toHaveBeenCalled();
+            expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.logout');
+            expect($state.go).toHaveBeenCalledWith('auth.login');
+        });
+
+        it('should fail to log out offline if login service rejects', function() {
+            offlineService.isOffline.andReturn(true);
+            confirmService.confirm.andReturn($q.resolve());
+            loginService.logout.andReturn($q.reject());
+
+            vm.logout();
+            $rootScope.$apply();
+
+            expect(offlineService.isOffline).toHaveBeenCalled();
+            expect(confirmService.confirm).toHaveBeenCalledWith(
+                'openlmisLogout.offlineWarning',
+                'openlmisLogout.logout'
+            );
+            expect(loginService.logout).toHaveBeenCalled();
+            expect($rootScope.$emit).not.toHaveBeenCalled();
+            expect($state.go).not.toHaveBeenCalled();
+        });
+
+        it('should fail to log out offline without confirmation', function() {
+            offlineService.isOffline.andReturn(true);
+            confirmService.confirm.andReturn($q.reject());
+
+            vm.logout();
+            $rootScope.$apply();
+
+            expect(offlineService.isOffline).toHaveBeenCalled();
+            expect(confirmService.confirm).toHaveBeenCalledWith(
+                'openlmisLogout.offlineWarning',
+                'openlmisLogout.logout'
+            );
+            expect(loginService.logout).not.toHaveBeenCalled();
+            expect($rootScope.$emit).not.toHaveBeenCalled();
+            expect($state.go).not.toHaveBeenCalled();
+        });
     });
 });

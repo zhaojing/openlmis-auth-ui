@@ -28,9 +28,10 @@
         .module('openlmis-logout')
         .controller('LogoutController', LogoutController);
 
-    LogoutController.$inject = ['$state', 'loginService', 'offlineService', 'confirmService'];
+    LogoutController.$inject = [
+        '$state', 'loginService', 'offlineService', 'confirmService', '$rootScope'];
 
-    function LogoutController($state, loginService, offlineService, confirmService) {
+    function LogoutController($state, loginService, offlineService, confirmService, $rootScope) {
         var vm = this;
 
         vm.logout = logout;
@@ -58,6 +59,7 @@
         function doLogout() {
             loginService.logout()
             .then(function() {
+                $rootScope.$emit('openlmis-auth.logout');
                 $state.go('auth.login');
             });
         }

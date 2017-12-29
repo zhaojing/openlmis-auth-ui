@@ -15,13 +15,12 @@
 
 describe('openlmis-login.loginService', function() {
 
-    var $q, authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService;
+    var authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService;
 
     beforeEach(function() {
         module('openlmis-login');
 
         inject(function($injector) {
-            $q = $injector.get('$q');
             authUrl = $injector.get('authUrl');
             $rootScope = $injector.get('$rootScope');
             $httpBackend = $injector.get('$httpBackend');
@@ -111,19 +110,6 @@ describe('openlmis-login.loginService', function() {
 
         });
 
-        it('should emit "openlmis-auth.login" event when successfully logged in', function() {
-            var success = false;
-            $rootScope.$on('openlmis-auth.login', function(){
-                success = true;
-            });
-
-            loginService.login('john', 'john-password');
-            $httpBackend.flush();
-            $rootScope.$apply();
-
-            expect(success).toBe(true);
-        });
-
         it('should set access token when login is successful', function() {
             loginService.login('john', 'john-password');
             $httpBackend.flush();
@@ -146,19 +132,6 @@ describe('openlmis-login.loginService', function() {
         beforeEach(function() {
             $httpBackend.when('POST', authUrl('/api/users/auth/logout'))
             .respond(400);
-        });
-
-        it('always emits a logout event', function() {
-            var success = false;
-            $rootScope.$on('openlmis-auth.logout', function() {
-                success = true;
-            });
-
-            loginService.logout();
-            $httpBackend.flush();
-            $rootScope.$apply();
-
-            expect(success).toBe(true);
         });
 
         it('always clears the access token', function(){
