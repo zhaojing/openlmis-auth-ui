@@ -8,7 +8,5 @@
   ],
   "authServiceURL": "/",
   "authServerClientId": "user-client",
-  "authServerClientSecret": "changeme",
-  "transifexProjectName": "openlmis-auth-ui",
-  "defaultLanguage": "en"
+  "authServerClientSecret": "changeme"
 }
