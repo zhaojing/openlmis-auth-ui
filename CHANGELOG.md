@@ -1,6 +1,9 @@
 6.0.2 / WIP
 ===========
 
+New functionality added in backwards-compatiable manner:
+* [OLMIS-3108:](https://openlmis.atlassian.net/browse/OLMIS-3108) Updated to use dev-ui v7 transifex build process
+
 Improvements:
 * [OLMIS-3828](https://openlmis.atlassian.net/browse/OLMIS-3828): Added API Keys module.
 * [OLMIS-3468](https://openlmis.atlassian.net/browse/OLMIS-3468): Login Service login method promise resolves to object with user name and user id.
