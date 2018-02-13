@@ -19,7 +19,16 @@ describe("openlmis-auth.authorizationService", function() {
     beforeEach(module('openlmis-auth'));
 
     beforeEach(inject(function(localStorageService) {
-        var fakeLocalStorage = {};
+        var fakeLocalStorage = {
+            'ROLE_ASSIGNMENTS': '[\
+                {\
+                    "name": "RIGHT_SUPERVISION",\
+                    "programCodes": ["program"],\
+                    "programIds": ["1"],\
+                    "facilityIds": ["2"]\
+                }\
+            ]'
+        };
 
         spyOn(localStorageService, 'add').andCallFake(function(key, value){
             fakeLocalStorage[key] = value;
@@ -90,6 +99,24 @@ describe("openlmis-auth.authorizationService", function() {
 
             expect(localStorageService.get).not.toHaveBeenCalled();
         }));
+
+        it('should return true if supervision right name is found with program id and facility id', function() {
+            expect(
+                authorizationService.hasRight('RIGHT_SUPERVISION', {
+                    programId: '1',
+                    facilityId: '2'
+                })
+            ).toBe(true);
+        });
+
+        it('should return false if supervision right name is found with program id but not facility id', function() {
+            expect(
+                authorizationService.hasRight('RIGHT_SUPERVISION', {
+                    programId: '1',
+                    facilityId: 'not found'
+                })
+            ).toBe(false);
+        });
     });
 
 });

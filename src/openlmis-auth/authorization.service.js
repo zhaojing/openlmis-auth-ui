@@ -297,6 +297,10 @@
                     if (details.supervisoryNodeId) {
                         hasRight = hasRight && right.supervisoryNodeIds.indexOf(details.supervisoryNodeId) > -1;
                     }
+
+                    if (details.facilityId) {
+                        hasRight = hasRight && right.facilityIds.indexOf(details.facilityId) > -1;
+                    }
                 }
 
                 return hasRight;
