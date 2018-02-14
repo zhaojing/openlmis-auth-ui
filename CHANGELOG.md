@@ -3,6 +3,7 @@
 
 New functionality added in backwards-compatiable manner:
 * [OLMIS-3108:](https://openlmis.atlassian.net/browse/OLMIS-3108) Updated to use dev-ui v7 transifex build process
+* [OLMIS-3527](https://openlmis.atlassian.net/browse/OLMIS-3527): Added checking a right by facility id.
 
 Improvements:
 * [OLMIS-3828](https://openlmis.atlassian.net/browse/OLMIS-3828): Added API Keys module.
