@@ -13,31 +13,33 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-xdescribe('navigationStateService', function() {
+describe('navigationStateService', function() {
 
-    var service, states, $state, authorizationService;
+    var service, states, $state, rootScope, authorizationService;
 
     beforeEach(function() {
-        module('openlmis-navigation');
-
         $state = jasmine.createSpyObj('$state', ['get']);
         authorizationService = jasmine.createSpyObj('authorizationService', ['hasRights']);
+        rootScope = jasmine.createSpyObj('$rootScope', ['$on', '$watch']);
 
-        module(function($provide) {
+        module('openlmis-navigation', function($provide) {
             $provide.factory('$state', function() {
                 return $state;
             });
             $provide.factory('authorizationService', function() {
                 return authorizationService;
             });
+            $provide.factory('$rootScope', function() {
+                return rootScope;
+            });
         });
 
         states = [
             createState('', false),
-            createState('state2.subState4', true, 15, false, 'rights'),
+            createState('state2.subState4', true, 15, false, ['rights'], false),
             createState('state4', true, 11),
             createState('state2', true, 12, true),
-            createState('state2.subState3', true, 53, false, 'rights', true),
+            createState('state2.subState3', true, 53, false, ['other-rights'], true),
             createState('state1', true, 10, true),
             createState('state3', false),
             createState('state3.subState16', true, 10),
@@ -47,6 +49,13 @@ xdescribe('navigationStateService', function() {
             createState('state1.subState65', false),
             createState('state2.subState4.subSubState1', true)
         ];
+
+        authorizationService.hasRights.andCallFake(function(rights) {
+            if ('other-rights' === rights[0]) {
+                return false;
+            }
+            return true;
+        });
 
         $state.get.andCallFake(function(stateName){
             if(!stateName){
@@ -72,8 +81,8 @@ xdescribe('navigationStateService', function() {
         it('should group by invisible root states', function() {
             expect(service.roots['']).not.toBeUndefined();
             expect(service.roots[''].length).toBe(3);
-            expect(service.roots['state3']).not.toBeUndefined();
-            expect(service.roots['state3'].length).toBe(2);
+            expect(service.roots.state3).not.toBeUndefined();
+            expect(service.roots.state3.length).toBe(2);
         });
 
         it('should add only visible children to parent state', function() {
@@ -92,50 +101,43 @@ xdescribe('navigationStateService', function() {
             expect(service.roots[''][2]).toBe(states[5]);
         });
 
+        it('should refresh states after login', function() {
+            expect(rootScope.$on).toHaveBeenCalled();
+        });
     });
 
-    describe('shouldDisplay', function() {
+    describe('refreshDisplay', function() {
 
         it('should return false if state should not be shown in navigation', function() {
-            expect(service.shouldDisplay(states[6])).toBe(false);
+            expect(service.roots[''][2].$shouldDisplay).toBe(false);
         });
 
         it('should return true if state does not require any rights', function() {
-            expect(service.shouldDisplay(states[2])).toBe(true);
+            expect(service.roots[''][1].$shouldDisplay).toBe(true);
         });
 
         it('should return true if user has required rights', function() {
-            authorizationService.hasRights.andReturn(true);
-            expect(service.shouldDisplay(states[1])).toBe(true);
+            expect(service.roots[''][0].children[1].$shouldDisplay).toBe(true);
         });
 
-        it('should return false if used does not have required rights', function() {
-            authorizationService.hasRights.andReturn(false);
-            expect(service.shouldDisplay(states[4])).not.toBe(true);
+        it('should return false if user does not have required rights', function() {
+            dump(service.roots[''][0].children[0]);
+            expect(service.roots[''][0].children[0].$shouldDisplay).not.toBe(true);
         });
 
         it('should return false if state is abstract and has no visible children', function() {
-            expect(service.shouldDisplay(states[5])).toBe(false);
+            expect(service.roots[''][2].$shouldDisplay).toBe(false);
         });
 
         it('should return true if state is abstract but has visible children', function() {
-            authorizationService.hasRights.andReturn(true);
-            expect(service.shouldDisplay(states[3])).toBe(true);
+            expect(service.roots[''][0].$shouldDisplay).toBe(true);
         });
-
-        it('should ask authorizationService once for the same state', function() {
-            service.shouldDisplay(states[1]);
-            service.shouldDisplay(states[1]);
-
-            expect(authorizationService.hasRights.calls.length).toBe(1);
-        });
-
     });
 
     describe('hasChildren', function() {
 
         it('should return true if state has visible children', function() {
-            authorizationService.hasRights.andReturn(true);
+            states[3].children[0].$shouldDisplay = true;
             expect(service.hasChildren(states[3])).toBe(true);
         });
 
@@ -163,10 +165,12 @@ xdescribe('navigationStateService', function() {
 
     describe('isOffline', function(){
         it('should return true if the state has isOffline defined', function(){
-            var offlineState = $state.get('state2.subState3');
-            var state = $state.get('state2.subState0');
+            var offlineState = $state.get('state2.subState3'),
+                state1 = $state.get('state2.subState0'),
+                state2 = $state.get('state2.subState4');
 
-            expect(service.isOffline(state)).toBe(false);
+            expect(service.isOffline(state1)).toBe(undefined);
+            expect(service.isOffline(state2)).toBe(false);
             expect(service.isOffline(offlineState)).toBe(true);
         });
     });

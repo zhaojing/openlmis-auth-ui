@@ -89,7 +89,7 @@
 		function hasChildren(state) {
             var result = false;
             angular.forEach(state.children, function(child) {
-                result = result || child.$shouldDisplay;;
+                result = result || child.$shouldDisplay;
             });
 			return result;
 		}
@@ -118,7 +118,7 @@
          * @name isOffline
          *
          * @description
-         * If the state is should be able to be viewed while the browser is offline.
+         * Returns true if state is available while offline.
          *
          * @param  {Object}  state A state object as returned by UI-Router
          * @return {Boolean}       If the state can be viewed while offline
