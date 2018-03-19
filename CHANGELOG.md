@@ -10,6 +10,9 @@ Improvements:
 * [OLMIS-3468](https://openlmis.atlassian.net/browse/OLMIS-3468): Login Service login method promise resolves to object with user name and user id.
 * [OLMIS-3468](https://openlmis.atlassian.net/browse/OLMIS-3468): Loading modal should no longer cover missing permission alert.
 
+Bug fixes which are backwards-compatible:
+* [OLMIS-3883](https://openlmis.atlassian.net/browse/OLMIS-3883): Fixed lack of navigation bar update after relogin.
+
 6.0.1 / 2017-11-23
 ==================
 
