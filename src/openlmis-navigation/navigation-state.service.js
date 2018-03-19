@@ -26,18 +26,18 @@
      * Reads routes set in UI-Router and returns all routes that are visible to
      * the user.
      *
-     * When writting UI-Router routes, set the route with 'showInNavigation: true'
+     * When writing UI-Router routes, set the route with 'showInNavigation: true'
      * which will add the route to the navigation service. The parent state
-     * from the UI-Router definition is used to create a hiearchy for navigation
+     * from the UI-Router definition is used to create a hierarchy for navigation
      * states.
      *
      * The UI-Router State definitions can also be set with access rights, and
-     * if the user has one of the rights, the route will be visiable to the
+     * if the user has one of the rights, the route will be visible to the
      * user. To use this feature set 'accessRights' on the state definition
      * object.
      *
      * Lastly, navigation states can be marked if they have offline
-     * functionality, which will make the UI-State appear accessiable when a
+     * functionality, which will make the UI-State appear accessible when a
      * user's browser is offline. This can be set by setting 'isOffline' to
      * true on the state definition object.
      *
@@ -64,17 +64,16 @@
         .module('openlmis-navigation')
         .service('navigationStateService', navigationStateService);
 
-    navigationStateService.$inject = ['$state', '$filter', 'authorizationService'];
+    navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$rootScope'];
 
-    function navigationStateService($state, $filter, authorizationService) {
+    function navigationStateService($state, $filter, authorizationService, $rootScope) {
         var service = this;
 
-        service.shouldDisplay = shouldDisplay;
         service.hasChildren = hasChildren;
         service.isSubmenu = isSubmenu;
         service.isOffline = isOffline;
 
-        service.roots = initialize();
+        initialize();
 
         /**
          * @ngdoc method
@@ -90,7 +89,7 @@
 		function hasChildren(state) {
             var result = false;
             angular.forEach(state.children, function(child) {
-                result = result || shouldDisplay(child);
+                result = result || child.$shouldDisplay;;
             });
 			return result;
 		}
@@ -108,35 +107,28 @@
          * @param  {Object}  state A state object as returned by UI-Router
          * @return {Boolean}       If the state is a sub-menu
          */
-		function isSubmenu(state){
+		function isSubmenu(state) {
 			return !isRoot(state) && hasChildren(state);
 		}
-
+        
         /**
          *
          * @ngdoc method
          * @methodOf openlmis-navigation.navigationStateService
-         * @name shouldDisplay
+         * @name isOffline
          *
          * @description
-         * Takes a state object and returns if the state can be viewed by the
-         * current user in the navigation hierarchy because of access rights.
+         * If the state is should be able to be viewed while the browser is offline.
          *
          * @param  {Object}  state A state object as returned by UI-Router
-         * @return {Boolean}       If the state can be viewed by the current user
-         *
+         * @return {Boolean}       If the state can be viewed while offline
          */
-		function shouldDisplay(state) {
-            if (!state.hasOwnProperty('$shouldDisplay')) {
-            state.$shouldDisplay = state.showInNavigation && (!state.accessRights ||
-                authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
-                (!state.abstract || hasChildren(state, true));
-            }
-            return state.$shouldDisplay;
-		}
+        function isOffline(state) {
+            return state && state.isOffline;
+        }
 
         function initialize() {
-            var roots = {}
+            service.roots = {};
 
             $state.get().forEach(function(state) {
                 if (state.showInNavigation) {
@@ -150,18 +142,19 @@
                     if (parent.showInNavigation) {
                         addChildState(parent, state);
                     } else {
-                        addToRoots(roots, parentName, state);
+                        addToRoots(service.roots, parentName, state);
                     }
 
                     state.priority = state.priority !== undefined ? state.priority : 10;
                 }
             });
 
-            for (var root in roots) {
-                roots[root] = sortStates(roots[root]);
+            for (var root in service.roots) {
+                service.roots[root] = sortStates(service.roots[root]);
             }
 
-            return roots;
+            $rootScope.$on('openlmis-auth.login', refreshDisplay);
+            refreshDisplay();
         }
 
         function getParentStateName(state) {
@@ -205,25 +198,26 @@
             return false;
         }
 
-        /**
-         *
-         * @ngdoc method
-         * @methodOf openlmis-navigation.navigationStateService
-         * @name isOffline
-         *
-         * @description
-         * If the state is should be able to be viewed while the browser is offline.
-         *
-         * @param  {Object}  state A state object as returned by UI-Router
-         * @return {Boolean}       If the state can be viewed while offline
-         */
-        function isOffline(state) {
-            if (state && state.isOffline) {
-                return true;
-            } else {
-                return false;
+        function refreshDisplay() {
+            for (var root in service.roots) {
+                service.roots[root].forEach(setShouldDisplayForParentState);
             }
         }
-    }
 
+        function setShouldDisplayForParentState(parentState) {
+            if (parentState.children && parentState.children.length > 0) {
+                parentState.children.forEach(function(childState) {
+                    setShouldDisplayForParentState(childState);
+                    setShouldDisplay(childState);
+                });
+            }
+            setShouldDisplay(parentState);
+        }
+
+        function setShouldDisplay(state) {
+            state.$shouldDisplay = state.showInNavigation && 
+                (!state.accessRights || authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
+                (!state.abstract || hasChildren(state));
+        }
+    }
 })();

@@ -15,13 +15,13 @@
 
 describe('NavigationController', function() {
 
-    var vm, scope, navigationStateService, $controller, mainRoot, subRoot, states;
+    var vm, scope, navigationStateService, $controller;
 
     beforeEach(function() {
         module('openlmis-navigation');
 
-        inject(function(_$controller_) {
-            $controller = _$controller_;
+        inject(function($injector) {
+            $controller = $injector.get('$controller');
         });
 
         scope = jasmine.createSpy();
@@ -29,7 +29,7 @@ describe('NavigationController', function() {
         navigationStateService = jasmine.createSpyObj('navigationStateService', [
             'hasChildren',
             'isSubmenu',
-            'shouldDisplay'
+            'isOffline'
         ]);
 
         navigationStateService.roots = {};
@@ -126,6 +126,7 @@ describe('NavigationController', function() {
             $scope: scope,
             navigationStateService: navigationStateService
         });
+        vm.$onInit();
     }
 
 });

@@ -43,8 +43,6 @@
         .module('openlmis-navigation')
         .directive('openlmisNavigation', directive);
 
-    directive.$inject = [];
-
     function directive() {
         var directive = {
             restrict: 'E',

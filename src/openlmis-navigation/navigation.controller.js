@@ -32,7 +32,13 @@
     NavigationController.$inject = ['$scope', 'navigationStateService'];
 
     function NavigationController($scope, navigationStateService) {
+        
         var vm = this;
+
+        vm.$onInit = onInit;
+        vm.hasChildren = navigationStateService.hasChildren;
+        vm.isSubmenu = navigationStateService.isSubmenu;
+        vm.isOffline = navigationStateService.isOffline;
 
         /**
          * @ngdoc property
@@ -43,25 +49,28 @@
          * @description
          * Contains all states in application in tree structure.
          */
-        vm.states = getStates();
+        vm.states = undefined;
 
-        vm.hasChildren = navigationStateService.hasChildren;
-        vm.isSubmenu = navigationStateService.isSubmenu;
-        vm.shouldDisplay = navigationStateService.shouldDisplay;
-        vm.isOffline = navigationStateService.isOffline;
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-navigation.controller:NavigationController
+         * @name onInit
+         *
+         * @description
+         * Initialization method for NavigationController.
+         */
+        function onInit() {
+            setStates();
+        }
 
-        function getStates() {
-            var states = [];
-
+        function setStates() {
             if (!$scope.rootState && !$scope.states) {
-                states = navigationStateService.roots[''];
+                vm.states = navigationStateService.roots[''];
             } else if ($scope.rootState) {
-                states = navigationStateService.roots[$scope.rootState];
+                vm.states = navigationStateService.roots[$scope.rootState];
             } else {
-                states = $scope.states;
+                vm.states = $scope.states;
             }
-            return states;
         }
     }
-
 })();
