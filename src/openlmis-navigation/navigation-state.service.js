@@ -86,13 +86,13 @@
          * @param  {Object}  state A state object as returned by UI-Router
          * @return {Boolean}       If the state has visible child states.
          */
-		function hasChildren(state) {
+        function hasChildren(state) {
             var result = false;
             angular.forEach(state.children, function(child) {
                 result = result || child.$shouldDisplay;
             });
-			return result;
-		}
+            return result;
+        }
 
         /**
          *
@@ -107,10 +107,10 @@
          * @param  {Object}  state A state object as returned by UI-Router
          * @return {Boolean}       If the state is a sub-menu
          */
-		function isSubmenu(state) {
-			return !isRoot(state) && hasChildren(state);
-		}
-        
+        function isSubmenu(state) {
+            return !isRoot(state) && hasChildren(state);
+        }
+
         /**
          *
          * @ngdoc method
@@ -178,7 +178,7 @@
 
         function sortStates(states) {
             angular.forEach(states, function(state) {
-                if(!state.priority) state.priority = 10;
+                if (!state.priority) state.priority = 10;
             });
             var sorted = $filter('orderBy')(states, ['-priority', 'name']);
             sorted.forEach(function(state) {
@@ -215,7 +215,7 @@
         }
 
         function setShouldDisplay(state) {
-            state.$shouldDisplay = state.showInNavigation && 
+            state.$shouldDisplay = state.showInNavigation &&
                 (!state.accessRights || authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
                 (!state.abstract || hasChildren(state));
         }

@@ -15,12 +15,11 @@
 
 describe('navigationStateService', function() {
 
-    var service, states, $state, rootScope, authorizationService;
+    var service, states, $state, $rootScope, authorizationService;
 
     beforeEach(function() {
         $state = jasmine.createSpyObj('$state', ['get']);
         authorizationService = jasmine.createSpyObj('authorizationService', ['hasRights']);
-        rootScope = jasmine.createSpyObj('$rootScope', ['$on', '$watch']);
 
         module('openlmis-navigation', function($provide) {
             $provide.factory('$state', function() {
@@ -28,9 +27,6 @@ describe('navigationStateService', function() {
             });
             $provide.factory('authorizationService', function() {
                 return authorizationService;
-            });
-            $provide.factory('$rootScope', function() {
-                return rootScope;
             });
         });
 
@@ -71,8 +67,9 @@ describe('navigationStateService', function() {
             }
         });
 
-        inject(function(navigationStateService) {
-            service = navigationStateService;
+        inject(function($injector) {
+            service = $injector.get('navigationStateService');
+            $rootScope = $injector.get('$rootScope');
         });
     });
 
@@ -102,7 +99,11 @@ describe('navigationStateService', function() {
         });
 
         it('should refresh states after login', function() {
-            expect(rootScope.$on).toHaveBeenCalled();
+            authorizationService.hasRights.andReturn(false);
+            $rootScope.$emit('openlmis-auth.login');
+            $rootScope.$apply();
+
+            expect(service.roots[''][0].children[1].$shouldDisplay).toBe(false);
         });
     });
 
@@ -121,7 +122,6 @@ describe('navigationStateService', function() {
         });
 
         it('should return false if user does not have required rights', function() {
-            dump(service.roots[''][0].children[0]);
             expect(service.roots[''][0].children[0].$shouldDisplay).not.toBe(true);
         });
 
