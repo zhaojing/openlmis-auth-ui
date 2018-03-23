@@ -199,9 +199,9 @@
         }
 
         function refreshDisplay() {
-            for (var root in service.roots) {
+            Object.keys(service.roots).forEach(function(root) {
                 service.roots[root].forEach(setShouldDisplayForParentState);
-            }
+            });
         }
 
         function setShouldDisplayForParentState(parentState) {
