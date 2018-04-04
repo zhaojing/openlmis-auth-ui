@@ -51,6 +51,7 @@ describe('openlmis-login.loginService', function() {
     });
 
     describe('login', function() {
+
         it('should reject bad logins', function() {
             var error = false;
             loginService.login('john', 'bad-password')
@@ -179,4 +180,8 @@ describe('openlmis-login.loginService', function() {
 
     });
 
+    afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
 });
