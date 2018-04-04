@@ -12,6 +12,7 @@ Improvements:
 
 Bug fixes which are backwards-compatible:
 * [OLMIS-3883](https://openlmis.atlassian.net/browse/OLMIS-3883): Fixed lack of navigation bar update after relogin.
+* [OLMIS-4469](https://openlmis.atlassian.net/browse/OLMIS-4469): Fixed lack of error modal after trying to login.
 
 6.0.1 / 2017-11-23
 ==================

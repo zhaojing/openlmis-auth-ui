@@ -74,10 +74,6 @@
          * @return {Promise} Resolves when successful, rejects otherwise
          */
         function requestLogin(username, password) {
-            if(offlineService.isOffline()) {
-                return $q.reject('openlmisLogin.cannotConnectToServer');
-            }
-
             return $http({
                 method: 'POST',
                 url: authUrl('/api/oauth/token?grant_type=password'),
@@ -149,10 +145,6 @@
          * @return {Promise} A promise that indicates if the user was logged out.
          */
         function requestLogout() {
-            if (offlineService.isOffline()) {
-                return $q.reject();
-            }
-
             return $http({
                 method: 'POST',
                 url: authUrl('/api/users/auth/logout'),

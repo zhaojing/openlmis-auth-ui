@@ -59,9 +59,7 @@
                 vm.loginError = error;
                 vm.password = undefined;
             })
-            .finally(function(){
-                loadingModalService.close();
-            });
+            .finally(loadingModalService.close);
         }
 
     }
