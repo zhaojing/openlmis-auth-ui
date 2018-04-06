@@ -1,4 +1,4 @@
-6.0.2 / WIP
+6.1.0 / WIP
 ===========
 
 New functionality added in backwards-compatiable manner:
