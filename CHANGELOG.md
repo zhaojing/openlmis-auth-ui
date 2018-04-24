@@ -1,4 +1,4 @@
-6.1.0 / 2018-04-24
+6.1.1 / 2018-04-24
 ==================
 
 New functionality added in backwards-compatiable manner:
