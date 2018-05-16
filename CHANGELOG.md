@@ -1,3 +1,9 @@
+6.1.1 / Work in Progress
+========================
+
+Improvements:
+* [OLMIS-3337](https://openlmis.atlassian.net/browse/OLMIS-3337): Updated error message when trying to login while offline
+
 6.1.0 / 2018-04-24
 ==================
 
