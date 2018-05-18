@@ -3,6 +3,7 @@
 
 Improvements:
 * [OLMIS-3337](https://openlmis.atlassian.net/browse/OLMIS-3337): Updated error message when trying to login while offline
+* [OLMIS-4738](https://openlmis.atlassian.net/browse/OLMIS-4738): Added Jenkinsfile.
 
 6.1.0 / 2018-04-24
 ==================
