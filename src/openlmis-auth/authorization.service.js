@@ -77,9 +77,8 @@
         function isAuthenticated() {
             if (this.getAccessToken()) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
 
         /**
@@ -97,9 +96,8 @@
 
             if (accessToken) {
                 return accessToken;
-            } else {
-                return false;
             }
+            return false;
         }
 
         /**
@@ -116,9 +114,8 @@
         function setAccessToken(token) {
             if (token) {
                 return localStorageService.add(storageKeys.ACCESS_TOKEN, token);
-            } else {
-                return false;
             }
+            return false;
         }
 
         /**
@@ -151,9 +148,8 @@
 
             if (userId && username) {
                 return new AuthUser(userId, username);
-            } else {
-                return false;
             }
+            return false;
         }
 
         /**
@@ -174,12 +170,12 @@
                 savedUsername;
             if (!userId || !username) {
                 return false;
-            } else {
-                savedUserID = localStorageService.add(storageKeys.USER_ID, userId);
-                savedUsername = localStorageService.add(storageKeys.USERNAME, username);
-
-                return savedUserID && savedUsername;
             }
+
+            savedUserID = localStorageService.add(storageKeys.USER_ID, userId);
+            savedUsername = localStorageService.add(storageKeys.USERNAME, username);
+
+            return savedUserID && savedUsername;
         }
 
         /**
@@ -258,47 +254,19 @@
                 throw 'Right name is required';
             }
 
-            var rights = $filter('filter')(getRights(), {
-                name: rightName
-            }, true);
+            var right = getRightByName(rightName);
 
-            if (!rights) {
-                return false;
-            }
+            if (right) {
+                var hasRight = true;
 
-            if (rights.length) {
-                var right = rights[0],
-                    hasRight = true;
-
-                if (rightName && details) {
-
-                    if (details.programCode) {
-                        hasRight = hasRight && right.programCodes.indexOf(details.programCode) > -1;
-                    }
-
-                    if (details.programId) {
-                        hasRight = hasRight && right.programIds.indexOf(details.programId) > -1;
-                    }
-
-                    if (details.warehouseCode) {
-                        hasRight = hasRight && right.warehouseCodes.indexOf(details.warehouseCode) > -1;
-                    }
-
-                    if (details.warehouseId) {
-                        hasRight = hasRight && right.warehouseIds.indexOf(details.warehouseId) > -1;
-                    }
-
-                    if (details.supervisoryNodeCode) {
-                        hasRight = hasRight && right.supervisoryNodeCodes.indexOf(details.supervisoryNodeCode) > -1;
-                    }
-
-                    if (details.supervisoryNodeId) {
-                        hasRight = hasRight && right.supervisoryNodeIds.indexOf(details.supervisoryNodeId) > -1;
-                    }
-
-                    if (details.facilityId) {
-                        hasRight = hasRight && right.facilityIds.indexOf(details.facilityId) > -1;
-                    }
+                if (details) {
+                    return appliesTo(right.programCodes, details.programCode) &&
+                        appliesTo(right.programIds, details.programId) &&
+                        appliesTo(right.warehouseCodes, details.warehouseCode) &&
+                        appliesTo(right.warehouseIds, details.warehouseId) &&
+                        appliesTo(right.supervisoryNodeCodes, details.supervisoryNodeCode) &&
+                        appliesTo(right.supervisoryNodeIds, details.supervisoryNodeId) &&
+                        appliesTo(right.facilityIds, details.facilityId);
                 }
 
                 return hasRight;
@@ -329,15 +297,14 @@
                     }
                 });
                 return hasPermission;
-            } else {
-                hasPermission = false;
-                angular.forEach(rights, function(right) {
-                    if (hasRight(right)) {
-                        hasPermission = true;
-                    }
-                });
-                return hasPermission;
             }
+            hasPermission = false;
+            rights.forEach(function(right) {
+                if (hasRight(right)) {
+                    hasPermission = true;
+                }
+            });
+            return hasPermission;
         }
 
         /**
@@ -356,6 +323,13 @@
                 name: rightName
             }, true);
             return angular.copy(rights[0]);
+        }
+
+        function appliesTo(entities, entity) {
+            if (entity) {
+                return entities.indexOf(entity) > -1;
+            }
+            return true;
         }
 
     }

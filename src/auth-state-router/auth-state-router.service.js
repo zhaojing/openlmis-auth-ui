@@ -42,7 +42,7 @@
          * @name initialize
          *
          * @description
-         * Initializes the state router.
+        * Initializes the state router.
          */
         function initialize() {
             $rootScope.$on('$stateChangeStart', reroute);
@@ -68,13 +68,16 @@
                 // if authenticated and on login page
                 event.preventDefault();
                 $state.go('openlmis.home');
-            } else if (toState.accessRights &&
-                       !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired)) {
-                // checking rights to enter state
+            } else if (canViewState(toState)) {
                 event.preventDefault();
                 loadingModalService.close();
                 alertService.error('openlmisAuth.authorization.error');
             }
+        }
+
+        function canViewState(toState) {
+            return toState.accessRights &&
+                !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired);
         }
     }
 

@@ -95,9 +95,8 @@
                         return $q.reject('openlmisLogin.invalidCredentials');
                     } else if (response.status === -1) {
                         return $q.reject('openlmisLogin.cannotConnectToServer');
-                    } else {
-                        return $q.reject('openlmisLogin.unknownServerError');
                     }
+                    return $q.reject('openlmisLogin.unknownServerError');
                 });
         }
 
@@ -156,9 +155,8 @@
                 .catch(function(data) {
                     if (data.status === 401) {
                         return $q.resolve();
-                    } else {
-                        return $q.reject();
                     }
+                    return $q.reject();
                 });
         }
     }
