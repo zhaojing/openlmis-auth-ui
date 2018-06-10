@@ -217,9 +217,13 @@
 
         function setShouldDisplay(state) {
             state.$shouldDisplay = state.showInNavigation &&
-                (!state.accessRights ||
-                authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
+                canViewState(state) &&
                 (!state.abstract || hasChildren(state));
+        }
+
+        function canViewState(state) {
+            return !state.accessRights ||
+                authorizationService.hasRights(state.accessRights, state.areAllRightsRequired);
         }
     }
 })();

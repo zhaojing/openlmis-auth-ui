@@ -255,24 +255,11 @@
             }
 
             var right = getRightByName(rightName);
-
-            if (right) {
-                var hasRight = true;
-
-                if (details) {
-                    return appliesTo(right.programCodes, details.programCode) &&
-                        appliesTo(right.programIds, details.programId) &&
-                        appliesTo(right.warehouseCodes, details.warehouseCode) &&
-                        appliesTo(right.warehouseIds, details.warehouseId) &&
-                        appliesTo(right.supervisoryNodeCodes, details.supervisoryNodeCode) &&
-                        appliesTo(right.supervisoryNodeIds, details.supervisoryNodeId) &&
-                        appliesTo(right.facilityIds, details.facilityId);
-                }
-
-                return hasRight;
+            if (!right) {
+                return false;
             }
 
-            return false;
+            return hasRightForProgram(right, details) && hasRightForFacility(right, details);
         }
 
         /**
@@ -323,6 +310,15 @@
                 name: rightName
             }, true);
             return angular.copy(rights[0]);
+        }
+
+        function hasRightForProgram(right, details) {
+            return appliesTo(right.programCodes, details.programCode) &&
+                appliesTo(right.programIds, details.programId);
+        }
+
+        function hasRightForFacility(right, details) {
+            return appliesTo(right.facilityIds, details.facilityId);
         }
 
         function appliesTo(entities, entity) {
