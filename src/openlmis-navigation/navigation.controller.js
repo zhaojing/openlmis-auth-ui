@@ -13,9 +13,8 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 (function() {
-    "use strict";
+    'use strict';
 
     /**
      * @ngdoc controller
@@ -32,7 +31,7 @@
     NavigationController.$inject = ['$scope', 'navigationStateService'];
 
     function NavigationController($scope, navigationStateService) {
-        
+
         var vm = this;
 
         vm.$onInit = onInit;

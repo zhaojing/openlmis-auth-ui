@@ -13,8 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
-(function(){
+(function() {
     'use strict';
 
     /**
@@ -51,15 +50,15 @@
         function doLogin() {
             loadingModalService.open();
             loginService.login(vm.username, vm.password)
-            .then(function() {
-                $rootScope.$emit('openlmis-auth.login');
-                modalDeferred.resolve();
-            })
-            .catch(function(error) {
-                vm.loginError = error;
-                vm.password = undefined;
-            })
-            .finally(loadingModalService.close);
+                .then(function() {
+                    $rootScope.$emit('openlmis-auth.login');
+                    modalDeferred.resolve();
+                })
+                .catch(function(error) {
+                    vm.loginError = error;
+                    vm.password = undefined;
+                })
+                .finally(loadingModalService.close);
         }
 
     }

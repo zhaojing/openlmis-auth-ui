@@ -48,11 +48,13 @@
          * @return {Promise}    the promise that is resolved when user successfully resets password
          */
         function open() {
-            if (dialog) return dialog.promise;
+            if (dialog) {
+                return dialog.promise;
+            }
 
             dialog = openlmisModalService.createDialog({
-                backdrop  : 'static',
-                keyboard  : false,
+                backdrop: 'static',
+                keyboard: false,
                 templateUrl: 'openlmis-reset-password/reset-password.html',
                 controller: 'ResetPasswordController',
                 controllerAs: 'vm',

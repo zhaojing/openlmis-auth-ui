@@ -35,7 +35,7 @@
         return {
             changePassword: changePassword
         };
-        
+
         /**
          * @ngdoc method
          * @methodOf openlmis-reset-password.changePasswordFactory

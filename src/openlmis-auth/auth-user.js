@@ -32,8 +32,9 @@
 
         return AuthUser;
 
-        function AuthUser(user_id, username) {
-            this.user_id = user_id;
+        function AuthUser(userId, username) {
+            //eslint-disable-next-line camelcase
+            this.user_id = userId;
             this.username = username;
         }
 

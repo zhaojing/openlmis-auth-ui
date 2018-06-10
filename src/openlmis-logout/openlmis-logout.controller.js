@@ -29,7 +29,8 @@
         .controller('LogoutController', LogoutController);
 
     LogoutController.$inject = [
-        '$state', 'loginService', 'offlineService', 'confirmService', '$rootScope'];
+        '$state', 'loginService', 'offlineService', 'confirmService', '$rootScope'
+    ];
 
     function LogoutController($state, loginService, offlineService, confirmService, $rootScope) {
         var vm = this;
@@ -45,12 +46,10 @@
          * Log outs user from application and redirects to login screen.
          */
         function logout() {
-            if(offlineService.isOffline()) {
-                confirmService.confirm(
-                    'openlmisLogout.offlineWarning',
-                    'openlmisLogout.logout'
-                )
-                .then(doLogout);
+            if (offlineService.isOffline()) {
+                confirmService.confirm('openlmisLogout.offlineWarning',
+                    'openlmisLogout.logout')
+                    .then(doLogout);
             } else {
                 doLogout();
             }
@@ -58,10 +57,10 @@
 
         function doLogout() {
             loginService.logout()
-            .then(function() {
-                $rootScope.$emit('openlmis-auth.logout');
-                $state.go('auth.login');
-            });
+                .then(function() {
+                    $rootScope.$emit('openlmis-auth.logout');
+                    $state.go('auth.login');
+                });
         }
     }
 

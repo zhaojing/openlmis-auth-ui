@@ -33,8 +33,8 @@
         onEnter.$inject = ['$state', 'openlmisModalService'];
         function onEnter($state, openlmisModalService) {
             openlmisModalService.createDialog({
-                backdrop  : 'static',
-                keyboard  : false,
+                backdrop: 'static',
+                keyboard: false,
                 templateUrl: 'openlmis-forgot-password/forgot-password.html',
                 controller: 'ForgotPasswordController',
                 controllerAs: 'vm',

@@ -36,10 +36,10 @@
         .service('authorizationService', service);
 
     var storageKeys = {
-        'ACCESS_TOKEN': 'ACCESS_TOKEN',
-        'USER_ID': 'USER_ID',
-        'USERNAME': 'USERNAME',
-        'USER_ROLE_ASSIGNMENTS': 'ROLE_ASSIGNMENTS'
+        ACCESS_TOKEN: 'ACCESS_TOKEN',
+        USER_ID: 'USER_ID',
+        USERNAME: 'USERNAME',
+        USER_ROLE_ASSIGNMENTS: 'ROLE_ASSIGNMENTS'
     };
 
     service.$inject = ['localStorageService', '$filter', 'AuthUser'];
@@ -75,7 +75,7 @@
          * @return {Boolean} true if the user is authenticated, false otherwise
          */
         function isAuthenticated() {
-            if(this.getAccessToken()) {
+            if (this.getAccessToken()) {
                 return true;
             } else {
                 return false;
@@ -95,7 +95,7 @@
         function getAccessToken() {
             var accessToken = localStorageService.get(storageKeys.ACCESS_TOKEN);
 
-            if(accessToken) {
+            if (accessToken) {
                 return accessToken;
             } else {
                 return false;
@@ -114,7 +114,7 @@
          * @return {Boolean}      true if successfully stored
          */
         function setAccessToken(token) {
-            if(token) {
+            if (token) {
                 return localStorageService.add(storageKeys.ACCESS_TOKEN, token);
             } else {
                 return false;
@@ -147,10 +147,10 @@
          */
         function getUser() {
             var username = localStorageService.get(storageKeys.USERNAME),
-                user_id = localStorageService.get(storageKeys.USER_ID);
+                userId = localStorageService.get(storageKeys.USER_ID);
 
-            if(user_id && username) {
-                return new AuthUser(user_id, username);
+            if (userId && username) {
+                return new AuthUser(userId, username);
             } else {
                 return false;
             }
@@ -169,13 +169,13 @@
          *
          * @return {Boolean} true if values are provided and stored successfully
          */
-        function setUser(user_id, username) {
+        function setUser(userId, username) {
             var savedUserID,
                 savedUsername;
-            if(!user_id || !username) {
+            if (!userId || !username) {
                 return false;
             } else {
-                savedUserID = localStorageService.add(storageKeys.USER_ID, user_id);
+                savedUserID = localStorageService.add(storageKeys.USER_ID, userId);
                 savedUsername = localStorageService.add(storageKeys.USERNAME, username);
 
                 return savedUserID && savedUsername;
@@ -198,7 +198,6 @@
 
             return usernameRemoved && userIdRemoved;
         }
-
 
         /**
          * @ngdoc method
@@ -225,10 +224,8 @@
          * @param {Array} rights the list of rights
          */
         function setRights(rights) {
-            localStorageService.add(
-                storageKeys.USER_ROLE_ASSIGNMENTS,
-                angular.toJson(rights)
-            );
+            localStorageService.add(storageKeys.USER_ROLE_ASSIGNMENTS,
+                angular.toJson(rights));
         }
 
         /**
@@ -242,7 +239,6 @@
         function clearRights() {
             localStorageService.remove(storageKeys.USER_ROLE_ASSIGNMENTS);
         }
-
 
         /**
          * @ngdoc method
@@ -259,14 +255,16 @@
          */
         function hasRight(rightName, details) {
             if (!rightName) {
-               throw "Right name is required";
+                throw 'Right name is required';
             }
 
             var rights = $filter('filter')(getRights(), {
                 name: rightName
             }, true);
 
-            if (!rights) return false;
+            if (!rights) {
+                return false;
+            }
 
             if (rights.length) {
                 var right = rights[0],
@@ -323,16 +321,20 @@
          */
         function hasRights(rights, areAllRightsRequired) {
             var hasPermission;
-            if(areAllRightsRequired) {
+            if (areAllRightsRequired) {
                 hasPermission = true;
                 angular.forEach(rights, function(right) {
-                    if(!hasRight(right)) hasPermission = false;
+                    if (!hasRight(right)) {
+                        hasPermission = false;
+                    }
                 });
                 return hasPermission;
             } else {
                 hasPermission = false;
                 angular.forEach(rights, function(right) {
-                    if(hasRight(right)) hasPermission = true;
+                    if (hasRight(right)) {
+                        hasPermission = true;
+                    }
                 });
                 return hasPermission;
             }
@@ -351,7 +353,8 @@
          */
         function getRightByName(rightName) {
             var rights = $filter('filter')(getRights(), {
-                name: rightName}, true);
+                name: rightName
+            }, true);
             return angular.copy(rights[0]);
         }
 

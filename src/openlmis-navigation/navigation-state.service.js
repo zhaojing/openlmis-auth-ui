@@ -13,7 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 (function() {
 
     'use strict';
@@ -145,7 +144,7 @@
                         addToRoots(service.roots, parentName, state);
                     }
 
-                    state.priority = state.priority !== undefined ? state.priority : 10;
+                    state.priority = state.priority === undefined ? 10 : state.priority;
                 }
             });
 
@@ -178,7 +177,9 @@
 
         function sortStates(states) {
             angular.forEach(states, function(state) {
-                if (!state.priority) state.priority = 10;
+                if (!state.priority) {
+                    state.priority = 10;
+                }
             });
             var sorted = $filter('orderBy')(states, ['-priority', 'name']);
             sorted.forEach(function(state) {
@@ -216,7 +217,8 @@
 
         function setShouldDisplay(state) {
             state.$shouldDisplay = state.showInNavigation &&
-                (!state.accessRights || authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
+                (!state.accessRights ||
+                authorizationService.hasRights(state.accessRights, state.areAllRightsRequired)) &&
                 (!state.abstract || hasChildren(state));
         }
     }

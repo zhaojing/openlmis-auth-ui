@@ -33,7 +33,7 @@
         $provide.decorator('openlmisDownloadFactory', decorate);
     }
 
-    decorate.$inject = ['$delegate', 'accessTokenFactory']
+    decorate.$inject = ['$delegate', 'accessTokenFactory'];
 
     function decorate($delegate, accessTokenFactory) {
         return download;

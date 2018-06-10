@@ -13,9 +13,8 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function(){
-    "use strict";
-
+(function() {
+    'use strict';
 
     /**
      * @ngdoc service
@@ -26,14 +25,14 @@
      * browser is offline.
      */
     angular.module('openlmis-navigation')
-    .run(offlineNavigationInterceptor);
+        .run(offlineNavigationInterceptor);
 
     offlineNavigationInterceptor.$inject = ['$rootScope', 'alertService', 'loadingModalService', 'offlineService'];
-    function offlineNavigationInterceptor($rootScope, alertService, loadingModalService, offlineService){
+    function offlineNavigationInterceptor($rootScope, alertService, loadingModalService, offlineService) {
         $rootScope.$on('$stateChangeStart', checkOffline);
 
-        function checkOffline(event, toState){
-            if(offlineService.isOffline() && !toState.isOffline){
+        function checkOffline(event, toState) {
+            if (offlineService.isOffline() && !toState.isOffline) {
                 event.preventDefault();
                 loadingModalService.close();
                 alertService.error('openlmisNavigation.notAvailableOffline');

@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function(){
+(function() {
 
     'use strict';
 
@@ -48,17 +48,15 @@
         function forgotPassword() {
             loadingModalService.open();
             forgotPasswordFactory.sendResetEmail(vm.email)
-            .then(function() {
-                alertService.success(
-                    'openlmisForgotPassword.resetPasswordAlert.title',
-                    'openlmisForgotPassword.resetPasswordAlert.message'
-                )
-                .then(modalDeferred.resolve);
-            })
-            .catch(function() {
-                vm.error = 'openlmisForgotPassword.passwordResetFailure';
-            })
-            .finally(loadingModalService.close);
+                .then(function() {
+                    alertService.success('openlmisForgotPassword.resetPasswordAlert.title',
+                        'openlmisForgotPassword.resetPasswordAlert.message')
+                        .then(modalDeferred.resolve);
+                })
+                .catch(function() {
+                    vm.error = 'openlmisForgotPassword.passwordResetFailure';
+                })
+                .finally(loadingModalService.close);
         }
     }
 }());

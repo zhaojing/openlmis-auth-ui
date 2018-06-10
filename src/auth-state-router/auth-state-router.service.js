@@ -29,8 +29,7 @@
         .service('authStateRouter', router);
 
     router.$inject = ['$rootScope', '$state', 'authorizationService', 'alertService',
-        'loadingModalService', 'loginModalService'
-    ];
+        'loadingModalService', 'loginModalService'];
 
     function router($rootScope, $state, authorizationService, alertService, loadingModalService,
                     loginModalService) {
@@ -49,8 +48,10 @@
             $rootScope.$on('$stateChangeStart', reroute);
         }
 
-        function reroute(event, toState, toParams, fromState, fromParams) {
-            if(!authorizationService.isAuthenticated() && toState.name.indexOf('auth') !== 0 && toState.name.indexOf('openlmis.home') !== 0) {
+        function reroute(event, toState, toParams, fromState) {
+            if (!authorizationService.isAuthenticated() && toState.name.indexOf('auth') !== 0 &&
+                toState.name.indexOf('openlmis.home') !== 0) {
+
                 // if not authenticated and not on login page or home page
                 event.preventDefault();
                 loadingModalService.close();
@@ -59,15 +60,16 @@
                         $state.go(toState.name, toParams);
                     });
                 }
-            } else if(!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') === 0){
+            } else if (!authorizationService.isAuthenticated() &&  toState.name.indexOf('openlmis.home') === 0) {
                 // if not authenticated and on home page
                 event.preventDefault();
                 $state.go('auth.login');
-            } else if(authorizationService.isAuthenticated() && toState.name.indexOf('auth') === 0) {
+            } else if (authorizationService.isAuthenticated() && toState.name.indexOf('auth') === 0) {
                 // if authenticated and on login page
                 event.preventDefault();
                 $state.go('openlmis.home');
-            } else if(toState.accessRights && !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired)) {
+            } else if (toState.accessRights &&
+                       !authorizationService.hasRights(toState.accessRights, toState.areAllRightsRequired)) {
                 // checking rights to enter state
                 event.preventDefault();
                 loadingModalService.close();

@@ -34,7 +34,7 @@
         return {
             sendResetEmail: sendResetEmail
         };
-        
+
         /**
          * @ngdoc method
          * @methodOf openlmis-forgot-password.forgotPasswordFactory

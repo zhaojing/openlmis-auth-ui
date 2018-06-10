@@ -47,7 +47,7 @@
          * Checks if both passwords are valid and sends change password request to server.
          */
         function changePassword() {
-            if(arePasswordsValid()) {
+            if (arePasswordsValid()) {
                 changePasswordFactory.changePassword(vm.password, $stateParams.token).then(function() {
                     alertService.success('openlmisResetPassword.passwordReset.success')
                         .finally(modalDeferred.resolve);
@@ -60,13 +60,13 @@
         function arePasswordsValid() {
             var regex = /\d/g;
 
-            if(vm.password !== vm.reenteredPassword) {
+            if (vm.password !== vm.reenteredPassword) {
                 vm.error = 'openlmisResetPassword.passwordMismatch';
                 return false;
-            } else if(vm.password.length < 8) {
+            } else if (vm.password.length < 8) {
                 vm.error = 'openlmisResetPassword.passwordTooShort';
                 return false;
-            } else if(!regex.test(vm.password)) {
+            } else if (!regex.test(vm.password)) {
                 vm.error = 'openlmisResetPassword.passwordMustContainNumber';
                 return false;
             }

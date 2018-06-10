@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function(){
+(function() {
 
     'use strict';
 
@@ -23,7 +23,7 @@
 
     routes.$inject = ['$stateProvider'];
 
-    function routes($stateProvider){
+    function routes($stateProvider) {
 
         $stateProvider.state('auth', {
             abstract: true

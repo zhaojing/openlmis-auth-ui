@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function(){
+(function() {
     'use strict';
 
     /**
@@ -28,11 +28,11 @@
         .module('openlmis-login')
         .service('loginService', loginService);
 
-    loginService.$inject = ['$rootScope', '$q', '$http', 'authUrl', 'openlmisUrlFactory', 'authorizationService',
-                            '$state', 'offlineService'];
+    loginService.$inject = [
+        '$rootScope', '$q', '$http', 'authUrl', 'openlmisUrlFactory', 'authorizationService'
+    ];
 
-    function loginService($rootScope, $q, $http, authUrl, openlmisUrlFactory, authorizationService,
-                            $state, offlineService) {
+    function loginService($rootScope, $q, $http, authUrl, openlmisUrlFactory, authorizationService) {
 
         this.login = login;
         this.logout = logout;
@@ -52,11 +52,11 @@
          */
         function login(username, password) {
             return requestLogin(username, password)
-            .then(function(response) {
-                authorizationService.setAccessToken(response.accessToken);
-                authorizationService.setUser(response.userId, response.username);
-                return response;
-            });
+                .then(function(response) {
+                    authorizationService.setAccessToken(response.accessToken);
+                    authorizationService.setUser(response.userId, response.username);
+                    return response;
+                });
         }
 
         /**
@@ -79,26 +79,26 @@
                 url: authUrl('/api/oauth/token?grant_type=password'),
                 data: 'username=' + username + '&password=' + password,
                 headers: {
-                    'Authorization': authorizationHeader(),
+                    Authorization: authorizationHeader(),
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             })
-            .then(function(response) {
-                return $q.resolve({
-                    userId: response.data.referenceDataUserId,
-                    username: response.data.username,
-                    accessToken: response.data.access_token
+                .then(function(response) {
+                    return $q.resolve({
+                        userId: response.data.referenceDataUserId,
+                        username: response.data.username,
+                        accessToken: response.data.access_token
+                    });
+                })
+                .catch(function(response) {
+                    if (response.status === 400) {
+                        return $q.reject('openlmisLogin.invalidCredentials');
+                    } else if (response.status === -1) {
+                        return $q.reject('openlmisLogin.cannotConnectToServer');
+                    } else {
+                        return $q.reject('openlmisLogin.unknownServerError');
+                    }
                 });
-            })
-            .catch(function(response) {
-                if (response.status === 400) {
-                    return $q.reject('openlmisLogin.invalidCredentials');
-                } else if (response.status === -1) {
-                    return $q.reject('openlmisLogin.cannotConnectToServer');
-                } else {
-                    return $q.reject('openlmisLogin.unknownServerError');
-                }
-            });
         }
 
         function authorizationHeader() {
@@ -124,11 +124,11 @@
             var deferred = $q.defer();
 
             requestLogout()
-            .finally(function() {
-                authorizationService.clearAccessToken();
-                authorizationService.clearUser();
-                deferred.resolve();
-            });
+                .finally(function() {
+                    authorizationService.clearAccessToken();
+                    authorizationService.clearUser();
+                    deferred.resolve();
+                });
 
             return deferred.promise;
         }
@@ -150,16 +150,16 @@
                 url: authUrl('/api/users/auth/logout'),
                 ignoreAuthModule: true
             })
-            .then(function() {
-                return $q.resolve();
-            })
-            .catch(function(data) {
-                if (data.status === 401) {
+                .then(function() {
                     return $q.resolve();
-                } else {
-                    return $q.reject();
-                }
-            });
+                })
+                .catch(function(data) {
+                    if (data.status === 401) {
+                        return $q.resolve();
+                    } else {
+                        return $q.reject();
+                    }
+                });
         }
     }
 

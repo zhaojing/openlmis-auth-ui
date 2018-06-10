@@ -49,7 +49,7 @@
          * @param {Object}  event          event
          * @param {Boolean} noRetryRequest true if should no retry request
          */
-        function onLoginRequired(event, _noRetryRequest_) {
+        function onLoginRequired() {
             loginModalService.open().then(function() {
                 authService.loginConfirmed(null, function(config) {
                     config.headers.Authorization = accessTokenFactory.authHeader();

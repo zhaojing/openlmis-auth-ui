@@ -15,29 +15,29 @@
 
 (function() {
 
- 	'use strict';
+    'use strict';
 
- 	/**
- 	 * @ngdoc service
- 	 * @name openlmis-auth.authUrl
- 	 *
- 	 * @description
- 	 * A factory that takes a URL and prepends the AuthServiceURL to the url. The actual auth
- 	 * url can be changed by setting the --authServiceURL flag at build time.
- 	 */
- 	angular
+    /**
+      * @ngdoc service
+      * @name openlmis-auth.authUrl
+      *
+      * @description
+      * A factory that takes a URL and prepends the AuthServiceURL to the url. The actual auth
+      * url can be changed by setting the --authServiceURL flag at build time.
+      */
+    angular
         .module('openlmis-auth')
- 		.factory('authUrl', factory);
+        .factory('authUrl', factory);
 
- 	factory.$inject = ['openlmisUrlFactory', 'pathFactory'];
+    factory.$inject = ['openlmisUrlFactory', 'pathFactory'];
 
- 	function factory(openlmisUrlFactory, pathFactory){
+    function factory(openlmisUrlFactory, pathFactory) {
 
- 		// String that gets replaced by AUTH_SERVICE_URL config variable
- 		var authUrl = '@@AUTH_SERVICE_URL';
-		if(authUrl.substr(0,2) == '@@'){
-			authUrl = '';
-		}
+        // String that gets replaced by AUTH_SERVICE_URL config variable
+        var authUrl = '@@AUTH_SERVICE_URL';
+        if (authUrl.substr(0, 2) === '@@') {
+            authUrl = '';
+        }
 
         /**
          * @ngdoc method
@@ -50,10 +50,10 @@
          * @param  {String} url authUrl URL from grunt file
          * @return {String}     authUrl URL
          */
- 		return function(url){
- 			url = pathFactory(authUrl, url);
- 			return openlmisUrlFactory(url);
- 		}
- 	}
+        return function(url) {
+            url = pathFactory(authUrl, url);
+            return openlmisUrlFactory(url);
+        };
+    }
 
- })();
+})();

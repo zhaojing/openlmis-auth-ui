@@ -13,8 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
- (function() {
+(function() {
 
     'use strict';
 
@@ -62,7 +61,7 @@
          * @return {Object}        A modified configuration object
          */
         function request(config) {
-            if(openlmisUrlService.check(config.url) && authorizationService.isAuthenticated()
+            if (openlmisUrlService.check(config.url) && authorizationService.isAuthenticated()
                     // we don't want to add the token to template requests
                     && !isHtml(config.url)) {
                 config.headers.Authorization = accessTokenFactory.authHeader();

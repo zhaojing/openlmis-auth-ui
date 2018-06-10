@@ -48,11 +48,13 @@
          * @return {Promise}    the promise that is resolved when user successfully logged in
          */
         function open() {
-            if (dialog) return dialog.promise;
+            if (dialog) {
+                return dialog.promise;
+            }
 
             dialog = openlmisModalService.createDialog({
-                backdrop  : 'static',
-                keyboard  : false,
+                backdrop: 'static',
+                keyboard: false,
                 controller: 'LoginController',
                 controllerAs: 'vm',
                 templateUrl: 'openlmis-login/login-form.html',
