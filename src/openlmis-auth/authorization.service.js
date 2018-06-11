@@ -313,7 +313,7 @@
             var rights = $filter('filter')(getRights(), {
                 name: rightName
             }, true);
-            return angular.copy(rights[0]);
+            return rights ? angular.copy(rights[0]) : undefined;
         }
 
         function hasRightForProgram(right, details) {
