@@ -259,6 +259,10 @@
                 return false;
             }
 
+            if (!details) {
+                return true;
+            }
+
             return hasRightForProgram(right, details) && hasRightForFacility(right, details);
         }
 
