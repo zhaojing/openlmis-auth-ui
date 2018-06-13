@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@bower_components/angular-http-auth": "witoldsz/angular-http-auth#^1.5"
+  },
+  "engines": {
+    "yarn": ">= 1.0.0"
+  }
+}
