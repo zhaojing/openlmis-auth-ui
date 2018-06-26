@@ -5,6 +5,5 @@
   ],
   "authServiceURL": "/",
   "authServerClientId": "user-client",
-  "authServerClientSecret": "changeme",
-  "noLint": false
+  "authServerClientSecret": "changeme"
 }
