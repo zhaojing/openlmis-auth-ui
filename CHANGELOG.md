@@ -6,6 +6,7 @@ Improvements:
 * [OLMIS-4738](https://openlmis.atlassian.net/browse/OLMIS-4738): Added Jenkinsfile.
 * [OLMIS-4795](https://openlmis.atlassian.net/browse/OLMIS-4795): Updated dev-ui to version 8.
 * [OLMIS-4813](https://openlmis.atlassian.net/browse/OLMIS-4813): Updated ui-components to version 6.0.0.
+* [OLMIS-4535](https://openlmis.atlassian.net/browse/OLMIS-4535): Offline navigation interceptor will no longer prevent user from going back to parent state while offline (if no reload is triggered).
 
 6.1.0 / 2018-04-24
 ==================

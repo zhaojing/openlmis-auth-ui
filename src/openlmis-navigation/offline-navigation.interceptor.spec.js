@@ -13,54 +13,97 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('Offline navigation interceptor', function(){
-	var $state, alertService, loadingModalService, isOffline;
+describe('Offline navigation interceptor', function() {
 
-	beforeEach(module('openlmis-navigation'));
+    var $state, alertService, loadingModalService, isOffline, $rootScope, offlineService;
 
-	beforeEach(module(function($stateProvider){
-		$stateProvider.state('normal', {
-			url: '/normal'
-		});
-		$stateProvider.state('offline', {
-			url: '/offline',
-			isOffline: true
-		});
-	}));
+    beforeEach(function() {
+        module('openlmis-navigation', function($stateProvider) {
+            $stateProvider.state('parent', {
+                url: '/parent',
+                isOffline: true
+            });
+            $stateProvider.state('parent.child.child', {
+                url: '/child'
+            });
+            $stateProvider.state('parent.child', {
+                url: '/child'
+            });
+            $stateProvider.state('normal', {
+                url: '/normal'
+            });
+            $stateProvider.state('offline', {
+                url: '/offline',
+                isOffline: true
+            });
+        });
 
-	beforeEach(inject(function(_$state_, _alertService_, _loadingModalService_, offlineService){
-		$state = _$state_;
+        inject(function($injector) {
+            $state = $injector.get('$state');
+            alertService = $injector.get('alertService');
+            loadingModalService = $injector.get('loadingModalService');
+            offlineService = $injector.get('offlineService');
+            $rootScope = $injector.get('$rootScope');
+        });
 
-		alertService = _alertService_;
-		spyOn(alertService, 'error');
+        spyOn(alertService, 'error');
+        spyOn(loadingModalService, 'close');
 
-		loadingModalService = _loadingModalService_;
-		spyOn(loadingModalService, 'close');
+        isOffline = false;
+        spyOn(offlineService, 'isOffline').andCallFake(function() {
+            return isOffline;
+        });
+    });
 
-		isOffline = false;
-		spyOn(offlineService, 'isOffline').andCallFake(function(){
-			return isOffline;
-		});
+    it('will show an alert if offline for non-offline state', function() {
+        $state.go('normal');
+        expect(alertService.error).not.toHaveBeenCalled();
 
-	}));
+        isOffline = true;
 
-	it('will show an alert if offline for non-offline state', function(){
-		$state.go('normal');
-		expect(alertService.error).not.toHaveBeenCalled();
+        $state.go('normal');
+        expect(alertService.error).toHaveBeenCalled();
+    });
 
-		isOffline = true;
+    it('will never show an alert if route is offline', function() {
+        $state.go('offline');
+        expect(alertService.error).not.toHaveBeenCalled();
 
-		$state.go('normal');
-		expect(alertService.error).toHaveBeenCalled();
-	});
+        isOffline = true;
+        $state.go('offline');
+        expect(alertService.error).not.toHaveBeenCalled();
+    });
 
-	it('will never show an alert if route is offline', function(){
-		$state.go('offline');
-		expect(alertService.error).not.toHaveBeenCalled();
+    it('will show an alert if offline and going to parent state with reload', function() {
+        $state.go('parent.child.child');
+        expect(alertService.error).not.toHaveBeenCalled();
 
-		isOffline = true;
-		$state.go('offline');
-		expect(alertService.error).not.toHaveBeenCalled();
-	});
+        isOffline = true;
+
+        $state.go('parent.child', {}, {
+            reload: true
+        });
+        expect(alertService.error).toHaveBeenCalled();
+    });
+
+    it('will never show an alert if offline and going to parent state without reload', function() {
+        $state.go('parent.child.child');
+        $rootScope.$apply();
+
+        isOffline = true;
+
+        $state.go('parent.child');
+        expect(alertService.error).not.toHaveBeenCalled();
+    });
+
+    it('will never show an alert if offline and going to an offline parent state with reload', function() {
+        $state.go('parent.child.child');
+        $rootScope.$apply();
+
+        isOffline = true;
+
+        $state.go('parent');
+        expect(alertService.error).not.toHaveBeenCalled();
+    });
 
 });

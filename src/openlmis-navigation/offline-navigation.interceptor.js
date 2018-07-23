@@ -31,12 +31,24 @@
     function offlineNavigationInterceptor($rootScope, alertService, loadingModalService, offlineService) {
         $rootScope.$on('$stateChangeStart', checkOffline);
 
-        function checkOffline(event, toState) {
-            if (offlineService.isOffline() && !toState.isOffline) {
+        function checkOffline(event, toState, toStateParams, fromState, fromStateParams, options) {
+            if (shouldPreventStateChange(toState, fromState, options)) {
                 event.preventDefault();
                 loadingModalService.close();
                 alertService.error('openlmisNavigation.notAvailableOffline');
             }
+        }
+
+        function shouldPreventStateChange(toState, fromState, options) {
+            if (!offlineService.isOffline()) {
+                return false;
+            }
+
+            return !isGoingToParentState(toState, fromState, options) && !toState.isOffline;
+        }
+
+        function isGoingToParentState(toState, fromState, options) {
+            return fromState.name.indexOf(toState.name) > -1 && !options.reload;
         }
     }
 
