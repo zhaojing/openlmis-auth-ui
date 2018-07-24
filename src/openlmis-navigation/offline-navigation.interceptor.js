@@ -44,15 +44,7 @@
                 return false;
             }
 
-            if (isGoingToParentState(toState, fromState, options)) {
-                return false;
-            }
-
-            if (toState.isOffline) {
-                return false;
-            }
-
-            return true;
+            return !(isGoingToParentState(toState, fromState, options) || toState.isOffline);
         }
 
         function isGoingToParentState(toState, fromState, options) {
