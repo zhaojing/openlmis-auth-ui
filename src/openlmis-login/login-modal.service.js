@@ -29,9 +29,9 @@
         .module('openlmis-login')
         .service('loginModalService', loginModalService);
 
-    loginModalService.$inject = ['openlmisModalService'];
+    loginModalService.$inject = ['openlmisModalService', 'loadingModalService'];
 
-    function loginModalService(openlmisModalService) {
+    function loginModalService(openlmisModalService, loadingModalService) {
         var dialog;
 
         this.open = open;
@@ -52,6 +52,7 @@
                 return dialog.promise;
             }
 
+            loadingModalService.close();
             dialog = openlmisModalService.createDialog({
                 backdrop: 'static',
                 keyboard: false,
