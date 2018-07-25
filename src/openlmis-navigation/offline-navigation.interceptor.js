@@ -27,8 +27,11 @@
     angular.module('openlmis-navigation')
         .run(offlineNavigationInterceptor);
 
-    offlineNavigationInterceptor.$inject = ['$rootScope', 'alertService', 'loadingModalService', 'offlineService'];
-    function offlineNavigationInterceptor($rootScope, alertService, loadingModalService, offlineService) {
+    offlineNavigationInterceptor.$inject = [
+        '$rootScope', 'alertService', 'loadingModalService', 'offlineService', '$state'
+    ];
+
+    function offlineNavigationInterceptor($rootScope, alertService, loadingModalService, offlineService, $state) {
         $rootScope.$on('$stateChangeStart', checkOffline);
 
         function checkOffline(event, toState, toStateParams, fromState, fromStateParams, options) {
@@ -40,15 +43,48 @@
         }
 
         function shouldPreventStateChange(toState, fromState, options) {
-            if (!offlineService.isOffline()) {
-                return false;
-            }
+            return offlineService.isOffline() && !isAccessibleOffline(toState, fromState, options);
+        }
 
-            return !(isGoingToParentState(toState, fromState, options) || toState.isOffline);
+        function isAccessibleOffline(toState, fromState, options) {
+            return isGoingToParentState(toState, fromState, options) || hasOfflinePath(toState, fromState);
         }
 
         function isGoingToParentState(toState, fromState, options) {
             return fromState.name.indexOf(toState.name) > -1 && !options.reload;
+        }
+
+        function hasOfflinePath(toState, fromState) {
+            if (toState.isOffline) {
+                var toStateParents = getParentStates(toState),
+                    fromStateParents = getParentStates(fromState);
+
+                var accessibleOffline = true;
+                toStateParents.forEach(function(parent) {
+                    if (fromStateParents.indexOf(parent) === -1 && !$state.get(parent).isOffline) {
+                        accessibleOffline = false;
+                    }
+                });
+
+                return accessibleOffline;
+            }
+
+            return false;
+        }
+
+        function getParentStates(state) {
+            var stateName = state.name;
+            if (stateName.lastIndexOf('.') > -1) {
+                stateName = stateName.slice(0, stateName.lastIndexOf('.'));
+            }
+
+            var parentStates = [];
+            while (stateName.lastIndexOf('.') > -1) {
+                parentStates.push(stateName);
+                stateName = stateName.slice(0, stateName.lastIndexOf('.'));
+            }
+
+            return parentStates;
         }
     }
 

@@ -7,6 +7,7 @@ Improvements:
 * [OLMIS-4795](https://openlmis.atlassian.net/browse/OLMIS-4795): Updated dev-ui to version 8.
 * [OLMIS-4813](https://openlmis.atlassian.net/browse/OLMIS-4813): Updated ui-components to version 6.0.0.
 * [OLMIS-4535](https://openlmis.atlassian.net/browse/OLMIS-4535): Offline navigation interceptor will no longer prevent user from going back to parent state while offline (if no reload is triggered).
+* [OLMIS-4535](https://openlmis.atlassian.net/browse/OLMIS-4535): Offline navigation interceptor will now check if there is offline path before preventing state change.
 
 Bug fixes which are backwards-compatible:
 * [OLMIS-5064](https://openlmis.atlassian.net/browse/OLMIS-5064): Fixed endless loading modal when 401 HTTP error is thrown.
