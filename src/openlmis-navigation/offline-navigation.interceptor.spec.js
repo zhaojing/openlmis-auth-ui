@@ -19,21 +19,39 @@ describe('Offline navigation interceptor', function() {
 
     beforeEach(function() {
         module('openlmis-navigation', function($stateProvider) {
-            $stateProvider.state('parent', {
-                url: '/parent',
-                isOffline: true
-            });
-            $stateProvider.state('parent.child.child', {
-                url: '/child'
-            });
-            $stateProvider.state('parent.child', {
-                url: '/child'
-            });
             $stateProvider.state('normal', {
                 url: '/normal'
             });
             $stateProvider.state('offline', {
                 url: '/offline',
+                isOffline: true
+            });
+            $stateProvider.state('parent', {
+                url: '/parent',
+                isOffline: true
+            });
+            $stateProvider.state('parent.child', {
+                url: '/child'
+            });
+            $stateProvider.state('parent.child.left', {
+                url: '/left'
+            });
+            $stateProvider.state('parent.child.child', {
+                url: '/child'
+            });
+            $stateProvider.state('parent.child.child.right', {
+                url: '/right'
+            });
+            $stateProvider.state('parent.child.child.left', {
+                url: '/left',
+                isOffline: true
+            });
+            $stateProvider.state('parent.child.child.left.left', {
+                url: '/left',
+                isOffline: true
+            });
+            $stateProvider.state('parent.child.child.left.left.left', {
+                url: '/left',
                 isOffline: true
             });
         });
@@ -104,6 +122,26 @@ describe('Offline navigation interceptor', function() {
 
         $state.go('parent');
         expect(alertService.error).not.toHaveBeenCalled();
+    });
+
+    it('will never show an alert if offline path is available between state', function() {
+        $state.go('parent.child.child.right');
+        $rootScope.$apply();
+
+        isOffline = true;
+
+        $state.go('parent.child.child.left.left.left');
+        expect(alertService.error).not.toHaveBeenCalled();
+    });
+
+    it('will never show an alert if offline path is available between state', function() {
+        $state.go('parent.child.child.right');
+        $rootScope.$apply();
+
+        isOffline = true;
+
+        $state.go('parent.child.left');
+        expect(alertService.error).toHaveBeenCalled();
     });
 
 });
