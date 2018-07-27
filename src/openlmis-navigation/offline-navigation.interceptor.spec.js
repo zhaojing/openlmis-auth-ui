@@ -134,7 +134,7 @@ describe('Offline navigation interceptor', function() {
         expect(alertService.error).not.toHaveBeenCalled();
     });
 
-    it('will never show an alert if offline path is available between state', function() {
+    it('will show an alert if offline path is not available between state', function() {
         $state.go('parent.child.child.right');
         $rootScope.$apply();
 
