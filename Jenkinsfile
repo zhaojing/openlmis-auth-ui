@@ -135,6 +135,7 @@ pipeline {
                 }
             }
             steps {
+                sh "docker pull openlmis/auth-ui:latest"
                 sh "docker tag openlmis/auth-ui:latest openlmis/auth-ui:${VERSION}"
                 sh "docker push openlmis/auth-ui:${VERSION}"
             }
@@ -142,7 +143,7 @@ pipeline {
                 success {
                     script {
                         if (!VERSION.endsWith("SNAPSHOT")) {
-                            currentBuild.rawBuild.keepLog(true)
+                            currentBuild.setKeepLog(true)
                         }
                     }
                 }
