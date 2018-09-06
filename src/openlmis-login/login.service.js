@@ -28,14 +28,17 @@
         .module('openlmis-login')
         .service('loginService', loginService);
 
-    loginService.$inject = [
-        '$rootScope', '$q', '$http', 'authUrl', 'openlmisUrlFactory', 'authorizationService'
-    ];
+    loginService.$inject = ['$q', '$http', 'authUrl', 'authorizationService'];
 
-    function loginService($rootScope, $q, $http, authUrl, openlmisUrlFactory, authorizationService) {
+    function loginService($q, $http, authUrl, authorizationService) {
+
+        var postLoginActions = [],
+            postLogoutActions = [];
 
         this.login = login;
         this.logout = logout;
+        this.registerPostLoginAction = registerPostLoginAction;
+        this.registerPostLogoutAction = registerPostLogoutAction;
 
         /**
          * @ngdoc method
@@ -56,6 +59,12 @@
                     authorizationService.setAccessToken(response.accessToken);
                     authorizationService.setUser(response.userId, response.username);
                     return response;
+                })
+                .then(function(user) {
+                    return waitForActions(postLoginActions, [user])
+                        .then(function() {
+                            return user;
+                        });
                 });
         }
 
@@ -124,6 +133,9 @@
 
             requestLogout()
                 .finally(function() {
+                    return waitForActions(postLogoutActions);
+                })
+                .finally(function() {
                     authorizationService.clearAccessToken();
                     authorizationService.clearUser();
                     deferred.resolve();
@@ -158,6 +170,46 @@
                     }
                     return $q.reject();
                 });
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-login.loginService
+         * @name  registerPostLoginAction
+         *
+         * @description
+         * Registers an action to be executed after user has logged in. This action will block the UI until user both
+         * logs in and the action is completed. Actions registered will be fired concurrently.
+         *
+         *  @param {Function} fn the action to be executed on login
+         */
+        function registerPostLoginAction(fn) {
+            postLoginActions.push(fn);
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-login.loginService
+         * @name  registerPostLogoutAction
+         *
+         * @description
+         * Registers an action to be executed after user has logged in. This action will block the UI until user both
+         * logs out and the action is completed. Actions registered will be fired concurrently.
+         *
+         *  @param {Function} fn the action to be executed on logout
+         */
+        function registerPostLogoutAction(fn) {
+            postLogoutActions.push(fn);
+        }
+
+        function waitForActions(actions, params) {
+            var promises = [];
+
+            actions.forEach(function(fn) {
+                promises.push($q.when(fn.apply(undefined, params)));
+            });
+
+            return $q.all(promises);
         }
     }
 
