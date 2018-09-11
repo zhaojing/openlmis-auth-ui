@@ -13,35 +13,34 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
+describe('authUrl', function() {
 
-describe("authUrl", function () {
+    var authUrl;
 
-  var authUrl;
+    beforeEach(module('openlmis-auth'));
 
-  beforeEach(module('openlmis-auth'));
+    beforeEach(module(function($provide) {
+        $provide.factory('openlmisUrlFactory', function() {
+            return function(url) {
+                return '/' + url;
+            };
+        });
+    }));
 
-  beforeEach(module(function($provide){
-    $provide.factory('openlmisUrlFactory', function(){
-      return function(url){
-        return '/' + url;
-      }
+    beforeEach(inject(function(_authUrl_) {
+        authUrl = _authUrl_;
+    }));
+
+    it('should return string', function() {
+        var url = authUrl('/someURL');
+        expect(typeof(url)).toBe('string');
     });
-  }));
 
-  beforeEach(inject(function (_authUrl_) {
-    authUrl = _authUrl_;
-  }));
+    it('should format relative and absolute urls the same', function() {
+        var relativeURL = authUrl('someURL');
+        var absoluteURL = authUrl('/someURL');
 
-  it('should return string', function () {
-    var url = authUrl("/someURL");
-    expect(typeof(url)).toBe("string");
-  });
-
-  it("should format relative and absolute urls the same", function(){
-    var relativeURL = authUrl("someURL");
-    var absoluteURL = authUrl("/someURL");
-
-    expect(relativeURL).toEqual(absoluteURL);
-  });
+        expect(relativeURL).toEqual(absoluteURL);
+    });
 
 });

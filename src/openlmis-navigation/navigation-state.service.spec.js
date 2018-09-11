@@ -53,18 +53,18 @@ describe('navigationStateService', function() {
             return true;
         });
 
-        $state.get.andCallFake(function(stateName){
-            if(!stateName){
+        $state.get.andCallFake(function(stateName) {
+            if (!stateName) {
                 return states;
-            } else {
-                var foundState = false;
-                angular.forEach(states, function(state){
-                    if(state.name == stateName){
-                        foundState = state;
-                    }
-                });
-                return foundState;
             }
+            var foundState = false;
+            angular.forEach(states, function(state) {
+                if (state.name === stateName) {
+                    foundState = state;
+                }
+            });
+            return foundState;
+
         });
 
         inject(function($injector) {
@@ -163,8 +163,8 @@ describe('navigationStateService', function() {
 
     });
 
-    describe('isOffline', function(){
-        it('should return true if the state has isOffline defined', function(){
+    describe('isOffline', function() {
+        it('should return true if the state has isOffline defined', function() {
             var offlineState = $state.get('state2.subState3'),
                 state1 = $state.get('state2.subState0'),
                 state2 = $state.get('state2.subState4');

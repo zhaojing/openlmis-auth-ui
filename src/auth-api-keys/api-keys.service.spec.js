@@ -115,9 +115,9 @@ describe('apiKeysService', function() {
             var result;
 
             apiKeysService.query(params)
-            .then(function(data) {
-                result = data;
-            });
+                .then(function(data) {
+                    result = data;
+                });
             $httpBackend.flush();
             $rootScope.$apply();
 

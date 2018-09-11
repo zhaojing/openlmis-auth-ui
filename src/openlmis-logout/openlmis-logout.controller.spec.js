@@ -13,7 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 describe('LogoutController', function() {
 
     var vm, loginService, $state, $rootScope, $q, confirmService, offlineService, $controller;

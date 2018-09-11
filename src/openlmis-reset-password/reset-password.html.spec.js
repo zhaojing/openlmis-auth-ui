@@ -15,37 +15,9 @@
 
 describe('reset-password.html template', function() {
 
-    var template, vm, $q, $timeout, $state;
+    var template, vm, $q, $timeout, $state, $rootScope;
 
-    beforeEach(prepareSuite);
-
-    describe('Show password checkbox', function() {
-
-        it('should change input type', function() {
-            var inputs = template.find("#password, #reenteredPassword");
-            expect(inputs.length).toEqual(2);
-
-            inputs.each(function() {
-                expect($(this).attr('type')).toEqual('password');
-            });
-
-            template.find('#showPassword').click();
-            $timeout.flush();
-
-            inputs.each(function() {
-                expect($(this).attr('type')).toEqual('text');
-            });
-
-            template.find('#showPassword').click();
-
-            inputs.each(function() {
-                expect($(this).attr('type')).toEqual('password');
-            });
-        });
-
-    });
-
-    function prepareSuite() {
+    beforeEach(function() {
         var $controller, $templateRequest, $compile, $scope;
 
         module('openlmis-reset-password');
@@ -74,6 +46,32 @@ describe('reset-password.html template', function() {
             template = $compile(requested)($scope);
         });
         $rootScope.$apply();
-    }
+    });
+
+    describe('Show password checkbox', function() {
+
+        it('should change input type', function() {
+            var inputs = template.find('#password, #reenteredPassword');
+            expect(inputs.length).toEqual(2);
+
+            inputs.each(function() {
+                expect($(this).attr('type')).toEqual('password');
+            });
+
+            template.find('#showPassword').click();
+            $timeout.flush();
+
+            inputs.each(function() {
+                expect($(this).attr('type')).toEqual('text');
+            });
+
+            template.find('#showPassword').click();
+
+            inputs.each(function() {
+                expect($(this).attr('type')).toEqual('password');
+            });
+        });
+
+    });
 
 });

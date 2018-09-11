@@ -15,27 +15,41 @@
 
 describe('accessTokenInterceptor', function() {
 
-    var provider, authorizationServiceMock;
+    var accessTokenInterceptor, authorizationService, config, openlmisUrlService, interceptors, accessTokenFactory, $q,
+        alertService;
+
+    beforeEach(function() {
+        module('openlmis-auth', function($httpProvider) {
+            interceptors = $httpProvider.interceptors;
+        });
+
+        inject(function($injector) {
+            $q = $injector.get('$q');
+            openlmisUrlService = $injector.get('openlmisUrlService');
+            authorizationService = $injector.get('authorizationService');
+            accessTokenInterceptor = $injector.get('accessTokenInterceptor');
+            accessTokenFactory = $injector.get('accessTokenFactory');
+            alertService = $injector.get('alertService');
+        });
+
+        spyOn(accessTokenFactory, 'addAccessToken').andCallFake(function(url) {
+            return url + '&access_token=SoMeAcCeSsToKeN';
+        });
+        spyOn(accessTokenFactory, 'authHeader').andReturn('Bearer SoMeAcCeSsToKeN');
+
+        spyOn(openlmisUrlService, 'check');
+        spyOn(authorizationService, 'isAuthenticated');
+        spyOn(authorizationService, 'clearAccessToken');
+        spyOn(authorizationService, 'clearUser');
+        spyOn(authorizationService, 'clearRights');
+        spyOn(alertService, 'error');
+    });
 
     describe('request', function() {
 
-        var config, accessTokenFactoryMock, openlmisUrlServiceMock, authorizationServiceMock,
-            interceptors;
-
         beforeEach(function() {
-            module('openlmis-auth', function($provide, $httpProvider) {
-                accessTokenFactoryMock = mockAccessTokenFactory($provide);
-                openlmisUrlServiceMock = mockOpenlmisUrlService($provide);
-                authorizationServiceMock = mockAuthorizationServiceMock($provide);
-                interceptors = $httpProvider.interceptors;
-            });
-
-            inject(function(accessTokenInterceptor) {
-                provider = accessTokenInterceptor;
-            });
-
-            openlmisUrlServiceMock.check.andReturn(true);
-            authorizationServiceMock.isAuthenticated.andReturn(true);
+            openlmisUrlService.check.andReturn(true);
+            authorizationService.isAuthenticated.andReturn(true);
 
             config = {
                 url: 'some.url',
@@ -48,7 +62,7 @@ describe('accessTokenInterceptor', function() {
         });
 
         it('should add token header', function() {
-            var result = provider.request(config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.url');
             expect(result.headers.Authorization).toEqual('Bearer SoMeAcCeSsToKeN');
@@ -57,55 +71,40 @@ describe('accessTokenInterceptor', function() {
         it('should not add token if requesting html file', function() {
             config.url = 'some.html';
 
-            var result = provider.request(config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.html');
             expect(result.headers.Authorization).not.toBeDefined();
         });
 
         it('should not add token if user is not authenticated', function() {
-            authorizationServiceMock.isAuthenticated.andReturn(false);
+            authorizationService.isAuthenticated.andReturn(false);
 
-            var result = provider.request(config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.url');
             expect(result.headers.Authorization).not.toBeDefined();
         });
 
         it('should check if user is authenticated', function() {
-            provider.request(config);
+            accessTokenInterceptor.request(config);
 
-            expect(authorizationServiceMock.isAuthenticated).toHaveBeenCalled();
+            expect(authorizationService.isAuthenticated).toHaveBeenCalled();
         });
 
         it('should check if url should not be bypassed', function() {
-            provider.request(config);
+            accessTokenInterceptor.request(config);
 
-            expect(openlmisUrlServiceMock.check).toHaveBeenCalledWith('some.url');
+            expect(openlmisUrlService.check).toHaveBeenCalledWith('some.url');
         });
 
     });
 
     describe('responseError', function() {
 
-        var response, $q, $injector;
+        var response;
 
         beforeEach(function() {
-            module('openlmis-auth', function($provide) {
-                authorizationServiceMock = mockAuthorizationServiceMock($provide);
-            });
-
-            inject(function(accessTokenInterceptor, _$q_, _$injector_) {
-                provider = accessTokenInterceptor;
-                $q = _$q_;
-                $injector = _$injector_;
-            });
-
-            alertMock = mockAlertService();
-            spyOn($injector, 'get').andCallFake(function(name) {
-                if (name === 'alertService') return alertMock;
-            })
-
             response = {};
         });
 
@@ -114,90 +113,58 @@ describe('accessTokenInterceptor', function() {
             beforeEach(function() {
                 response.status = 401;
 
-                provider.responseError(response);
+                accessTokenInterceptor.responseError(response);
             });
 
             it('should clear access token', function() {
-                expect(authorizationServiceMock.clearAccessToken).toHaveBeenCalled();
+                expect(authorizationService.clearAccessToken).toHaveBeenCalled();
             });
 
-            it ('should clear user', function() {
-                expect(authorizationServiceMock.clearUser).toHaveBeenCalled();
+            it('should clear user', function() {
+                expect(authorizationService.clearUser).toHaveBeenCalled();
             });
 
             it('should clear rights', function() {
-                expect(authorizationServiceMock.clearRights).toHaveBeenCalled();
+                expect(authorizationService.clearRights).toHaveBeenCalled();
             });
 
         });
 
         it('should show error.authorization alert on 403 status', function() {
             response.status = 403;
-            response.data = {message: 'Test message'};
+            response.data = {
+                message: 'Test message'
+            };
 
-            provider.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
-            expect(alertMock.error)
+            expect(alertService.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
         });
 
         it('should not call with message when message is null on 403', function() {
             response.status = 403;
-            response.data = {message: null};
+            response.data = {
+                message: null
+            };
 
-            provider.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
-            expect(alertMock.error)
+            expect(alertService.error)
                 .not
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
-            expect(alertMock.error)
+            expect(alertService.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error');
         });
 
         it('should reject response', function() {
             spyOn($q, 'reject').andCallThrough();
 
-            provider.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
             expect($q.reject).toHaveBeenCalledWith(response);
         });
 
     });
-
-    function mockAccessTokenFactory($provide) {
-        var accessTokenFactoryMock = jasmine.createSpyObj('accessTokenFactory', ['addAccessToken', 'authHeader']);
-        accessTokenFactoryMock.addAccessToken.andCallFake(function(url) {
-            return url + '&access_token=SoMeAcCeSsToKeN';
-        });
-        accessTokenFactoryMock.authHeader.andCallFake(function() {
-            return 'Bearer SoMeAcCeSsToKeN';
-        });
-        $provide.factory('accessTokenFactory', function() {
-            return accessTokenFactoryMock;
-        });
-        return accessTokenFactoryMock;
-    }
-
-    function mockOpenlmisUrlService($provide) {
-        var openlmisUrlServiceMock = jasmine.createSpyObj('openlmisUrlService', ['check']);
-        $provide.factory('openlmisUrlService', function() {
-            return openlmisUrlServiceMock;
-        });
-        return openlmisUrlServiceMock;
-    }
-
-    function mockAuthorizationServiceMock($provide) {
-        var authorizationServiceMock = jasmine.createSpyObj('authorizationService', [
-            'isAuthenticated', 'clearAccessToken', 'clearUser', 'clearRights'
-        ]);
-        $provide.factory('authorizationService', function() {
-            return authorizationServiceMock;
-        });
-        return authorizationServiceMock;
-    }
-
-    function mockAlertService() {
-        return jasmine.createSpyObj('alertService', ['error']);
-    }
 
 });

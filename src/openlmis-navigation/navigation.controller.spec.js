@@ -59,7 +59,7 @@ describe('NavigationController', function() {
                 '': mainRoot,
                 subRoot: subRoot
             };
-        })
+        });
 
         it('should expose navigationStateService.isSubmenu method', function() {
             initController();
@@ -102,7 +102,7 @@ describe('NavigationController', function() {
         beforeEach(function() {
             navigationStateService.hasChildren.andCallFake(function(state) {
                 return state === 'state';
-            })
+            });
 
             initController();
         });

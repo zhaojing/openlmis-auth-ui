@@ -14,31 +14,33 @@
  */
 
 describe('openlmis-reset-password.changePasswordFactory', function() {
-	var changePasswordFactory, $httpBackend, $rootScope;
 
-    beforeEach(module('openlmis-reset-password'));
+    var changePasswordFactory, $httpBackend, $rootScope, openlmisUrlFactory, spy;
 
-    beforeEach(inject(function(_changePasswordFactory_, _$httpBackend_, _$rootScope_){
-        changePasswordFactory = _changePasswordFactory_;
-        $httpBackend = _$httpBackend_;
-        $rootScope = _$rootScope_;
-    }));
+    beforeEach(function() {
+        module('openlmis-reset-password');
 
-    beforeEach(inject(function(openlmisUrlFactory){
+        inject(function($injector) {
+            changePasswordFactory = $injector.get('changePasswordFactory');
+            $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
+            openlmisUrlFactory = $injector.get('openlmisUrlFactory');
+        });
+
         var data = {
-                token: 'token',
-                newPassword: 'password'
-            };
+            token: 'token',
+            newPassword: 'password'
+        };
 
         $httpBackend.when('POST', openlmisUrlFactory('/api/users/auth/changePassword'))
-        .respond(function(method, url, body){
-            if(body === angular.toJson(data)){
-                return [200];
-            } else {
+            .respond(function(method, url, body) {
+                if (body === angular.toJson(data)) {
+                    return [200];
+                }
                 return [404];
-            }
-        });
-    }));
+
+            });
+    });
 
     it('will resolve for successful requests', function() {
         spy = jasmine.createSpy();

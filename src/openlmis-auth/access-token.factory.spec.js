@@ -14,13 +14,17 @@
  */
 
 describe('accessTokenFactory', function() {
-    var accessTokenFactory;
 
-    beforeEach(module('openlmis-auth'));
+    var accessTokenFactory, authorizationService;
 
-    beforeEach(inject(function(_accessTokenFactory_){
-        accessTokenFactory  = _accessTokenFactory_;
-    }));
+    beforeEach(function() {
+        module('openlmis-auth');
+
+        inject(function($injector) {
+            authorizationService = $injector.get('authorizationService');
+            accessTokenFactory = $injector.get('accessTokenFactory');
+        });
+    });
 
     it('should update query param value when key exists', function() {
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
@@ -36,47 +40,47 @@ describe('accessTokenFactory', function() {
         expect(updatedUri).toEqual(uri);
     });
 
-    it('should add access_token if not already in URI', inject(function(authorizationService) {
+    it('should add access_token if not already in URI', function() {
         spyOn(authorizationService, 'getAccessToken').andReturn('123');
 
         var uri = 'http://example.com/requisitions?program=abc';
         var updatedUri = accessTokenFactory.addAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=123');
-    }));
+    });
 
-    it('should not add access_token if already in URI', inject(function(authorizationService) {
+    it('should not add access_token if already in URI', function() {
         spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
         var updatedUri = accessTokenFactory.addAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=123');
-    }));
+    });
 
-    it('should update access_token when "access_token" key in query params', inject(function(authorizationService) {
+    it('should update access_token when "access_token" key in query params', function() {
         spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
         var updatedUri = accessTokenFactory.updateAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=321');
-    }));
+    });
 
-    it('should not update access_token when "access_token" key not in query params', inject(function(authorizationService) {
+    it('should not update access_token when "access_token" key not in query params', function() {
         spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc';
         var updatedUri = accessTokenFactory.updateAccessToken(uri);
 
         expect(updatedUri).toEqual(uri);
-    }));
+    });
 
-    it('should create a token header', inject(function(authorizationService) {
-       spyOn(authorizationService, 'getAccessToken').andReturn('321');
+    it('should create a token header', function() {
+        spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
-       var header = accessTokenFactory.authHeader();
+        var header = accessTokenFactory.authHeader();
 
-       expect(header).toEqual('Bearer 321');
-    }));
+        expect(header).toEqual('Bearer 321');
+    });
 });

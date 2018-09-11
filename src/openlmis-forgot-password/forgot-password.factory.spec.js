@@ -14,14 +14,27 @@
  */
 
 describe('openlmis-forgot-password.forgotPasswordFactory', function() {
-	beforeEach(module('openlmis-forgot-password'));
 
-    it('sendResetEmail should call forgot password endpoint', inject(function(forgotPasswordFactory, $rootScope, $httpBackend, openlmisUrlFactory) {
+    var forgotPasswordFactory, $rootScope, $httpBackend, openlmisUrlFactory;
+
+    beforeEach(function() {
+        module('openlmis-forgot-password');
+
+        inject(function($injector) {
+            forgotPasswordFactory = $injector.get('forgotPasswordFactory');
+            $rootScope = $injector.get('$rootScope');
+            $httpBackend = $injector.get('$httpBackend');
+            openlmisUrlFactory = $injector.get('openlmisUrlFactory');
+        });
+    });
+    beforeEach();
+
+    it('sendResetEmail should call forgot password endpoint', function() {
         var email = 'user@openlmis.org',
             spy = jasmine.createSpy();
 
         $httpBackend.when('POST', openlmisUrlFactory('/api/users/auth/forgotPassword?email=' + email))
-        .respond(200, {});
+            .respond(200, {});
 
         forgotPasswordFactory.sendResetEmail(email).then(spy);
 
@@ -29,6 +42,6 @@ describe('openlmis-forgot-password.forgotPasswordFactory', function() {
         $rootScope.$apply();
 
         expect(spy).toHaveBeenCalled();
-    }));
+    });
 
 });

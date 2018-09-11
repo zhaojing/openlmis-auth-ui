@@ -13,10 +13,9 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-
 describe('ResetPasswordController', function() {
 
-    var $rootScope, changePasswordFactory, $q, alertService, vm, alertSpy, token;
+    var $rootScope, changePasswordFactory, $q, vm, alertSpy, token;
 
     beforeEach(function() {
         token = '1234';
@@ -36,7 +35,7 @@ describe('ResetPasswordController', function() {
             });
         });
 
-        inject(function (_$rootScope_, _changePasswordFactory_, $controller, _$q_) {
+        inject(function(_$rootScope_, _changePasswordFactory_, $controller, _$q_) {
             $rootScope = _$rootScope_;
             $q = _$q_;
 
@@ -59,7 +58,9 @@ describe('ResetPasswordController', function() {
             vm.reenteredPassword = password;
 
             changePasswordFactory.changePassword.andCallFake(function(pass, tk) {
-                if(password === pass && tk === token) passwordPassed = true;
+                if (password === pass && tk === token) {
+                    passwordPassed = true;
+                }
                 return $q.when(true);
             });
             alertSpy.success.andCallFake(alertSpyMethod);

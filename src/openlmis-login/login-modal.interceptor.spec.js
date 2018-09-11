@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe("LoginModalInterceptor", function() {
+describe('LoginModalInterceptor', function() {
 
     var $q, $rootScope, loginModalService, loginDeferred, authService;
 

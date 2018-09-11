@@ -55,14 +55,13 @@ describe('authStateRouter', function() {
         expect(loginModalService.open).toHaveBeenCalled();
     });
 
-      it('should close loading dialog if auth token is not set and state is not home', inject(function (loadingModalService) {
+    it('should close loading dialog if auth token is not set and state is not home', function() {
         authorizationService.isAuthenticated.andReturn(false);
 
         $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {}, createState(''));
 
         expect(loadingModalService.close).toHaveBeenCalled();
-      }));
-
+    });
 
     it('will not redirect user if accessing pages in "auth.*" routes, and user is NOT authenticated', function() {
         authorizationService.isAuthenticated.andReturn(false);

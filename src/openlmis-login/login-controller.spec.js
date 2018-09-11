@@ -13,13 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe("LoginController", function() {
+describe('LoginController', function() {
 
     var vm, $q, $rootScope, $controller, loginService, modalDeferred, loadingModalService;
 
     beforeEach(function() {
 
-        module('openlmis-login', function($provide){
+        module('openlmis-login', function($provide) {
             // Turn off AuthToken
             $provide.factory('accessTokenInterceptor', function() {
                 return {};
@@ -36,7 +36,7 @@ describe("LoginController", function() {
 
         modalDeferred = $q.defer();
 
-        vm = $controller("LoginController", {
+        vm = $controller('LoginController', {
             modalDeferred: modalDeferred
         });
     });
@@ -121,7 +121,7 @@ describe("LoginController", function() {
             expect(loadingModalService.close).toHaveBeenCalled();
         });
 
-        it('will resolve modalDeferred promise if login is successful', function($controller) {
+        it('will resolve modalDeferred promise if login is successful', function() {
             var resolved;
             modalDeferred.promise.then(function() {
                 resolved = true;
@@ -147,7 +147,7 @@ describe("LoginController", function() {
 
         it('should emit "openlmis-auth.login" event when successfully logged in', function() {
             var success = false;
-            $rootScope.$on('openlmis-auth.login', function(){
+            $rootScope.$on('openlmis-auth.login', function() {
                 success = true;
             });
 
@@ -163,7 +163,7 @@ describe("LoginController", function() {
 
         it('should not emit "openlmis-auth.login" event when login failed', function() {
             var success = true;
-            $rootScope.$on('openlmis-auth.login', function(){
+            $rootScope.$on('openlmis-auth.login', function() {
                 success = false;
             });
 
