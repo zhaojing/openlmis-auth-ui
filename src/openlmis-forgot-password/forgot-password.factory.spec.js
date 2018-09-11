@@ -27,7 +27,6 @@ describe('openlmis-forgot-password.forgotPasswordFactory', function() {
             openlmisUrlFactory = $injector.get('openlmisUrlFactory');
         });
     });
-    beforeEach();
 
     it('sendResetEmail should call forgot password endpoint', function() {
         var email = 'user@openlmis.org',
