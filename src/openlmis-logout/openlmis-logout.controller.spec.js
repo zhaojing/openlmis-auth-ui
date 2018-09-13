@@ -84,6 +84,7 @@ describe('LogoutController', function() {
                 'openlmisLogout.offlineWarning',
                 'openlmisLogout.logout'
             );
+
             expect(loginService.logout).toHaveBeenCalled();
             expect($rootScope.$emit).toHaveBeenCalledWith('openlmis-auth.logout');
             expect($state.go).toHaveBeenCalledWith('auth.login');
@@ -102,6 +103,7 @@ describe('LogoutController', function() {
                 'openlmisLogout.offlineWarning',
                 'openlmisLogout.logout'
             );
+
             expect(loginService.logout).toHaveBeenCalled();
             expect($rootScope.$emit).not.toHaveBeenCalled();
             expect($state.go).not.toHaveBeenCalled();
@@ -119,6 +121,7 @@ describe('LogoutController', function() {
                 'openlmisLogout.offlineWarning',
                 'openlmisLogout.logout'
             );
+
             expect(loginService.logout).not.toHaveBeenCalled();
             expect($rootScope.$emit).not.toHaveBeenCalled();
             expect($state.go).not.toHaveBeenCalled();

@@ -75,25 +75,30 @@ describe('Offline navigation interceptor', function() {
 
     it('will show an alert if offline for non-offline state', function() {
         $state.go('normal');
+
         expect(alertService.error).not.toHaveBeenCalled();
 
         isOffline = true;
 
         $state.go('normal');
+
         expect(alertService.error).toHaveBeenCalled();
     });
 
     it('will never show an alert if route is offline', function() {
         $state.go('offline');
+
         expect(alertService.error).not.toHaveBeenCalled();
 
         isOffline = true;
         $state.go('offline');
+
         expect(alertService.error).not.toHaveBeenCalled();
     });
 
     it('will show an alert if offline and going to parent state with reload', function() {
         $state.go('parent.child.child');
+
         expect(alertService.error).not.toHaveBeenCalled();
 
         isOffline = true;
@@ -101,6 +106,7 @@ describe('Offline navigation interceptor', function() {
         $state.go('parent.child', {}, {
             reload: true
         });
+
         expect(alertService.error).toHaveBeenCalled();
     });
 
@@ -111,6 +117,7 @@ describe('Offline navigation interceptor', function() {
         isOffline = true;
 
         $state.go('parent.child');
+
         expect(alertService.error).not.toHaveBeenCalled();
     });
 
@@ -121,6 +128,7 @@ describe('Offline navigation interceptor', function() {
         isOffline = true;
 
         $state.go('parent');
+
         expect(alertService.error).not.toHaveBeenCalled();
     });
 
@@ -131,6 +139,7 @@ describe('Offline navigation interceptor', function() {
         isOffline = true;
 
         $state.go('parent.child.child.left.left.left');
+
         expect(alertService.error).not.toHaveBeenCalled();
     });
 
@@ -141,6 +150,7 @@ describe('Offline navigation interceptor', function() {
         isOffline = true;
 
         $state.go('parent.child.left');
+
         expect(alertService.error).toHaveBeenCalled();
     });
 

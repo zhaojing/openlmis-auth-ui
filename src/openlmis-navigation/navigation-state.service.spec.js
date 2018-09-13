@@ -138,6 +138,7 @@ describe('navigationStateService', function() {
 
         it('should return true if state has visible children', function() {
             states[3].children[0].$shouldDisplay = true;
+
             expect(service.hasChildren(states[3])).toBe(true);
         });
 

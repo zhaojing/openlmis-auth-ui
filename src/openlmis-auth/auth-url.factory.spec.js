@@ -33,6 +33,7 @@ describe('authUrl', function() {
 
     it('should return string', function() {
         var url = authUrl('/someURL');
+
         expect(typeof(url)).toBe('string');
     });
 

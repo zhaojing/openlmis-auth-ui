@@ -52,6 +52,7 @@ describe('reset-password.html template', function() {
 
         it('should change input type', function() {
             var inputs = template.find('#password, #reenteredPassword');
+
             expect(inputs.length).toEqual(2);
 
             inputs.each(function() {

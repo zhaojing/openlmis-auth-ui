@@ -64,6 +64,7 @@ describe('openlmis-auth.authorizationService', function() {
             expect(authorizationService.getAccessToken()).toBe('token');
 
             authorizationService.clearAccessToken();
+
             expect(authorizationService.getAccessToken()).toBe(false);
         });
 
@@ -73,9 +74,11 @@ describe('openlmis-auth.authorizationService', function() {
 
         it('will remove the user object', function() {
             authorizationService.setUser('1234', 'test');
+
             expect(authorizationService.getUser()).not.toBeUndefined();
 
             authorizationService.clearUser();
+
             expect(authorizationService.getUser()).toBe(false);
         });
 
@@ -87,6 +90,7 @@ describe('openlmis-auth.authorizationService', function() {
             authorizationService.setUser('1234', 'test');
 
             var user = authorizationService.getUser();
+
             expect(user.user_id).toBe('1234');
             expect(user.username).toBe('test');
         });

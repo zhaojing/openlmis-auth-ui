@@ -58,7 +58,7 @@ describe('accessTokenInterceptor', function() {
         });
 
         it('should be registered', function() {
-            expect(interceptors.indexOf('accessTokenInterceptor') > -1).toBe(true);
+            expect(interceptors.indexOf('accessTokenInterceptor')).toBeGreaterThan(-1);
         });
 
         it('should add token header', function() {
@@ -153,6 +153,7 @@ describe('accessTokenInterceptor', function() {
             expect(alertService.error)
                 .not
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
+
             expect(alertService.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error');
         });

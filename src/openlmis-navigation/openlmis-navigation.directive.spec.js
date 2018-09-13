@@ -106,6 +106,7 @@ describe('openlmis-navigation directive', function() {
             expect(testLink.attr('disabled')).toBe('disabled');
             expect(testLink.hasClass('is-offline')).toBe(true);
         });
+
         it('states marked offline will not be disabled', function() {
             var testLink = angular.element(element.children('li')[1]).children('a');
 
