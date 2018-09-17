@@ -3,6 +3,7 @@
 
 Improvements:
 * [OLMIS-5235](https://openlmis.atlassian.net/browse/OLMIS-5235): Added post login and post logout hooks to the loginService.
+* [OLMIS-5409](https://openlmis.atlassian.net/browse/OLMIS-5409): Updated ui-components to version 7.0.0.
 
 6.1.1 / 2018-08-16
 ==================
