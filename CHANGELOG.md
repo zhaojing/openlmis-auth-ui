@@ -1,5 +1,5 @@
-6.1.2 / Work in Progress
-========================
+6.1.2 / 2018-10-01
+==================
 
 Improvements:
 * [OLMIS-5235](https://openlmis.atlassian.net/browse/OLMIS-5235): Added post login and post logout hooks to the loginService.
