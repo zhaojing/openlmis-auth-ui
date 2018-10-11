@@ -29,12 +29,9 @@
         .module('openlmis-login')
         .run(loginRequiredInterceptor);
 
-    loginRequiredInterceptor.$inject = [
-        '$rootScope', 'authService', 'accessTokenFactory', 'loginModalService'
-    ];
+    loginRequiredInterceptor.$inject = ['$rootScope', 'loginModalService'];
 
-    function loginRequiredInterceptor($rootScope, authService, accessTokenFactory,
-                                      loginModalService) {
+    function loginRequiredInterceptor($rootScope, loginModalService) {
 
         $rootScope.$on('event:auth-loginRequired', onLoginRequired);
 
@@ -50,12 +47,7 @@
          * @param {Boolean} noRetryRequest true if should no retry request
          */
         function onLoginRequired() {
-            loginModalService.open().then(function() {
-                authService.loginConfirmed(null, function(config) {
-                    config.headers.Authorization = accessTokenFactory.authHeader();
-                    return config;
-                });
-            });
+            loginModalService.open();
         }
     }
 })();

@@ -28,9 +28,9 @@
         .module('openlmis-login')
         .service('loginService', loginService);
 
-    loginService.$inject = ['$q', '$http', 'authUrl', 'authorizationService'];
+    loginService.$inject = ['$q', '$http', 'authUrl', 'authorizationService', 'authService', 'accessTokenFactory'];
 
-    function loginService($q, $http, authUrl, authorizationService) {
+    function loginService($q, $http, authUrl, authorizationService, authService, accessTokenFactory) {
 
         var postLoginActions = [],
             postLogoutActions = [];
@@ -58,6 +58,12 @@
                 .then(function(response) {
                     authorizationService.setAccessToken(response.accessToken);
                     authorizationService.setUser(response.userId, response.username);
+
+                    authService.loginConfirmed(null, function(config) {
+                        config.headers.Authorization = accessTokenFactory.authHeader();
+                        return config;
+                    });
+
                     return response;
                 })
                 .then(function(user) {

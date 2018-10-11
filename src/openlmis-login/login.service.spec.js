@@ -15,7 +15,7 @@
 
 describe('openlmis-login.loginService', function() {
 
-    var authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService, $q;
+    var authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService, $q, authService;
 
     beforeEach(function() {
         module('openlmis-login');
@@ -24,6 +24,7 @@ describe('openlmis-login.loginService', function() {
             $q = $injector.get('$q');
             authUrl = $injector.get('authUrl');
             $rootScope = $injector.get('$rootScope');
+            authService = $injector.get('authService');
             $httpBackend = $injector.get('$httpBackend');
             loginService = $injector.get('loginService');
             offlineService = $injector.get('offlineService');
@@ -45,6 +46,7 @@ describe('openlmis-login.loginService', function() {
 
         spyOn(authorizationService, 'setAccessToken').andCallThrough();
         spyOn(authorizationService, 'clearAccessToken').andCallThrough();
+        spyOn(authService, 'loginConfirmed').andCallThrough();
 
         spyOn(authorizationService, 'setUser');
         spyOn(authorizationService, 'clearUser');
@@ -154,6 +156,38 @@ describe('openlmis-login.loginService', function() {
                 username: 'john',
                 accessToken: 'access_token'
             });
+        });
+
+        it('should inform authService about successful login before executing post login actions', function() {
+            var postLoginActionDeferred = $q.defer();
+            var postLoginAction = jasmine.createSpy('postLoginAction');
+            postLoginAction.andReturn(postLoginActionDeferred.promise);
+
+            loginService.registerPostLoginAction(postLoginAction);
+
+            var success;
+            loginService.login('john', 'john-password')
+                .then(function() {
+                    success = true;
+                });
+            $httpBackend.flush();
+            $rootScope.$apply();
+
+            expect(authService.loginConfirmed).toHaveBeenCalled();
+            expect(success).toBeUndefined();
+        });
+
+        it('should not inform authService if login failed', function() {
+            var error;
+            loginService.login('john', 'bad-password')
+                .catch(function() {
+                    error = true;
+                });
+            $httpBackend.flush();
+            $rootScope.$apply();
+
+            expect(authService.loginConfirmed).not.toHaveBeenCalled();
+            expect(error).toBe(true);
         });
     });
 
