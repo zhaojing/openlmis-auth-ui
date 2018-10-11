@@ -15,21 +15,19 @@
 
 describe("LoginModalInterceptor", function() {
 
-    var $q, $rootScope, loginModalService, loginDeferred, authService;
+    var $q, $rootScope, loginModalService, loginDeferred;
 
     beforeEach(function() {
         module('openlmis-login');
 
         inject(function($injector) {
             loginModalService = $injector.get('loginModalService');
-            authService = $injector.get('authService');
             $rootScope = $injector.get('$rootScope');
             $q = $injector.get('$q');
         });
 
         loginDeferred = $q.defer();
         spyOn(loginModalService, 'open').andReturn(loginDeferred.promise);
-        spyOn(authService, 'loginConfirmed');
 
         $rootScope.$broadcast('event:auth-loginRequired');
     });
@@ -38,21 +36,6 @@ describe("LoginModalInterceptor", function() {
         $rootScope.$apply();
 
         expect(loginModalService.open).toHaveBeenCalled();
-    });
-
-    it('should inform authService that the login succeeded', function() {
-        loginDeferred.resolve();
-        $rootScope.$apply();
-
-        expect(authService.loginConfirmed).toHaveBeenCalled();
-    });
-
-    it('should not inform authService if login failed', function() {
-        loginDeferred.reject();
-        $rootScope.$apply();
-
-        expect(loginModalService.open).toHaveBeenCalled();
-        expect(authService.loginConfirmed).not.toHaveBeenCalled();
     });
 
 });
