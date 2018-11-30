@@ -1,7 +1,7 @@
 version: "2"
 services:
   auth-ui:
-    image: openlmis/dev-ui:8.1.0-RC1
+    image: openlmis/dev-ui:8.1.0-SNAPSHOT
     ports:
       - "9000:9000"
       - "9876:9876"
@@ -14,7 +14,7 @@ services:
     depends_on:
       - ui-components
   ui-components:
-    image: openlmis/ui-components:7.0.0-RC1
+    image: openlmis/ui-components:7.0.0-SNAPSHOT
     volumes:
       - '/openlmis-ui-components'
   image:
