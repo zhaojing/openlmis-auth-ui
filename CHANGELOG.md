@@ -1,5 +1,5 @@
-6.1.3 / Work in Progress
-========================
+6.1.3 / 2018-12-12
+==================
 
 Improvements:
 * [OLMIS-5409](https://openlmis.atlassian.net/browse/OLMIS-5409): Updated ui-components to version 7.0.0.
