@@ -67,7 +67,9 @@
             } else if (authorizationService.isAuthenticated() && toState.name.indexOf('auth') === 0) {
                 // if authenticated and on login page
                 event.preventDefault();
-                $state.go('openlmis.home');
+                $state.go('openlmis.home', {}, {
+                    reload: true
+                });
             } else if (canViewState(toState)) {
                 event.preventDefault();
                 loadingModalService.close();

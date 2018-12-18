@@ -83,7 +83,9 @@ describe('authStateRouter', function() {
         $rootScope.$broadcast('$stateChangeStart', createState('auth.login'), {},
             createState('somewhere'));
 
-        expect($state.go).toHaveBeenCalledWith('openlmis.home');
+        expect($state.go).toHaveBeenCalledWith('openlmis.home', {}, {
+            reload: true
+        });
     });
 
     it('should call alert if has no permission to enter state', function() {
