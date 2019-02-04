@@ -75,33 +75,6 @@
 
         loadStates();
 
-        function loadStates() {
-            service.roots = {};
-
-            $state.get().forEach(function(state) {
-                if (state.showInNavigation) {
-                    var parentName = getParentStateName(state);
-
-                    var filtered = $filter('filter')($state.get(), {
-                        name: parentName
-                    }, true);
-
-                    var parent = filtered[0];
-                    if (parent.showInNavigation) {
-                        addChildState(parent, state);
-                    } else {
-                        addToRoots(service.roots, parentName, state);
-                    }
-
-                    state.priority = state.priority === undefined ? 10 : state.priority;
-                }
-            });
-
-            for (var root in service.roots) {
-                service.roots[root] = sortStates(service.roots[root]);
-            }
-        }
-
         /**
          * @ngdoc method
          * @methodOf openlmis-navigation.navigationStateService
@@ -154,6 +127,15 @@
             return state && state.isOffline;
         }
 
+        /**
+         *
+         * @ngdoc method
+         * @methodOf openlmis-navigation.navigationStateService
+         * @name updateStateAvailability
+         *
+         * @description
+         * Updates the state availability based on the access rights and custom, per-state methods.
+         */
         function updateStateAvailability() {
             var promises = [];
             Object.keys(service.roots).forEach(function(root) {
@@ -162,6 +144,33 @@
                 });
             });
             return $q.all(promises);
+        }
+
+        function loadStates() {
+            service.roots = {};
+
+            $state.get().forEach(function(state) {
+                if (state.showInNavigation) {
+                    var parentName = getParentStateName(state);
+
+                    var filtered = $filter('filter')($state.get(), {
+                        name: parentName
+                    }, true);
+
+                    var parent = filtered[0];
+                    if (parent.showInNavigation) {
+                        addChildState(parent, state);
+                    } else {
+                        addToRoots(service.roots, parentName, state);
+                    }
+
+                    state.priority = state.priority === undefined ? 10 : state.priority;
+                }
+            });
+
+            for (var root in service.roots) {
+                service.roots[root] = sortStates(service.roots[root]);
+            }
         }
 
         function getParentStateName(state) {
