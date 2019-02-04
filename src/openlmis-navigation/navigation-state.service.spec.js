@@ -15,135 +15,109 @@
 
 describe('navigationStateService', function() {
 
-    var service, states, $state, $rootScope, authorizationService;
-
     beforeEach(function() {
-        $state = jasmine.createSpyObj('$state', ['get']);
-        authorizationService = jasmine.createSpyObj('authorizationService', ['hasRights']);
-
-        module('openlmis-navigation', function($provide) {
-            $provide.factory('$state', function() {
-                return $state;
-            });
-            $provide.factory('authorizationService', function() {
-                return authorizationService;
-            });
+        module('openlmis-navigation', function($stateProvider) {
+            createState($stateProvider, 'state1', true, 10, true);
+            createState($stateProvider, 'state1.subState13', false);
+            createState($stateProvider, 'state1.subState65', false);
+            createState($stateProvider, 'state2', true, 12, true);
+            createState($stateProvider, 'state2.subState0', false);
+            createState($stateProvider, 'state2.subState3', true, 53, false, ['other-rights'], true);
+            createState($stateProvider, 'state2.subState4', true, 15, false, ['rights'], false);
+            createState($stateProvider, 'state2.subState4.subSubState1', true);
+            createState($stateProvider, 'state3', false);
+            createState($stateProvider, 'state3.subState1', true, 11);
+            createState($stateProvider, 'state3.subState16', true, 10);
+            createState($stateProvider, 'state4', true, 11);
         });
 
-        states = [
-            createState('', false),
-            createState('state2.subState4', true, 15, false, ['rights'], false),
-            createState('state4', true, 11),
-            createState('state2', true, 12, true),
-            createState('state2.subState3', true, 53, false, ['other-rights'], true),
-            createState('state1', true, 10, true),
-            createState('state3', false),
-            createState('state3.subState16', true, 10),
-            createState('state3.subState1', true, 11),
-            createState('state2.subState0', false),
-            createState('state1.subState13', false),
-            createState('state1.subState65', false),
-            createState('state2.subState4.subSubState1', true)
-        ];
+        inject(function($injector) {
+            this.authorizationService = $injector.get('authorizationService');
+        });
 
-        authorizationService.hasRights.andCallFake(function(rights) {
+        spyOn(this.authorizationService, 'hasRights').andCallFake(function(rights) {
             if ('other-rights' === rights[0]) {
                 return false;
             }
             return true;
         });
 
-        $state.get.andCallFake(function(stateName) {
-            if (!stateName) {
-                return states;
-            }
-            var foundState = false;
-            angular.forEach(states, function(state) {
-                if (state.name === stateName) {
-                    foundState = state;
-                }
-            });
-            return foundState;
-
-        });
-
         inject(function($injector) {
-            service = $injector.get('navigationStateService');
-            $rootScope = $injector.get('$rootScope');
+            this.navigationStateService = $injector.get('navigationStateService');
+            this.$rootScope = $injector.get('$rootScope');
+            this.$state = $injector.get('$state');
         });
     });
 
     describe('initialization', function() {
 
-        it('should group by invisible root states', function() {
-            expect(service.roots['']).not.toBeUndefined();
-            expect(service.roots[''].length).toBe(3);
-            expect(service.roots.state3).not.toBeUndefined();
-            expect(service.roots.state3.length).toBe(2);
+        it('should group by invisible root this.states', function() {
+            expect(this.navigationStateService.roots['']).not.toBeUndefined();
+            expect(this.navigationStateService.roots[''].length).toBe(3);
+            expect(this.navigationStateService.roots.state3).not.toBeUndefined();
+            expect(this.navigationStateService.roots.state3.length).toBe(2);
         });
 
         it('should add only visible children to parent state', function() {
-            expect(service.roots[''][0].children).not.toBeUndefined();
-            expect(service.roots[''][0].children.length).toBe(2);
+            expect(this.navigationStateService.roots[''][0].children).not.toBeUndefined();
+            expect(this.navigationStateService.roots[''][0].children.length).toBe(2);
         });
 
         it('should sort children by priority', function() {
-            expect(service.roots[''][0].children[0]).toBe(states[4]);
-            expect(service.roots[''][0].children[1]).toBe(states[1]);
+            expect(this.navigationStateService.roots[''][0].children[0].name).toBe('state2.subState3');
+            expect(this.navigationStateService.roots[''][0].children[1].name).toBe('state2.subState4');
         });
 
         it('should sort states by priority', function() {
-            expect(service.roots[''][0]).toBe(states[3]);
-            expect(service.roots[''][1]).toBe(states[2]);
-            expect(service.roots[''][2]).toBe(states[5]);
+            expect(this.navigationStateService.roots[''][0].name).toBe('state2');
+            expect(this.navigationStateService.roots[''][1].name).toBe('state4');
+            expect(this.navigationStateService.roots[''][2].name).toBe('state1');
         });
 
-        it('should refresh states after login', function() {
-            authorizationService.hasRights.andReturn(false);
-            $rootScope.$emit('openlmis-auth.login');
-            $rootScope.$apply();
+        it('should refresh this.states after login', function() {
+            this.authorizationService.hasRights.andReturn(false);
+            this.$rootScope.$emit('openlmis-auth.login');
+            this.$rootScope.$apply();
 
-            expect(service.roots[''][0].children[1].$shouldDisplay).toBe(false);
+            expect(this.navigationStateService.roots[''][0].children[1].$shouldDisplay).toBe(false);
         });
     });
 
     describe('refreshDisplay', function() {
 
         it('should return false if state should not be shown in navigation', function() {
-            expect(service.roots[''][2].$shouldDisplay).toBe(false);
+            expect(this.navigationStateService.roots[''][2].$shouldDisplay).toBe(false);
         });
 
         it('should return true if state does not require any rights', function() {
-            expect(service.roots[''][1].$shouldDisplay).toBe(true);
+            expect(this.navigationStateService.roots[''][1].$shouldDisplay).toBe(true);
         });
 
         it('should return true if user has required rights', function() {
-            expect(service.roots[''][0].children[1].$shouldDisplay).toBe(true);
+            expect(this.navigationStateService.roots[''][0].children[1].$shouldDisplay).toBe(true);
         });
 
         it('should return false if user does not have required rights', function() {
-            expect(service.roots[''][0].children[0].$shouldDisplay).not.toBe(true);
+            expect(this.navigationStateService.roots[''][0].children[0].$shouldDisplay).not.toBe(true);
         });
 
         it('should return false if state is abstract and has no visible children', function() {
-            expect(service.roots[''][2].$shouldDisplay).toBe(false);
+            expect(this.navigationStateService.roots[''][2].$shouldDisplay).toBe(false);
         });
 
         it('should return true if state is abstract but has visible children', function() {
-            expect(service.roots[''][0].$shouldDisplay).toBe(true);
+            expect(this.navigationStateService.roots[''][0].$shouldDisplay).toBe(true);
         });
     });
 
     describe('hasChildren', function() {
 
         it('should return true if state has visible children', function() {
-            states[3].children[0].$shouldDisplay = true;
-
-            expect(service.hasChildren(states[3])).toBe(true);
+            expect(this.navigationStateService.hasChildren(this.$state.get('state2'))).toBe(true);
         });
 
         it('should return false if state is abstract and does not have visible children', function() {
-            expect(service.hasChildren(states[5])).toBe(false);
+            expect(this.navigationStateService.hasChildren(this.$state.get('state1'))).toBe(false);
         });
 
     });
@@ -151,40 +125,39 @@ describe('navigationStateService', function() {
     describe('isSubmenu', function() {
 
         it('should return false if state is child of root', function() {
-            expect(service.isSubmenu(states[3])).toBe(false);
+            expect(this.navigationStateService.isSubmenu(this.$state.get('state2'))).toBe(false);
         });
 
         it('should return true if state is not child of root and has children', function() {
-            expect(service.isSubmenu(states[1])).toBe(true);
+            expect(this.navigationStateService.isSubmenu(this.$state.get('state2.subState4'))).toBe(true);
         });
 
         it('should return false if state is not child of root and has no children', function() {
-            expect(service.isSubmenu(states[4])).toBe(false);
+            expect(this.navigationStateService.isSubmenu(this.$state.get('state2.subState3'))).toBe(false);
         });
 
     });
 
     describe('isOffline', function() {
         it('should return true if the state has isOffline defined', function() {
-            var offlineState = $state.get('state2.subState3'),
-                state1 = $state.get('state2.subState0'),
-                state2 = $state.get('state2.subState4');
+            var offlineState = this.$state.get('state2.subState3'),
+                state1 = this.$state.get('state2.subState0'),
+                state2 = this.$state.get('state2.subState4');
 
-            expect(service.isOffline(state1)).toBe(undefined);
-            expect(service.isOffline(state2)).toBe(false);
-            expect(service.isOffline(offlineState)).toBe(true);
+            expect(this.navigationStateService.isOffline(state1)).toBe(undefined);
+            expect(this.navigationStateService.isOffline(state2)).toBe(false);
+            expect(this.navigationStateService.isOffline(offlineState)).toBe(true);
         });
     });
 
-    function createState(name, showInNavigation, priority, abstract, rights, offline) {
-        return {
-            name: name,
+    function createState($stateProvider, name, showInNavigation, priority, abstract, rights, offline) {
+        $stateProvider.state(name, {
             showInNavigation: showInNavigation,
             priority: priority,
             abstract: abstract,
             accessRights: rights,
             isOffline: offline
-        };
+        });
     }
 
 });
