@@ -1,5 +1,8 @@
-6.1.4 / Work in Progress
+6.2.0 / Work in Progress
 ========================
+
+New functionality added in backwards-compatible manner:
+* [OLMIS-5976:](https://openlmis.atlassian.net/browse/OLMIS-5976) Added the ability to add "canAccess" method defining screen availability.
 
 Bug fixes which are backwards-compatible:
 * [OLMIS-5840](https://openlmis.atlassian.net/browse/OLMIS-5840): Fixed a bug with endless loading when trying to enter login page from the home page.

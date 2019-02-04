@@ -63,16 +63,44 @@
         .module('openlmis-navigation')
         .service('navigationStateService', navigationStateService);
 
-    navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$rootScope'];
+    navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$rootScope', '$q'];
 
-    function navigationStateService($state, $filter, authorizationService, $rootScope) {
+    function navigationStateService($state, $filter, authorizationService, $rootScope, $q) {
         var service = this;
 
         service.hasChildren = hasChildren;
         service.isSubmenu = isSubmenu;
         service.isOffline = isOffline;
+        service.updateStateAvailability = updateStateAvailability;
 
-        initialize();
+        loadStates();
+
+        function loadStates() {
+            service.roots = {};
+
+            $state.get().forEach(function(state) {
+                if (state.showInNavigation) {
+                    var parentName = getParentStateName(state);
+
+                    var filtered = $filter('filter')($state.get(), {
+                        name: parentName
+                    }, true);
+
+                    var parent = filtered[0];
+                    if (parent.showInNavigation) {
+                        addChildState(parent, state);
+                    } else {
+                        addToRoots(service.roots, parentName, state);
+                    }
+
+                    state.priority = state.priority === undefined ? 10 : state.priority;
+                }
+            });
+
+            for (var root in service.roots) {
+                service.roots[root] = sortStates(service.roots[root]);
+            }
+        }
 
         /**
          * @ngdoc method
@@ -126,34 +154,14 @@
             return state && state.isOffline;
         }
 
-        function initialize() {
-            service.roots = {};
-
-            $state.get().forEach(function(state) {
-                if (state.showInNavigation) {
-                    var parentName = getParentStateName(state);
-
-                    var filtered = $filter('filter')($state.get(), {
-                        name: parentName
-                    }, true);
-
-                    var parent = filtered[0];
-                    if (parent.showInNavigation) {
-                        addChildState(parent, state);
-                    } else {
-                        addToRoots(service.roots, parentName, state);
-                    }
-
-                    state.priority = state.priority === undefined ? 10 : state.priority;
-                }
+        function updateStateAvailability() {
+            var promises = [];
+            Object.keys(service.roots).forEach(function(root) {
+                service.roots[root].forEach(function(root) {
+                    promises.push(setShouldDisplayForParentState(root));
+                });
             });
-
-            for (var root in service.roots) {
-                service.roots[root] = sortStates(service.roots[root]);
-            }
-
-            $rootScope.$on('openlmis-auth.login', refreshDisplay);
-            refreshDisplay();
+            return $q.all(promises);
         }
 
         function getParentStateName(state) {
@@ -199,31 +207,40 @@
             return false;
         }
 
-        function refreshDisplay() {
-            Object.keys(service.roots).forEach(function(root) {
-                service.roots[root].forEach(setShouldDisplayForParentState);
-            });
-        }
-
         function setShouldDisplayForParentState(parentState) {
+            var promises = [];
             if (parentState.children && parentState.children.length > 0) {
                 parentState.children.forEach(function(childState) {
-                    setShouldDisplayForParentState(childState);
-                    setShouldDisplay(childState);
+                    promises.push(setShouldDisplayForParentState(childState));
+                    promises.push(setShouldDisplay(childState));
                 });
             }
-            setShouldDisplay(parentState);
+            promises.push(setShouldDisplay(parentState));
+            return $q.all(promises);
         }
 
         function setShouldDisplay(state) {
-            state.$shouldDisplay = state.showInNavigation &&
-                canViewState(state) &&
-                (!state.abstract || hasChildren(state));
+            return canViewState(state)
+                .then(function(canViewState) {
+                    state.$shouldDisplay = state.showInNavigation
+                        && canViewState
+                        && (!state.abstract || hasChildren(state));
+                });
         }
 
         function canViewState(state) {
-            return !state.accessRights ||
-                authorizationService.hasRights(state.accessRights, state.areAllRightsRequired);
+            var canViewState = !state.accessRights
+                || authorizationService.hasRights(state.accessRights, state.areAllRightsRequired);
+
+            if (state.canAccess) {
+                return $q.when(state.canAccess())
+                    .then(function(canAccess) {
+                        return canAccess && canViewState;
+                    });
+            }
+
+            return $q.resolve(canViewState);
         }
+
     }
 })();

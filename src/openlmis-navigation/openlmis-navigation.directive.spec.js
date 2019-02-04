@@ -47,7 +47,11 @@ describe('openlmis-navigation directive', function() {
             this.$rootScope = $injector.get('$rootScope');
             this.$compile = $injector.get('$compile');
             this.offlineService = $injector.get('offlineService');
+            this.navigationStateService = $injector.get('navigationStateService');
         });
+
+        this.navigationStateService.updateStateAvailability();
+        this.$rootScope.$apply();
 
         spyOn(this.offlineService, 'isOffline').andReturn(true);
 

@@ -16,24 +16,83 @@
 describe('navigationStateService', function() {
 
     beforeEach(function() {
+        var context = this;
         module('openlmis-navigation', function($stateProvider) {
-            createState($stateProvider, 'state1', true, 10, true);
-            createState($stateProvider, 'state1.subState13', false);
-            createState($stateProvider, 'state1.subState65', false);
-            createState($stateProvider, 'state2', true, 12, true);
-            createState($stateProvider, 'state2.subState0', false);
-            createState($stateProvider, 'state2.subState3', true, 53, false, ['other-rights'], true);
-            createState($stateProvider, 'state2.subState4', true, 15, false, ['rights'], false);
-            createState($stateProvider, 'state2.subState4.subSubState1', true);
-            createState($stateProvider, 'state3', false);
-            createState($stateProvider, 'state3.subState1', true, 11);
-            createState($stateProvider, 'state3.subState16', true, 10);
-            createState($stateProvider, 'state4', true, 11);
+            context.$stateProvider = $stateProvider;
+            $stateProvider
+                .state('state1', {
+                    showInNavigation: true,
+                    priority: 10,
+                    abstract: true
+                })
+                .state('state1.subState13', {})
+                .state('state1.subState65', {})
+                .state('state2', {
+                    showInNavigation: true,
+                    priority: 12,
+                    abstract: true
+                })
+                .state('state2.subState0', {})
+                .state('state2.subState3', {
+                    showInNavigation: true,
+                    priority: 53,
+                    accessRights: ['other-rights'],
+                    isOffline: true
+                })
+                .state('state2.subState4', {
+                    showInNavigation: true,
+                    priority: 15,
+                    accessRights: ['rights']
+                })
+                .state('state2.subState4.subSubState1', {
+                    showInNavigation: true
+                })
+                .state('state3', {})
+                .state('state3.subState1', {
+                    showInNavigation: true,
+                    priority: 11
+                })
+                .state('state3.subState16', {
+                    showInNavigation: true,
+                    priority: 10
+                })
+                .state('state4', {
+                    showInNavigation: true,
+                    priority: 11
+                })
+                .state('state5', {
+                    showInNavigation: true,
+                    canAccess: function() {
+                        return false;
+                    }
+                })
+                .state('state8', {
+                    showInNavigation: true,
+                    canAccess: function() {
+                        return true;
+                    }
+                });
         });
 
         inject(function($injector) {
             this.authorizationService = $injector.get('authorizationService');
+            this.$q = $injector.get('$q');
         });
+
+        var $q = this.$q;
+        this.$stateProvider
+            .state('state6', {
+                showInNavigation: true,
+                canAccess: function() {
+                    return $q.resolve(false);
+                }
+            })
+            .state('state7', {
+                showInNavigation: true,
+                canAccess: function() {
+                    return $q.resolve(true);
+                }
+            });
 
         spyOn(this.authorizationService, 'hasRights').andCallFake(function(rights) {
             if ('other-rights' === rights[0]) {
@@ -47,13 +106,16 @@ describe('navigationStateService', function() {
             this.$rootScope = $injector.get('$rootScope');
             this.$state = $injector.get('$state');
         });
+
+        this.navigationStateService.updateStateAvailability();
+        this.$rootScope.$apply();
     });
 
     describe('initialization', function() {
 
         it('should group by invisible root this.states', function() {
             expect(this.navigationStateService.roots['']).not.toBeUndefined();
-            expect(this.navigationStateService.roots[''].length).toBe(3);
+            expect(this.navigationStateService.roots[''].length).toBe(7);
             expect(this.navigationStateService.roots.state3).not.toBeUndefined();
             expect(this.navigationStateService.roots.state3.length).toBe(2);
         });
@@ -73,17 +135,9 @@ describe('navigationStateService', function() {
             expect(this.navigationStateService.roots[''][1].name).toBe('state4');
             expect(this.navigationStateService.roots[''][2].name).toBe('state1');
         });
-
-        it('should refresh this.states after login', function() {
-            this.authorizationService.hasRights.andReturn(false);
-            this.$rootScope.$emit('openlmis-auth.login');
-            this.$rootScope.$apply();
-
-            expect(this.navigationStateService.roots[''][0].children[1].$shouldDisplay).toBe(false);
-        });
     });
 
-    describe('refreshDisplay', function() {
+    describe('updateStateAvailability', function() {
 
         it('should return false if state should not be shown in navigation', function() {
             expect(this.navigationStateService.roots[''][2].$shouldDisplay).toBe(false);
@@ -107,6 +161,16 @@ describe('navigationStateService', function() {
 
         it('should return true if state is abstract but has visible children', function() {
             expect(this.navigationStateService.roots[''][0].$shouldDisplay).toBe(true);
+        });
+
+        it('should return false if user has no access to the state', function() {
+            expect(this.navigationStateService.roots[''][3].$shouldDisplay).toBe(false);
+            expect(this.navigationStateService.roots[''][4].$shouldDisplay).toBe(false);
+        });
+
+        it('should return true if user has access to the state', function() {
+            expect(this.navigationStateService.roots[''][5].$shouldDisplay).toBe(true);
+            expect(this.navigationStateService.roots[''][6].$shouldDisplay).toBe(true);
         });
     });
 
@@ -144,20 +208,10 @@ describe('navigationStateService', function() {
                 state1 = this.$state.get('state2.subState0'),
                 state2 = this.$state.get('state2.subState4');
 
-            expect(this.navigationStateService.isOffline(state1)).toBe(undefined);
-            expect(this.navigationStateService.isOffline(state2)).toBe(false);
+            expect(this.navigationStateService.isOffline(state1)).toBeFalsy();
+            expect(this.navigationStateService.isOffline(state2)).toBeFalsy();
             expect(this.navigationStateService.isOffline(offlineState)).toBe(true);
         });
     });
-
-    function createState($stateProvider, name, showInNavigation, priority, abstract, rights, offline) {
-        $stateProvider.state(name, {
-            showInNavigation: showInNavigation,
-            priority: priority,
-            abstract: abstract,
-            accessRights: rights,
-            isOffline: offline
-        });
-    }
 
 });
