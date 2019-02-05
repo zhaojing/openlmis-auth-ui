@@ -135,6 +135,8 @@
          *
          * @description
          * Updates the state availability based on the access rights and custom, per-state methods.
+         * 
+         * @return {Promise}  the promise resolved once the availability of all states is set
          */
         function updateStateAvailability() {
             var promises = [];
