@@ -63,9 +63,9 @@
         .module('openlmis-navigation')
         .service('navigationStateService', navigationStateService);
 
-    navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$rootScope', '$q'];
+    navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$injector', '$q'];
 
-    function navigationStateService($state, $filter, authorizationService, $rootScope, $q) {
+    function navigationStateService($state, $filter, authorizationService, $injector, $q) {
         var service = this;
 
         service.hasChildren = hasChildren;
@@ -244,7 +244,7 @@
                 || authorizationService.hasRights(state.accessRights, state.areAllRightsRequired);
 
             if (state.canAccess) {
-                return $q.when(state.canAccess())
+                return $q.when($injector.invoke(state.canAccess))
                     .then(function(canAccess) {
                         return canAccess && canViewState;
                     });

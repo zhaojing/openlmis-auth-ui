@@ -17,6 +17,17 @@ describe('navigationStateService', function() {
 
     beforeEach(function() {
         var context = this;
+
+        this.dependencyMethod = jasmine.createSpy('dependencyMethod');
+
+        angular.module('dependency', []);
+        angular
+            .module('dependency')
+            .service('mockService', function() {
+                this.mockMethod = context.dependencyMethod;
+            });
+
+        module('dependency');
         module('openlmis-navigation', function($stateProvider) {
             context.$stateProvider = $stateProvider;
             $stateProvider
@@ -71,6 +82,12 @@ describe('navigationStateService', function() {
                     canAccess: function() {
                         return true;
                     }
+                })
+                .state('state9', {
+                    showInNavigation: true,
+                    canAccess: function(mockService) {
+                        return mockService.mockMethod();
+                    }
                 });
         });
 
@@ -101,6 +118,8 @@ describe('navigationStateService', function() {
             return true;
         });
 
+        this.dependencyMethod.andReturn(true);
+
         inject(function($injector) {
             this.navigationStateService = $injector.get('navigationStateService');
             this.$rootScope = $injector.get('$rootScope');
@@ -115,7 +134,7 @@ describe('navigationStateService', function() {
 
         it('should group by invisible root this.states', function() {
             expect(this.navigationStateService.roots['']).not.toBeUndefined();
-            expect(this.navigationStateService.roots[''].length).toBe(7);
+            expect(this.navigationStateService.roots[''].length).toBe(8);
             expect(this.navigationStateService.roots.state3).not.toBeUndefined();
             expect(this.navigationStateService.roots.state3.length).toBe(2);
         });
@@ -171,6 +190,11 @@ describe('navigationStateService', function() {
         it('should return true if user has access to the state', function() {
             expect(this.navigationStateService.roots[''][5].$shouldDisplay).toBe(true);
             expect(this.navigationStateService.roots[''][6].$shouldDisplay).toBe(true);
+        });
+
+        it('should inject dependencies into the canAccess function', function() {
+            expect(this.navigationStateService.roots[''][7].$shouldDisplay).toBe(true);
+            expect(this.dependencyMethod).toHaveBeenCalled();
         });
     });
 
