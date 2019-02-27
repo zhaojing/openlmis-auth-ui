@@ -66,12 +66,14 @@
     navigationStateService.$inject = ['$state', '$filter', 'authorizationService', '$injector', '$q'];
 
     function navigationStateService($state, $filter, authorizationService, $injector, $q) {
-        var service = this;
+        var service = this,
+            promise;
 
         service.hasChildren = hasChildren;
         service.isSubmenu = isSubmenu;
         service.isOffline = isOffline;
-        service.updateStateAvailability = updateStateAvailability;
+        service.setUpStatesAvailability = setUpStatesAvailability;
+        service.clearStatesAvailability = clearStatesAvailability;
 
         loadStates();
 
@@ -128,24 +130,46 @@
         }
 
         /**
-         *
          * @ngdoc method
          * @methodOf openlmis-navigation.navigationStateService
-         * @name updateStateAvailability
+         * @name setUpStatesAvailability
          *
          * @description
-         * Updates the state availability based on the access rights and custom, per-state methods.
+         * Sets up states availability based on the access rights and custom, per-state methods. This method will not
+         * update states availability on subsequent calls until clearStatesAvailability methods is called.
          * 
          * @return {Promise}  the promise resolved once the availability of all states is set
          */
-        function updateStateAvailability() {
+        function setUpStatesAvailability() {
+            if (promise) {
+                return promise;
+            }
+
             var promises = [];
             Object.keys(service.roots).forEach(function(root) {
                 service.roots[root].forEach(function(root) {
                     promises.push(setShouldDisplayForParentState(root));
                 });
             });
-            return $q.all(promises);
+
+            promise = $q.all(promises);
+
+            return promise;
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-navigation.navigationStateService
+         * @name clearStatesAvailability
+         *
+         * @description
+         * Clear the availability of all defined states.
+         */
+        function clearStatesAvailability() {
+            $state.get().forEach(function(state) {
+                state.$shouldDisplay = undefined;
+            });
+            promise = undefined;
         }
 
         function loadStates() {

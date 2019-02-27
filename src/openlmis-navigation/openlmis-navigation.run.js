@@ -17,18 +17,17 @@
 
     'use strict';
 
-    /**
-     * @module openlmis-navigation
-     *
-     * @description
-     * This module is responsible for managing navigation bar in the OpenLMIS.
-     */
-    angular.module('openlmis-navigation', [
-        'openlmis-auth',
-        'openlmis-offline',
-        'openlmis-modal',
-        'openlmis-login',
-        'mgcrea.ngStrap.dropdown'
-    ]);
+    angular
+        .module('openlmis-navigation')
+        .run(routes);
+
+    routes.$inject = ['loginService', 'navigationStateService'];
+
+    function routes(loginService, navigationStateService) {
+
+        loginService.registerPostLogoutAction(function() {
+            return navigationStateService.clearStatesAvailability();
+        });
+    }
 
 })();

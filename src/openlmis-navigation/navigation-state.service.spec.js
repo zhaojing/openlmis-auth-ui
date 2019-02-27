@@ -88,6 +88,18 @@ describe('navigationStateService', function() {
                     canAccess: function(mockService) {
                         return mockService.mockMethod();
                     }
+                })
+                .state('state6', {
+                    showInNavigation: true,
+                    canAccess: function($q) {
+                        return $q.resolve(false);
+                    }
+                })
+                .state('state7', {
+                    showInNavigation: true,
+                    canAccess: function($q) {
+                        return $q.resolve(true);
+                    }
                 });
         });
 
@@ -95,21 +107,6 @@ describe('navigationStateService', function() {
             this.authorizationService = $injector.get('authorizationService');
             this.$q = $injector.get('$q');
         });
-
-        var $q = this.$q;
-        this.$stateProvider
-            .state('state6', {
-                showInNavigation: true,
-                canAccess: function() {
-                    return $q.resolve(false);
-                }
-            })
-            .state('state7', {
-                showInNavigation: true,
-                canAccess: function() {
-                    return $q.resolve(true);
-                }
-            });
 
         spyOn(this.authorizationService, 'hasRights').andCallFake(function(rights) {
             if ('other-rights' === rights[0]) {
@@ -126,7 +123,7 @@ describe('navigationStateService', function() {
             this.$state = $injector.get('$state');
         });
 
-        this.navigationStateService.updateStateAvailability();
+        this.navigationStateService.setUpStatesAvailability();
         this.$rootScope.$apply();
     });
 
@@ -156,7 +153,7 @@ describe('navigationStateService', function() {
         });
     });
 
-    describe('updateStateAvailability', function() {
+    describe('setUpStatesAvailability', function() {
 
         it('should return false if state should not be shown in navigation', function() {
             expect(this.navigationStateService.roots[''][2].$shouldDisplay).toBe(false);
@@ -196,6 +193,33 @@ describe('navigationStateService', function() {
             expect(this.navigationStateService.roots[''][7].$shouldDisplay).toBe(true);
             expect(this.dependencyMethod).toHaveBeenCalled();
         });
+
+        it('should not update states availability for subsequent call unless they are cleared', function() {
+            expect(this.dependencyMethod.callCount).toEqual(1);
+
+            this.navigationStateService.setUpStatesAvailability();
+
+            expect(this.dependencyMethod.callCount).toEqual(1);
+
+            this.navigationStateService.clearStatesAvailability();
+            this.navigationStateService.setUpStatesAvailability();
+
+            expect(this.dependencyMethod.callCount).toEqual(2);
+        });
+    });
+
+    describe('clearStatesAvailability', function() {
+
+        it('should clear state availability', function() {
+            this.navigationStateService.clearStatesAvailability();
+
+            var allCleared = this.$state.get().reduce(function(allCleared, state) {
+                return allCleared && state.$shouldDisplay !== true;
+            }, true);
+
+            expect(allCleared).toBe(true);
+        });
+
     });
 
     describe('hasChildren', function() {
