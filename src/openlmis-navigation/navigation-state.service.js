@@ -247,11 +247,12 @@
             if (parentState.children && parentState.children.length > 0) {
                 parentState.children.forEach(function(childState) {
                     promises.push(setShouldDisplayForParentState(childState));
-                    promises.push(setShouldDisplay(childState));
                 });
             }
-            promises.push(setShouldDisplay(parentState));
-            return $q.all(promises);
+            return $q.all(promises)
+                .then(function() {
+                    return setShouldDisplay(parentState);
+                });
         }
 
         function setShouldDisplay(state) {

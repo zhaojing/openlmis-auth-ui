@@ -77,6 +77,18 @@ describe('navigationStateService', function() {
                         return false;
                     }
                 })
+                .state('state6', {
+                    showInNavigation: true,
+                    canAccess: function($q) {
+                        return $q.resolve(false);
+                    }
+                })
+                .state('state7', {
+                    showInNavigation: true,
+                    canAccess: function($q) {
+                        return $q.resolve(true);
+                    }
+                })
                 .state('state8', {
                     showInNavigation: true,
                     canAccess: function() {
@@ -89,16 +101,15 @@ describe('navigationStateService', function() {
                         return mockService.mockMethod();
                     }
                 })
-                .state('state6', {
+                .state('state91', {
                     showInNavigation: true,
-                    canAccess: function($q) {
-                        return $q.resolve(false);
-                    }
+                    abstract: true
                 })
-                .state('state7', {
+                .state('state91.subState17', {
                     showInNavigation: true,
                     canAccess: function($q) {
-                        return $q.resolve(true);
+                        context.state91SubState17Deferred = $q.defer();
+                        return context.state91SubState17Deferred.promise;
                     }
                 });
         });
@@ -131,7 +142,7 @@ describe('navigationStateService', function() {
 
         it('should group by invisible root this.states', function() {
             expect(this.navigationStateService.roots['']).not.toBeUndefined();
-            expect(this.navigationStateService.roots[''].length).toBe(8);
+            expect(this.navigationStateService.roots[''].length).toBe(9);
             expect(this.navigationStateService.roots.state3).not.toBeUndefined();
             expect(this.navigationStateService.roots.state3.length).toBe(2);
         });
@@ -198,13 +209,24 @@ describe('navigationStateService', function() {
             expect(this.dependencyMethod.callCount).toEqual(1);
 
             this.navigationStateService.setUpStatesAvailability();
+            this.state91SubState17Deferred.resolve(true);
+            this.$rootScope.$apply();
 
             expect(this.dependencyMethod.callCount).toEqual(1);
 
             this.navigationStateService.clearStatesAvailability();
+            this.state91SubState17Deferred.resolve(true);
             this.navigationStateService.setUpStatesAvailability();
+            this.$rootScope.$apply();
 
             expect(this.dependencyMethod.callCount).toEqual(2);
+        });
+
+        it('should set parent availability after setting children visibility', function() {
+            this.state91SubState17Deferred.resolve(true);
+            this.$rootScope.$apply();
+
+            expect(this.navigationStateService.roots[''][8].$shouldDisplay).toBe(true);
         });
     });
 
