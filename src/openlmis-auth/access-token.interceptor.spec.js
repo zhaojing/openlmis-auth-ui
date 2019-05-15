@@ -15,85 +15,87 @@
 
 describe('accessTokenInterceptor', function() {
 
+    var accessTokenInterceptor, authorizationService, config, openlmisUrlService, interceptors, accessTokenFactory, $q,
+        alertService;
+
     beforeEach(function() {
-        var context = this;
         module('openlmis-auth', function($httpProvider) {
-            context.interceptors = $httpProvider.interceptors;
+            interceptors = $httpProvider.interceptors;
         });
 
         inject(function($injector) {
-            this.$q = $injector.get('$q');
-            this.openlmisUrlService = $injector.get('openlmisUrlService');
-            this.authorizationService = $injector.get('authorizationService');
-            this.accessTokenInterceptor = $injector.get('accessTokenInterceptor');
-            this.accessTokenFactory = $injector.get('accessTokenFactory');
-            this.alertService = $injector.get('alertService');
+            $q = $injector.get('$q');
+            openlmisUrlService = $injector.get('openlmisUrlService');
+            authorizationService = $injector.get('authorizationService');
+            accessTokenInterceptor = $injector.get('accessTokenInterceptor');
+            accessTokenFactory = $injector.get('accessTokenFactory');
+            alertService = $injector.get('alertService');
         });
 
-        spyOn(this.accessTokenFactory, 'addAccessToken').andCallFake(function(url) {
+        spyOn(accessTokenFactory, 'addAccessToken').andCallFake(function(url) {
             return url + '&access_token=SoMeAcCeSsToKeN';
         });
-        spyOn(this.accessTokenFactory, 'authHeader').andReturn('Bearer SoMeAcCeSsToKeN');
+        spyOn(accessTokenFactory, 'authHeader').andReturn('Bearer SoMeAcCeSsToKeN');
 
-        spyOn(this.openlmisUrlService, 'check');
-        spyOn(this.authorizationService, 'isAuthenticated');
-        spyOn(this.authorizationService, 'clearAccessToken');
-        spyOn(this.authorizationService, 'clearUser');
-        spyOn(this.authorizationService, 'clearRights');
-        spyOn(this.alertService, 'error');
+        spyOn(openlmisUrlService, 'check');
+        spyOn(authorizationService, 'isAuthenticated');
+        spyOn(authorizationService, 'clearAccessToken');
+        spyOn(authorizationService, 'clearUser');
+        spyOn(authorizationService, 'clearRights');
+        spyOn(alertService, 'error');
     });
 
     describe('request', function() {
 
         beforeEach(function() {
-            this.openlmisUrlService.check.andReturn(true);
-            this.authorizationService.isAuthenticated.andReturn(true);
+            openlmisUrlService.check.andReturn(true);
+            authorizationService.isAuthenticated.andReturn(true);
 
-            this.config = {
+            config = {
                 url: 'some.url',
                 headers: { }
             };
         });
 
         it('should be registered', function() {
-            expect(this.interceptors.indexOf('accessTokenInterceptor')).toBeGreaterThan(-1);
+            expect(interceptors.indexOf('accessTokenInterceptor')).toBeGreaterThan(-1);
         });
 
         it('should add token header', function() {
-            var result = this.accessTokenInterceptor.request(this.config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.url');
             expect(result.headers.Authorization).toEqual('Bearer SoMeAcCeSsToKeN');
         });
 
         it('should not add token if requesting html file', function() {
-            this.config.url = 'some.html';
+            config.url = 'some.html';
 
-            var result = this.accessTokenInterceptor.request(this.config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.html');
             expect(result.headers.Authorization).not.toBeDefined();
         });
 
         it('should not add token if user is not authenticated', function() {
-            this.authorizationService.isAuthenticated.andReturn(false);
+            authorizationService.isAuthenticated.andReturn(false);
 
-            var result = this.accessTokenInterceptor.request(this.config);
+            var result = accessTokenInterceptor.request(config);
 
             expect(result.url).toEqual('some.url');
             expect(result.headers.Authorization).not.toBeDefined();
         });
 
         it('should check if user is authenticated', function() {
-            this.accessTokenInterceptor.request(this.config);
+            accessTokenInterceptor.request(config);
 
-            expect(this.authorizationService.isAuthenticated).toHaveBeenCalled();
+            expect(authorizationService.isAuthenticated).toHaveBeenCalled();
         });
 
         it('should check if url should not be bypassed', function() {
-            this.accessTokenInterceptor.request(this.config);
+            accessTokenInterceptor.request(config);
 
-            expect(this.openlmisUrlService.check).toHaveBeenCalledWith('some.url');
+            expect(openlmisUrlService.check).toHaveBeenCalledWith('some.url');
         });
 
     });
@@ -111,19 +113,19 @@ describe('accessTokenInterceptor', function() {
             beforeEach(function() {
                 response.status = 401;
 
-                this.accessTokenInterceptor.responseError(response);
+                accessTokenInterceptor.responseError(response);
             });
 
             it('should clear access token', function() {
-                expect(this.authorizationService.clearAccessToken).toHaveBeenCalled();
+                expect(authorizationService.clearAccessToken).toHaveBeenCalled();
             });
 
             it('should clear user', function() {
-                expect(this.authorizationService.clearUser).toHaveBeenCalled();
+                expect(authorizationService.clearUser).toHaveBeenCalled();
             });
 
             it('should clear rights', function() {
-                expect(this.authorizationService.clearRights).toHaveBeenCalled();
+                expect(authorizationService.clearRights).toHaveBeenCalled();
             });
 
         });
@@ -134,9 +136,9 @@ describe('accessTokenInterceptor', function() {
                 message: 'Test message'
             };
 
-            this.accessTokenInterceptor.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
-            expect(this.alertService.error)
+            expect(alertService.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
         });
 
@@ -146,22 +148,22 @@ describe('accessTokenInterceptor', function() {
                 message: null
             };
 
-            this.accessTokenInterceptor.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
-            expect(this.alertService.error)
+            expect(alertService.error)
                 .not
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error', response.data.message);
 
-            expect(this.alertService.error)
+            expect(alertService.error)
                 .toHaveBeenCalledWith('openlmisAuth.authorization.error');
         });
 
         it('should reject response', function() {
-            spyOn(this.$q, 'reject').andCallThrough();
+            spyOn($q, 'reject').andCallThrough();
 
-            this.accessTokenInterceptor.responseError(response);
+            accessTokenInterceptor.responseError(response);
 
-            expect(this.$q.reject).toHaveBeenCalledWith(response);
+            expect($q.reject).toHaveBeenCalledWith(response);
         });
 
     });

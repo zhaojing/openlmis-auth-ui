@@ -15,43 +15,43 @@
 
 describe('reset-password.html template', function() {
 
+    var template, vm, $q, $timeout, $state, $rootScope;
+
     beforeEach(function() {
+        var $controller, $templateRequest, $compile, $scope;
+
         module('openlmis-reset-password');
 
         inject(function($injector) {
-            this.$rootScope = $injector.get('$rootScope');
-            this.$templateRequest = $injector.get('$templateRequest');
-            this.$controller = $injector.get('$controller');
-            this.$compile = $injector.get('$compile');
-            this.$state = $injector.get('$state');
-            this.$timeout = $injector.get('$timeout');
-            this.$q = $injector.get('$q');
+            $rootScope = $injector.get('$rootScope');
+            $templateRequest = $injector.get('$templateRequest');
+            $controller = $injector.get('$controller');
+            $compile = $injector.get('$compile');
+            $state = $injector.get('$state');
+            $timeout = $injector.get('$timeout');
+            $q = $injector.get('$q');
         });
 
-        this.$scope = this.$rootScope.$new();
+        $scope = $rootScope.$new();
 
-        spyOn(this.$state, 'go').andReturn();
+        spyOn($state, 'go');
 
-        this.vm = this.$controller('ResetPasswordController', {
-            modalDeferred: this.$q.defer()
+        vm = $controller('ResetPasswordController', {
+            modalDeferred: $q.defer()
         });
 
-        this.$scope.vm = this.vm;
+        $scope.vm = vm;
 
-        var template;
-        this.$templateRequest('openlmis-reset-password/reset-password.html').then(function(requested) {
-            template = requested;
+        $templateRequest('openlmis-reset-password/reset-password.html').then(function(requested) {
+            template = $compile(requested)($scope);
         });
-        this.$rootScope.$apply();
-
-        this.template = this.$compile(template)(this.$scope);
-        this.$rootScope.$apply();
+        $rootScope.$apply();
     });
 
     describe('Show password checkbox', function() {
 
         it('should change input type', function() {
-            var inputs = this.template.find('#password, #reenteredPassword');
+            var inputs = template.find('#password, #reenteredPassword');
 
             expect(inputs.length).toEqual(2);
 
@@ -59,14 +59,14 @@ describe('reset-password.html template', function() {
                 expect($(this).attr('type')).toEqual('password');
             });
 
-            this.template.find('#showPassword').click();
-            this.$timeout.flush();
+            template.find('#showPassword').click();
+            $timeout.flush();
 
             inputs.each(function() {
                 expect($(this).attr('type')).toEqual('text');
             });
 
-            this.template.find('#showPassword').click();
+            template.find('#showPassword').click();
 
             inputs.each(function() {
                 expect($(this).attr('type')).toEqual('password');

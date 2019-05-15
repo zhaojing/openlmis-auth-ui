@@ -15,98 +15,101 @@
 
 describe('authStateRouter', function() {
 
+    var $rootScope, loginModalService, authorizationService, $state, alertService,
+        loadingModalService;
+
     beforeEach(function() {
         module('auth-state-router');
 
         inject(function($injector) {
-            this.$rootScope = $injector.get('$rootScope');
-            this.loginModalService = $injector.get('loginModalService');
-            this.loadingModalService = $injector.get('loadingModalService');
-            this.authorizationService = $injector.get('authorizationService');
-            this.$state = $injector.get('$state');
-            this.alertService = $injector.get('alertService');
+            $rootScope = $injector.get('$rootScope');
+            loginModalService = $injector.get('loginModalService');
+            loadingModalService = $injector.get('loadingModalService');
+            authorizationService = $injector.get('authorizationService');
+            $state = $injector.get('$state');
+            alertService = $injector.get('alertService');
         });
 
-        spyOn(this.$state, 'go');
-        spyOn(this.$rootScope, '$emit');
-        spyOn(this.alertService, 'error');
-        spyOn(this.loadingModalService, 'close');
-        spyOn(this.authorizationService, 'hasRights');
-        spyOn(this.authorizationService, 'isAuthenticated');
-        spyOn(this.loginModalService, 'open').andCallThrough();
-
-        this.createState = function(name, accessRights) {
-            return {
-                name: name ? name : '',
-                accessRights: accessRights
-            };
-        };
+        spyOn($state, 'go');
+        spyOn($rootScope, '$emit');
+        spyOn(alertService, 'error');
+        spyOn(loadingModalService, 'close');
+        spyOn(authorizationService, 'hasRights');
+        spyOn(authorizationService, 'isAuthenticated');
+        spyOn(loginModalService, 'open').andCallThrough();
     });
 
     it('will redirect user to login if auth token is not set and state is home', function() {
-        this.authorizationService.isAuthenticated.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('openlmis.home'));
+        $rootScope.$broadcast('$stateChangeStart', createState('openlmis.home'));
 
-        expect(this.$state.go).toHaveBeenCalledWith('auth.login');
+        expect($state.go).toHaveBeenCalledWith('auth.login');
     });
 
     it('will open login modal if auth token is not set and state is not home', function() {
-        this.authorizationService.isAuthenticated.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('somewhere'), {}, this.createState(''));
+        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {}, createState(''));
 
-        expect(this.loginModalService.open).toHaveBeenCalled();
+        expect(loginModalService.open).toHaveBeenCalled();
     });
 
     it('should close loading dialog if auth token is not set and state is not home', function() {
-        this.authorizationService.isAuthenticated.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('somewhere'), {}, this.createState(''));
+        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'), {}, createState(''));
 
-        expect(this.loadingModalService.close).toHaveBeenCalled();
+        expect(loadingModalService.close).toHaveBeenCalled();
     });
 
     it('will not redirect user if accessing pages in "auth.*" routes, and user is NOT authenticated', function() {
-        this.authorizationService.isAuthenticated.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('auth.login'));
+        $rootScope.$broadcast('$stateChangeStart', createState('auth.login'));
 
-        expect(this.$state.go).not.toHaveBeenCalled();
+        expect($state.go).not.toHaveBeenCalled();
 
     });
 
     it('will not redirect user if auth token is set, unless page is login.html', function() {
-        this.authorizationService.isAuthenticated.andReturn(true);
-        this.authorizationService.hasRights.andReturn(true);
+        authorizationService.isAuthenticated.andReturn(true);
+        authorizationService.hasRights.andReturn(true);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('somewhere'));
+        $rootScope.$broadcast('$stateChangeStart', createState('somewhere'));
 
-        expect(this.$state.go).not.toHaveBeenCalled();
+        expect($state.go).not.toHaveBeenCalled();
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('auth.login'), {},
-            this.createState('somewhere'));
+        $rootScope.$broadcast('$stateChangeStart', createState('auth.login'), {},
+            createState('somewhere'));
 
-        expect(this.$state.go).toHaveBeenCalledWith('openlmis.home', {}, {
+        expect($state.go).toHaveBeenCalledWith('openlmis.home', {}, {
             reload: true
         });
     });
 
     it('should call alert if has no permission to enter state', function() {
-        this.authorizationService.isAuthenticated.andReturn(true);
-        this.authorizationService.hasRights.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(true);
+        authorizationService.hasRights.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('somewhere', []));
+        $rootScope.$broadcast('$stateChangeStart', createState('somewhere', []));
 
-        expect(this.alertService.error).toHaveBeenCalled();
+        expect(alertService.error).toHaveBeenCalled();
     });
 
     it('should close loading modal if user has no permission to enter state', function() {
-        this.authorizationService.isAuthenticated.andReturn(true);
-        this.authorizationService.hasRights.andReturn(false);
+        authorizationService.isAuthenticated.andReturn(true);
+        authorizationService.hasRights.andReturn(false);
 
-        this.$rootScope.$broadcast('$stateChangeStart', this.createState('somewhere', []));
+        $rootScope.$broadcast('$stateChangeStart', createState('somewhere', []));
 
-        expect(this.loadingModalService.close).toHaveBeenCalled();
+        expect(loadingModalService.close).toHaveBeenCalled();
     });
+
+    function createState(name, accessRights) {
+        return {
+            name: name ? name : '',
+            accessRights: accessRights
+        };
+    }
 });

@@ -15,23 +15,31 @@
 
 describe('authUrl', function() {
 
-    beforeEach(function() {
-        module('openlmis-auth');
+    var authUrl;
 
-        inject(function($injector) {
-            this.authUrl = $injector.get('authUrl');
+    beforeEach(module('openlmis-auth'));
+
+    beforeEach(module(function($provide) {
+        $provide.factory('openlmisUrlFactory', function() {
+            return function(url) {
+                return '/' + url;
+            };
         });
-    });
+    }));
+
+    beforeEach(inject(function(_authUrl_) {
+        authUrl = _authUrl_;
+    }));
 
     it('should return string', function() {
-        var url = this.authUrl('/someURL');
+        var url = authUrl('/someURL');
 
         expect(typeof(url)).toBe('string');
     });
 
     it('should format relative and absolute urls the same', function() {
-        var relativeURL = this.authUrl('someURL');
-        var absoluteURL = this.authUrl('/someURL');
+        var relativeURL = authUrl('someURL');
+        var absoluteURL = authUrl('/someURL');
 
         expect(relativeURL).toEqual(absoluteURL);
     });

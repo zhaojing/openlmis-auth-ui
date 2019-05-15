@@ -15,25 +15,27 @@
 
 describe('LoginModalInterceptor', function() {
 
+    var $q, $rootScope, loginModalService, loginDeferred;
+
     beforeEach(function() {
         module('openlmis-login');
 
         inject(function($injector) {
-            this.loginModalService = $injector.get('loginModalService');
-            this.$rootScope = $injector.get('$rootScope');
-            this.$q = $injector.get('$q');
+            loginModalService = $injector.get('loginModalService');
+            $rootScope = $injector.get('$rootScope');
+            $q = $injector.get('$q');
         });
 
-        this.loginDeferred = this.$q.defer();
-        spyOn(this.loginModalService, 'open').andReturn(this.loginDeferred.promise);
+        loginDeferred = $q.defer();
+        spyOn(loginModalService, 'open').andReturn(loginDeferred.promise);
 
-        this.$rootScope.$broadcast('event:auth-loginRequired');
+        $rootScope.$broadcast('event:auth-loginRequired');
     });
 
     it('should open login modal dialog on event:auth-loginRequired', function() {
-        this.$rootScope.$apply();
+        $rootScope.$apply();
 
-        expect(this.loginModalService.open).toHaveBeenCalled();
+        expect(loginModalService.open).toHaveBeenCalled();
     });
 
 });

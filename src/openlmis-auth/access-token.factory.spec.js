@@ -13,71 +13,73 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('this.accessTokenFactory', function() {
+describe('accessTokenFactory', function() {
+
+    var accessTokenFactory, authorizationService;
 
     beforeEach(function() {
         module('openlmis-auth');
 
         inject(function($injector) {
-            this.authorizationService = $injector.get('authorizationService');
-            this.accessTokenFactory = $injector.get('accessTokenFactory');
+            authorizationService = $injector.get('authorizationService');
+            accessTokenFactory = $injector.get('accessTokenFactory');
         });
     });
 
     it('should update query param value when key exists', function() {
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
-        var updatedUri = this.accessTokenFactory.updateQueryStringParameter(uri, 'access_token', '321');
+        var updatedUri = accessTokenFactory.updateQueryStringParameter(uri, 'access_token', '321');
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=321');
     });
 
     it('should not update query param value when key not exists', function() {
         var uri = 'http://example.com/requisitions?program=abc';
-        var updatedUri = this.accessTokenFactory.updateQueryStringParameter(uri, 'access_token', '321');
+        var updatedUri = accessTokenFactory.updateQueryStringParameter(uri, 'access_token', '321');
 
         expect(updatedUri).toEqual(uri);
     });
 
     it('should add access_token if not already in URI', function() {
-        spyOn(this.authorizationService, 'getAccessToken').andReturn('123');
+        spyOn(authorizationService, 'getAccessToken').andReturn('123');
 
         var uri = 'http://example.com/requisitions?program=abc';
-        var updatedUri = this.accessTokenFactory.addAccessToken(uri);
+        var updatedUri = accessTokenFactory.addAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=123');
     });
 
     it('should not add access_token if already in URI', function() {
-        spyOn(this.authorizationService, 'getAccessToken').andReturn('321');
+        spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
-        var updatedUri = this.accessTokenFactory.addAccessToken(uri);
+        var updatedUri = accessTokenFactory.addAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=123');
     });
 
     it('should update access_token when "access_token" key in query params', function() {
-        spyOn(this.authorizationService, 'getAccessToken').andReturn('321');
+        spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc&access_token=123';
-        var updatedUri = this.accessTokenFactory.updateAccessToken(uri);
+        var updatedUri = accessTokenFactory.updateAccessToken(uri);
 
         expect(updatedUri).toEqual('http://example.com/requisitions?program=abc&access_token=321');
     });
 
     it('should not update access_token when "access_token" key not in query params', function() {
-        spyOn(this.authorizationService, 'getAccessToken').andReturn('321');
+        spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
         var uri = 'http://example.com/requisitions?program=abc';
-        var updatedUri = this.accessTokenFactory.updateAccessToken(uri);
+        var updatedUri = accessTokenFactory.updateAccessToken(uri);
 
         expect(updatedUri).toEqual(uri);
     });
 
     it('should create a token header', function() {
-        spyOn(this.authorizationService, 'getAccessToken').andReturn('321');
+        spyOn(authorizationService, 'getAccessToken').andReturn('321');
 
-        var header = this.accessTokenFactory.authHeader();
+        var header = accessTokenFactory.authHeader();
 
         expect(header).toEqual('Bearer 321');
     });

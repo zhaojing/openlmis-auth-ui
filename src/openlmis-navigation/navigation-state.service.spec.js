@@ -140,7 +140,7 @@ describe('navigationStateService', function() {
 
     describe('initialization', function() {
 
-        it('should group by invisible root states', function() {
+        it('should group by invisible root this.states', function() {
             expect(this.navigationStateService.roots['']).not.toBeUndefined();
             expect(this.navigationStateService.roots[''].length).toBe(9);
             expect(this.navigationStateService.roots.state3).not.toBeUndefined();

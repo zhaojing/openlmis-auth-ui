@@ -15,6 +15,8 @@
 
 describe('Offline navigation interceptor', function() {
 
+    var $state, alertService, loadingModalService, isOffline, $rootScope, offlineService;
+
     beforeEach(function() {
         module('openlmis-navigation', function($stateProvider) {
             $stateProvider.state('normal', {
@@ -55,103 +57,101 @@ describe('Offline navigation interceptor', function() {
         });
 
         inject(function($injector) {
-            this.$state = $injector.get('$state');
-            this.alertService = $injector.get('alertService');
-            this.loadingModalService = $injector.get('loadingModalService');
-            this.offlineService = $injector.get('offlineService');
-            this.$rootScope = $injector.get('$rootScope');
+            $state = $injector.get('$state');
+            alertService = $injector.get('alertService');
+            loadingModalService = $injector.get('loadingModalService');
+            offlineService = $injector.get('offlineService');
+            $rootScope = $injector.get('$rootScope');
         });
 
-        this.isOffline = false;
+        spyOn(alertService, 'error');
+        spyOn(loadingModalService, 'close');
 
-        spyOn(this.alertService, 'error');
-        spyOn(this.loadingModalService, 'close');
-
-        var context = this;
-        spyOn(this.offlineService, 'isOffline').andCallFake(function() {
-            return context.isOffline;
+        isOffline = false;
+        spyOn(offlineService, 'isOffline').andCallFake(function() {
+            return isOffline;
         });
     });
 
     it('will show an alert if offline for non-offline state', function() {
-        this.$state.go('normal');
+        $state.go('normal');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('normal');
+        $state.go('normal');
 
-        expect(this.alertService.error).toHaveBeenCalled();
+        expect(alertService.error).toHaveBeenCalled();
     });
 
     it('will never show an alert if route is offline', function() {
-        this.$state.go('offline');
+        $state.go('offline');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
 
-        this.isOffline = true;
-        this.$state.go('offline');
+        isOffline = true;
+        $state.go('offline');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
     });
 
     it('will show an alert if offline and going to parent state with reload', function() {
-        this.$state.go('parent.child.child');
+        $state.go('parent.child.child');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('parent.child', {}, {
+        $state.go('parent.child', {}, {
             reload: true
         });
 
-        expect(this.alertService.error).toHaveBeenCalled();
+        expect(alertService.error).toHaveBeenCalled();
     });
 
     it('will never show an alert if offline and going to parent state without reload', function() {
-        this.$state.go('parent.child.child');
-        this.$rootScope.$apply();
+        $state.go('parent.child.child');
+        $rootScope.$apply();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('parent.child');
+        $state.go('parent.child');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
     });
 
     it('will never show an alert if offline and going to an offline parent state with reload', function() {
-        this.$state.go('parent.child.child');
-        this.$rootScope.$apply();
+        $state.go('parent.child.child');
+        $rootScope.$apply();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('parent');
+        $state.go('parent');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
     });
 
     it('will never show an alert if offline path is available between state', function() {
-        this.$state.go('parent.child.child.right');
-        this.$rootScope.$apply();
+        $state.go('parent.child.child.right');
+        $rootScope.$apply();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('parent.child.child.left.left.left');
+        $state.go('parent.child.child.left.left.left');
 
-        expect(this.alertService.error).not.toHaveBeenCalled();
+        expect(alertService.error).not.toHaveBeenCalled();
     });
 
     it('will show an alert if offline path is not available between state', function() {
-        this.$state.go('parent.child.child.right');
-        this.$rootScope.$apply();
+        $state.go('parent.child.child.right');
+        $rootScope.$apply();
 
-        this.isOffline = true;
+        isOffline = true;
 
-        this.$state.go('parent.child.left');
+        $state.go('parent.child.left');
 
-        expect(this.alertService.error).toHaveBeenCalled();
+        expect(alertService.error).toHaveBeenCalled();
     });
 
 });

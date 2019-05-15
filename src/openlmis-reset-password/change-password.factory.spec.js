@@ -15,48 +15,51 @@
 
 describe('openlmis-reset-password.changePasswordFactory', function() {
 
+    var changePasswordFactory, $httpBackend, $rootScope, openlmisUrlFactory, spy;
+
     beforeEach(function() {
         module('openlmis-reset-password');
 
         inject(function($injector) {
-            this.changePasswordFactory = $injector.get('changePasswordFactory');
-            this.$httpBackend = $injector.get('$httpBackend');
-            this.$rootScope = $injector.get('$rootScope');
-            this.openlmisUrlFactory = $injector.get('openlmisUrlFactory');
+            changePasswordFactory = $injector.get('changePasswordFactory');
+            $httpBackend = $injector.get('$httpBackend');
+            $rootScope = $injector.get('$rootScope');
+            openlmisUrlFactory = $injector.get('openlmisUrlFactory');
         });
 
-        this.apiUsersAuthChangePasswordUrl = this.openlmisUrlFactory('/api/users/auth/changePassword');
-        this.spy = jasmine.createSpy();
+        var data = {
+            token: 'token',
+            newPassword: 'password'
+        };
+
+        $httpBackend.when('POST', openlmisUrlFactory('/api/users/auth/changePassword'))
+            .respond(function(method, url, body) {
+                if (body === angular.toJson(data)) {
+                    return [200];
+                }
+                return [404];
+
+            });
     });
 
     it('will resolve for successful requests', function() {
-        this.$httpBackend
-            .whenPOST(this.apiUsersAuthChangePasswordUrl)
-            .respond(200);
+        spy = jasmine.createSpy();
+        changePasswordFactory.changePassword('password', 'token').then(spy);
 
-        this.changePasswordFactory
-            .changePassword('password', 'token')
-            .then(this.spy);
+        $httpBackend.flush();
+        $rootScope.$apply();
 
-        this.$httpBackend.flush();
-        this.$rootScope.$apply();
-
-        expect(this.spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('will reject for failed requests', function() {
-        this.$httpBackend
-            .whenPOST(this.apiUsersAuthChangePasswordUrl)
-            .respond(404);
+        spy = jasmine.createSpy();
+        changePasswordFactory.changePassword('password', 'incorrect token').catch(spy);
 
-        this.changePasswordFactory
-            .changePassword('password', 'incorrect token')
-            .catch(this.spy);
+        $httpBackend.flush();
+        $rootScope.$apply();
 
-        this.$httpBackend.flush();
-        this.$rootScope.$apply();
-
-        expect(this.spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
 });

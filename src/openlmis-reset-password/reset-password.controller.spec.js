@@ -15,90 +15,111 @@
 
 describe('ResetPasswordController', function() {
 
+    var $rootScope, changePasswordFactory, $q, vm, alertSpy, token;
+
     beforeEach(function() {
+        token = '1234';
 
         module('openlmis-reset-password');
 
-        inject(function($injector) {
-            this.$q = $injector.get('$q');
-            this.$rootScope = $injector.get('$rootScope');
-            this.$controller = $injector.get('$controller');
-            this.changePasswordFactory = $injector.get('changePasswordFactory');
-            this.alertService = $injector.get('alertService');
-            this.$stateParams = $injector.get('$stateParams');
+        module(function($provide) {
+            var stateParamsSpy = jasmine.createSpyObj('$stateParams', ['token']);
+            stateParamsSpy.token = token;
+            $provide.factory('$stateParams', function() {
+                return stateParamsSpy;
+            });
+
+            alertSpy = jasmine.createSpyObj('alertService', ['success']);
+            $provide.factory('alertService', function() {
+                return alertSpy;
+            });
         });
 
-        this.token = '1234';
-        this.$stateParams.token = this.token;
+        inject(function(_$rootScope_, _changePasswordFactory_, $controller, _$q_) {
+            $rootScope = _$rootScope_;
+            $q = _$q_;
 
-        spyOn(this.changePasswordFactory, 'changePassword');
-        spyOn(this.alertService, 'success');
+            changePasswordFactory = _changePasswordFactory_;
+            spyOn(changePasswordFactory, 'changePassword');
 
-        this.vm = this.$controller('ResetPasswordController', {
-            modalDeferred: this.$q.defer()
+            vm = $controller('ResetPasswordController', {
+                modalDeferred: $q.defer()
+            });
         });
     });
 
     describe('changePassword', function() {
-
         it('should call change password factory', function() {
-            var password = 'password123';
+            var password = 'password123',
+                passwordPassed = false,
+                alertSpyMethod = jasmine.createSpy();
 
-            this.vm.password = password;
-            this.vm.reenteredPassword = password;
+            vm.password = password;
+            vm.reenteredPassword = password;
 
-            this.changePasswordFactory.changePassword.andReturn(this.$q.when(true));
+            changePasswordFactory.changePassword.andCallFake(function(pass, tk) {
+                if (password === pass && tk === token) {
+                    passwordPassed = true;
+                }
+                return $q.when(true);
+            });
+            alertSpy.success.andCallFake(alertSpyMethod);
 
-            this.vm.changePassword();
-            this.$rootScope.$apply();
+            vm.changePassword();
+            $rootScope.$apply();
 
-            expect(this.changePasswordFactory.changePassword).toHaveBeenCalledWith(password, this.token);
-            expect(this.alertService.success).toHaveBeenCalled();
+            expect(passwordPassed).toBe(true);
+            expect(alertSpyMethod).toHaveBeenCalled();
         });
 
         it('should set error message after rejecting change password call', function() {
-            var password = 'password123';
+            var password = 'password123',
+                deferred = $q.defer();
 
-            this.vm.password = password;
-            this.vm.reenteredPassword = password;
+            vm.password = password;
+            vm.reenteredPassword = password;
 
-            this.changePasswordFactory.changePassword.andReturn(this.$q.reject());
+            changePasswordFactory.changePassword.andCallFake(function() {
+                return deferred.promise;
+            });
 
-            this.vm.changePassword();
-            this.$rootScope.$apply();
+            vm.changePassword();
 
-            expect(this.vm.error).toEqual('openlmisResetPassword.passwordReset.failure');
+            deferred.reject();
+            $rootScope.$apply();
+
+            expect(vm.error).toEqual('openlmisResetPassword.passwordReset.failure');
         });
 
         it('should set error message if password are different', function() {
-            this.vm.password = 'password1';
-            this.vm.reenteredPassword = 'password2';
+            vm.password = 'password1';
+            vm.reenteredPassword = 'password2';
 
-            this.vm.changePassword();
+            vm.changePassword();
 
-            expect(this.vm.error).toEqual('openlmisResetPassword.passwordMismatch');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordMismatch');
         });
 
         it('should set error message if password is too short', function() {
             var password = 'pass1';
 
-            this.vm.password = password;
-            this.vm.reenteredPassword = password;
+            vm.password = password;
+            vm.reenteredPassword = password;
 
-            this.vm.changePassword();
+            vm.changePassword();
 
-            expect(this.vm.error).toEqual('openlmisResetPassword.passwordTooShort');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordTooShort');
         });
 
         it('should set error message if password does not contain number', function() {
             var password = 'passwordWithoutNumber';
 
-            this.vm.password = password;
-            this.vm.reenteredPassword = password;
+            vm.password = password;
+            vm.reenteredPassword = password;
 
-            this.vm.changePassword();
+            vm.changePassword();
 
-            expect(this.vm.error).toEqual('openlmisResetPassword.passwordMustContainNumber');
+            expect(vm.error).toEqual('openlmisResetPassword.passwordMustContainNumber');
         });
     });
 

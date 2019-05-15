@@ -15,104 +15,113 @@
 
 describe('ForgotPasswordController', function() {
 
+    var vm, $q, $controller, modalDeferred, forgotPasswordFactory, loadingModalService;
+
     beforeEach(function() {
         module('openlmis-forgot-password');
 
         inject(function($injector) {
-            this.$q = $injector.get('$q');
-            this.$controller = $injector.get('$controller');
-            this.forgotPasswordFactory = $injector.get('forgotPasswordFactory');
-            this.loadingModalService = $injector.get('loadingModalService');
-            this.$rootScope = $injector.get('$rootScope');
-            this.alertService = $injector.get('alertService');
+            $q = $injector.get('$q');
+            $controller = $injector.get('$controller');
+            forgotPasswordFactory = $injector.get('forgotPasswordFactory');
+            loadingModalService = $injector.get('loadingModalService');
         });
 
-        this.modalDeferred = this.$q.defer();
-        this.forgotPasswordDeferred = this.$q.defer();
-        this.email = 'some-valid@email.com';
+        modalDeferred = $q.defer();
 
-        spyOn(this.forgotPasswordFactory, 'sendResetEmail').andReturn(this.forgotPasswordDeferred.promise);
-        spyOn(this.loadingModalService, 'open').andReturn(true);
-        spyOn(this.loadingModalService, 'close').andReturn(true);
-        spyOn(this.alertService, 'success').andReturn(this.$q.when());
+        spyOn(forgotPasswordFactory, 'sendResetEmail');
+        spyOn(loadingModalService, 'open').andReturn(true);
+        spyOn(loadingModalService, 'close').andReturn(true);
 
-        this.vm = this.$controller('ForgotPasswordController', {
-            modalDeferred: this.modalDeferred
+        vm = $controller('ForgotPasswordController', {
+            modalDeferred: modalDeferred
         });
-        this.vm.email = this.email;
     });
 
     describe('forgotPassword', function() {
 
-        beforeEach(function() {
+        var $rootScope, alertService, forgotPasswordDeferred, email;
 
+        beforeEach(function() {
+            inject(function($injector) {
+                $rootScope = $injector.get('$rootScope');
+                alertService = $injector.get('alertService');
+            });
+
+            forgotPasswordDeferred = $q.defer();
+
+            forgotPasswordFactory.sendResetEmail.andReturn(forgotPasswordDeferred.promise);
+            spyOn(alertService, 'success').andReturn($q.when());
+
+            email = 'some-valid@email.com';
+            vm.email = email;
         });
 
         it('should open loading modal', function() {
-            this.vm.forgotPassword();
+            vm.forgotPassword();
 
-            expect(this.loadingModalService.open).toHaveBeenCalled();
+            expect(loadingModalService.open).toHaveBeenCalled();
         });
 
-        it('should call this.forgotPasswordFactory', function() {
-            this.vm.forgotPassword();
+        it('should call forgotPasswordFactory', function() {
+            vm.forgotPassword();
 
-            expect(this.forgotPasswordFactory.sendResetEmail).toHaveBeenCalledWith(this.email);
+            expect(forgotPasswordFactory.sendResetEmail).toHaveBeenCalledWith(email);
         });
 
         it('should show alert if password reset succeeded', function() {
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.resolve();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
+            $rootScope.$apply();
 
-            expect(this.alertService.success).toHaveBeenCalled();
+            expect(alertService.success).toHaveBeenCalled();
         });
 
         it('should close modal if alert was dismissed', function() {
-            spyOn(this.modalDeferred, 'resolve').andCallThrough();
+            spyOn(modalDeferred, 'resolve').andCallThrough();
 
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.resolve();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
+            $rootScope.$apply();
 
-            expect(this.modalDeferred.resolve).toHaveBeenCalled();
+            expect(modalDeferred.resolve).toHaveBeenCalled();
         });
 
         it('should not show alert if password reset failed', function() {
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.reject();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
 
-            expect(this.alertService.success).not.toHaveBeenCalled();
+            expect(alertService.success).not.toHaveBeenCalled();
         });
 
         it('should set error if password reset failed', function() {
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.reject();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
 
-            expect(this.vm.error).not.toBeUndefined();
+            expect(vm.error).not.toBeUndefined();
         });
 
         it('should close loading modal on reject', function() {
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.resolve();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.resolve();
+            $rootScope.$apply();
 
-            expect(this.loadingModalService.close).toHaveBeenCalled();
+            expect(loadingModalService.close).toHaveBeenCalled();
         });
 
         it('should close loading modal on resolve', function() {
-            this.vm.forgotPassword();
-            this.forgotPasswordDeferred.reject();
-            this.$rootScope.$apply();
+            vm.forgotPassword();
+            forgotPasswordDeferred.reject();
+            $rootScope.$apply();
 
-            expect(this.loadingModalService.close).toHaveBeenCalled();
+            expect(loadingModalService.close).toHaveBeenCalled();
         });
     });
 
     it('cancel should expose modal reject method', function() {
-        expect(this.vm.cancel).toBe(this.modalDeferred.reject);
+        expect(vm.cancel).toBe(modalDeferred.reject);
     });
 
 });
