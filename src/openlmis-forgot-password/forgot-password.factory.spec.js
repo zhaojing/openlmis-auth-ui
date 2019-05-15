@@ -15,16 +15,14 @@
 
 describe('openlmis-forgot-password.forgotPasswordFactory', function() {
 
-    var forgotPasswordFactory, $rootScope, $httpBackend, openlmisUrlFactory;
-
     beforeEach(function() {
         module('openlmis-forgot-password');
 
         inject(function($injector) {
-            forgotPasswordFactory = $injector.get('forgotPasswordFactory');
-            $rootScope = $injector.get('$rootScope');
-            $httpBackend = $injector.get('$httpBackend');
-            openlmisUrlFactory = $injector.get('openlmisUrlFactory');
+            this.forgotPasswordFactory = $injector.get('forgotPasswordFactory');
+            this.$rootScope = $injector.get('$rootScope');
+            this.$httpBackend = $injector.get('$httpBackend');
+            this.openlmisUrlFactory = $injector.get('openlmisUrlFactory');
         });
     });
 
@@ -32,13 +30,14 @@ describe('openlmis-forgot-password.forgotPasswordFactory', function() {
         var email = 'user@openlmis.org',
             spy = jasmine.createSpy();
 
-        $httpBackend.when('POST', openlmisUrlFactory('/api/users/auth/forgotPassword?email=' + email))
+        this.$httpBackend
+            .whenPOST(this.openlmisUrlFactory('/api/users/auth/forgotPassword?email=' + email))
             .respond(200, {});
 
-        forgotPasswordFactory.sendResetEmail(email).then(spy);
+        this.forgotPasswordFactory.sendResetEmail(email).then(spy);
 
-        $httpBackend.flush();
-        $rootScope.$apply();
+        this.$httpBackend.flush();
+        this.$rootScope.$apply();
 
         expect(spy).toHaveBeenCalled();
     });
