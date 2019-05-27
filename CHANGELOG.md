@@ -1,5 +1,5 @@
-6.2.0 / Work in Progress
-========================
+6.2.0 / 2019-05-27
+==================
 
 New functionality added in backwards-compatible manner:
 * [OLMIS-5976:](https://openlmis.atlassian.net/browse/OLMIS-5976) Added the ability to add "canAccess" method defining screen availability.
