@@ -15,35 +15,34 @@
 
 describe('apiKeysService', function() {
 
-    var authUrl, $httpBackend, $rootScope, apiKeysService, ApiKeyBuilder,
-        apiKeys;
-
     beforeEach(function() {
         module('auth-api-keys');
 
         inject(function($injector) {
-            authUrl = $injector.get('authUrl');
-            apiKeysService = $injector.get('apiKeysService');
-            $rootScope = $injector.get('$rootScope');
-            $httpBackend = $injector.get('$httpBackend');
-            ApiKeyBuilder = $injector.get('ApiKeyBuilder');
+            this.authUrl = $injector.get('authUrl');
+            this.apiKeysService = $injector.get('apiKeysService');
+            this.$rootScope = $injector.get('$rootScope');
+            this.$httpBackend = $injector.get('$httpBackend');
+            this.ApiKeyBuilder = $injector.get('ApiKeyBuilder');
         });
 
-        apiKeys = [
-            new ApiKeyBuilder().build(),
-            new ApiKeyBuilder().build()
+        this.apiKeys = [
+            new this.ApiKeyBuilder().build(),
+            new this.ApiKeyBuilder().build()
         ];
     });
 
     describe('create', function() {
 
         beforeEach(function() {
-            $httpBackend.whenPOST(authUrl('/api/apiKeys')).respond(200, apiKeys[0]);
+            this.$httpBackend
+                .whenPOST(this.authUrl('/api/apiKeys'))
+                .respond(200, this.apiKeys[0]);
         });
 
         it('should return promise', function() {
-            var result = apiKeysService.create();
-            $httpBackend.flush();
+            var result = this.apiKeysService.create();
+            this.$httpBackend.flush();
 
             expect(result.then).not.toBeUndefined();
         });
@@ -51,62 +50,68 @@ describe('apiKeysService', function() {
         it('should resolve to service account', function() {
             var result;
 
-            apiKeysService.create().then(function(data) {
+            this.apiKeysService.create().then(function(data) {
                 result = data;
             });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(result.apiKey).toEqual(apiKeys[0].apiKey);
+            expect(result.apiKey).toEqual(this.apiKeys[0].apiKey);
         });
 
+        //eslint-disable-next-line jasmine/missing-expect
         it('should make a proper request', function() {
-            $httpBackend.expectPOST(authUrl('/api/apiKeys'));
+            this.$httpBackend.expectPOST(this.authUrl('/api/apiKeys'));
 
-            apiKeysService.create();
-            $httpBackend.flush();
+            this.apiKeysService.create();
+            this.$httpBackend.flush();
         });
     });
 
     describe('remove', function() {
 
-        var token = 'key';
-
         beforeEach(function() {
-            $httpBackend.whenDELETE(authUrl('/api/apiKeys/' + token)).respond(204);
+            this.token = 'key';
+
+            this.$httpBackend
+                .whenDELETE(this.authUrl('/api/apiKeys/' + this.token))
+                .respond(204);
         });
 
         it('should return promise', function() {
-            var result = apiKeysService.remove(token);
-            $httpBackend.flush();
+            var result = this.apiKeysService.remove(this.token);
+            this.$httpBackend.flush();
 
             expect(result.then).not.toBeUndefined();
         });
 
+        //eslint-disable-next-line jasmine/missing-expect
         it('should make a proper request', function() {
-            $httpBackend.expectDELETE(authUrl('/api/apiKeys/' + token));
+            this.$httpBackend.expectDELETE(this.authUrl('/api/apiKeys/' + this.token));
 
-            apiKeysService.remove(token);
-            $httpBackend.flush();
+            this.apiKeysService.remove(this.token);
+            this.$httpBackend.flush();
         });
     });
 
     describe('query', function() {
 
-        var params = {
-            page: 1,
-            size: 10
-        };
-
         beforeEach(function() {
-            $httpBackend.whenGET(authUrl('/api/apiKeys?page=' + params.page + '&size=' + params.size)).respond(200, {
-                content: apiKeys
-            });
+            this.params = {
+                page: 1,
+                size: 10
+            };
+
+            this.$httpBackend
+                .whenGET(this.authUrl('/api/apiKeys?page=' + this.params.page + '&size=' + this.params.size))
+                .respond(200, {
+                    content: this.apiKeys
+                });
         });
 
         it('should return promise', function() {
-            var result = apiKeysService.query(params);
-            $httpBackend.flush();
+            var result = this.apiKeysService.query(this.params);
+            this.$httpBackend.flush();
 
             expect(result.then).not.toBeUndefined();
         });
@@ -114,26 +119,28 @@ describe('apiKeysService', function() {
         it('should resolve to service accounts page', function() {
             var result;
 
-            apiKeysService.query(params)
+            this.apiKeysService.query(this.params)
                 .then(function(data) {
                     result = data;
                 });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(result.content).toEqual(apiKeys);
+            expect(result.content).toEqual(this.apiKeys);
         });
 
+        //eslint-disable-next-line jasmine/missing-expect
         it('should make a proper request', function() {
-            $httpBackend.expectGET(authUrl('/api/apiKeys?page=' + params.page + '&size=' + params.size));
+            this.$httpBackend
+                .expectGET(this.authUrl('/api/apiKeys?page=' + this.params.page + '&size=' + this.params.size));
 
-            apiKeysService.query(params);
-            $httpBackend.flush();
+            this.apiKeysService.query(this.params);
+            this.$httpBackend.flush();
         });
     });
 
     afterEach(function() {
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
+        this.$httpBackend.verifyNoOutstandingExpectation();
+        this.$httpBackend.verifyNoOutstandingRequest();
     });
 });

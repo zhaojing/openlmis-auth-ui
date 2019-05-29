@@ -15,33 +15,26 @@
 
 describe('AuthUser', function() {
 
-    var USER_ID = 'some-id',
-        USERNAME = 'someUser';
-
-    var AuthUser;
-
     beforeEach(function() {
         module('openlmis-auth');
 
         inject(function($injector) {
-            AuthUser = $injector.get('AuthUser');
+            this.AuthUser = $injector.get('AuthUser');
         });
+
+        this.USER_ID = 'some-id';
+        this.USERNAME = 'someUser';
+        this.authUser = new this.AuthUser(this.USER_ID, this.USERNAME);
     });
 
     describe('constructor', function() {
 
-        var authUser;
-
-        beforeEach(function() {
-            authUser = new AuthUser(USER_ID, USERNAME);
-        });
-
         it('should set user_id', function() {
-            expect(authUser.user_id).toEqual(USER_ID);
+            expect(this.authUser.user_id).toEqual(this.USER_ID);
         });
 
         it('should set username', function() {
-            expect(authUser.username).toEqual(USERNAME);
+            expect(this.authUser.username).toEqual(this.USERNAME);
         });
 
     });

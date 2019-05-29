@@ -15,8 +15,6 @@
 
 describe('LoginController', function() {
 
-    var vm, $q, $rootScope, $controller, loginService, modalDeferred, loadingModalService;
-
     beforeEach(function() {
 
         module('openlmis-login', function($provide) {
@@ -27,17 +25,17 @@ describe('LoginController', function() {
         });
 
         inject(function($injector) {
-            $q = $injector.get('$q');
-            $rootScope = $injector.get('$rootScope');
-            $controller = $injector.get('$controller');
-            loginService = $injector.get('loginService');
-            loadingModalService = $injector.get('loadingModalService');
+            this.$q = $injector.get('$q');
+            this.$rootScope = $injector.get('$rootScope');
+            this.$controller = $injector.get('$controller');
+            this.loginService = $injector.get('loginService');
+            this.loadingModalService = $injector.get('loadingModalService');
         });
 
-        modalDeferred = $q.defer();
+        this.modalDeferred = this.$q.defer();
 
-        vm = $controller('LoginController', {
-            modalDeferred: modalDeferred
+        this.vm = this.$controller('LoginController', {
+            modalDeferred: this.modalDeferred
         });
     });
 
@@ -46,9 +44,9 @@ describe('LoginController', function() {
         var username, validPassword, invalidPassword;
 
         beforeEach(function() {
-            spyOn(loginService, 'login');
-            spyOn(loadingModalService, 'open');
-            spyOn(loadingModalService, 'close');
+            spyOn(this.loginService, 'login');
+            spyOn(this.loadingModalService, 'open');
+            spyOn(this.loadingModalService, 'close');
 
             username = 'john';
             validPassword = 'good-password';
@@ -56,123 +54,123 @@ describe('LoginController', function() {
         });
 
         it('should not login and show error when server returns error', function() {
-            loginService.login.andReturn($q.reject('error'));
+            this.loginService.login.andReturn(this.$q.reject('error'));
 
-            vm.username = username;
-            vm.password = invalidPassword;
+            this.vm.username = username;
+            this.vm.password = invalidPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loginService.login).toHaveBeenCalledWith(username, invalidPassword);
-            expect(vm.loginError).toEqual('error');
+            expect(this.loginService.login).toHaveBeenCalledWith(username, invalidPassword);
+            expect(this.vm.loginError).toEqual('error');
         });
 
         it('should clear password on failed login attempt', function() {
-            loginService.login.andReturn($q.reject());
+            this.loginService.login.andReturn(this.$q.reject());
 
-            vm.username = username;
-            vm.password = invalidPassword;
+            this.vm.username = username;
+            this.vm.password = invalidPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loginService.login).toHaveBeenCalledWith(username, invalidPassword);
-            expect(vm.password).toBe(undefined);
+            expect(this.loginService.login).toHaveBeenCalledWith(username, invalidPassword);
+            expect(this.vm.password).toBe(undefined);
         });
 
         it('should not clear password on successful login attempt', function() {
-            loginService.login.andReturn($q.resolve());
+            this.loginService.login.andReturn(this.$q.resolve());
 
-            vm.username = username;
-            vm.password = validPassword;
+            this.vm.username = username;
+            this.vm.password = validPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loginService.login).toHaveBeenCalledWith(username, validPassword);
-            expect(vm.password).toBe(validPassword);
+            expect(this.loginService.login).toHaveBeenCalledWith(username, validPassword);
+            expect(this.vm.password).toBe(validPassword);
         });
 
         it('should open loading modal', function() {
-            loginService.login.andReturn($q.resolve());
+            this.loginService.login.andReturn(this.$q.resolve());
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loadingModalService.open).toHaveBeenCalled();
+            expect(this.loadingModalService.open).toHaveBeenCalled();
         });
 
         it('should close loading modal after successful login', function() {
-            loginService.login.andReturn($q.resolve());
+            this.loginService.login.andReturn(this.$q.resolve());
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loadingModalService.close).toHaveBeenCalled();
+            expect(this.loadingModalService.close).toHaveBeenCalled();
         });
 
         it('should close loading modal after failed login', function() {
-            loginService.login.andReturn($q.reject());
+            this.loginService.login.andReturn(this.$q.reject());
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
-            expect(loadingModalService.close).toHaveBeenCalled();
+            expect(this.loadingModalService.close).toHaveBeenCalled();
         });
 
         it('will resolve modalDeferred promise if login is successful', function() {
             var resolved;
-            modalDeferred.promise.then(function() {
+            this.modalDeferred.promise.then(function() {
                 resolved = true;
             });
 
-            loginService.login.andReturn($q.reject());
-            vm.username = username;
-            vm.password = invalidPassword;
+            this.loginService.login.andReturn(this.$q.reject());
+            this.vm.username = username;
+            this.vm.password = invalidPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
             expect(resolved).not.toBe(true);
 
-            loginService.login.andReturn($q.resolve());
-            vm.password = validPassword;
+            this.loginService.login.andReturn(this.$q.resolve());
+            this.vm.password = validPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
             expect(resolved).toBe(true);
         });
 
         it('should emit "openlmis-auth.login" event when successfully logged in', function() {
             var success = false;
-            $rootScope.$on('openlmis-auth.login', function() {
+            this.$rootScope.$on('openlmis-auth.login', function() {
                 success = true;
             });
 
-            loginService.login.andReturn($q.resolve());
-            vm.username = username;
-            vm.password = validPassword;
+            this.loginService.login.andReturn(this.$q.resolve());
+            this.vm.username = username;
+            this.vm.password = validPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
             expect(success).toBe(true);
         });
 
         it('should not emit "openlmis-auth.login" event when login failed', function() {
             var success = true;
-            $rootScope.$on('openlmis-auth.login', function() {
+            this.$rootScope.$on('openlmis-auth.login', function() {
                 success = false;
             });
 
-            loginService.login.andReturn($q.reject());
-            vm.username = username;
-            vm.password = invalidPassword;
+            this.loginService.login.andReturn(this.$q.reject());
+            this.vm.username = username;
+            this.vm.password = invalidPassword;
 
-            vm.doLogin();
-            $rootScope.$apply();
+            this.vm.doLogin();
+            this.$rootScope.$apply();
 
             expect(success).toBe(true);
         });

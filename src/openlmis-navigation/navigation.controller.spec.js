@@ -15,84 +15,85 @@
 
 describe('NavigationController', function() {
 
-    var vm, scope, navigationStateService, $controller;
-
     beforeEach(function() {
         module('openlmis-navigation');
 
         inject(function($injector) {
-            $controller = $injector.get('$controller');
+            this.$controller = $injector.get('$controller');
+            this.navigationStateService = $injector.get('navigationStateService');
+            this.$rootScope = $injector.get('$rootScope');
         });
 
-        scope = jasmine.createSpy();
+        this.$scope = this.$rootScope.$new();
 
-        navigationStateService = jasmine.createSpyObj('navigationStateService', [
-            'hasChildren',
-            'isSubmenu',
-            'isOffline'
-        ]);
+        this.mainRoot = [
+            'subState1',
+            'subState2'
+        ];
 
-        navigationStateService.roots = {};
+        this.subRoot = [
+            'subSubState1',
+            'subSubState2'
+        ];
+
+        this.states = [
+            'state1',
+            'state2'
+        ];
+
+        this.navigationStateService.roots = {};
+
+        spyOn(this.navigationStateService, 'hasChildren');
+
+        this.initController = function() {
+            this.vm = this.$controller('NavigationController', {
+                $scope: this.$scope
+            });
+            this.vm.$onInit();
+        };
     });
 
     describe('initialization', function() {
 
-        var mainRoot, subRoot, states;
-
         beforeEach(function() {
-            mainRoot = [
-                'subState1',
-                'subState2'
-            ];
-
-            subRoot = [
-                'subSubState1',
-                'subSubState2'
-            ];
-
-            states = [
-                'state1',
-                'state2'
-            ];
-
-            navigationStateService.roots = {
-                '': mainRoot,
-                subRoot: subRoot
+            this.navigationStateService.roots = {
+                '': this.mainRoot,
+                subRoot: this.subRoot
             };
         });
 
         it('should expose navigationStateService.isSubmenu method', function() {
-            initController();
+            this.initController();
 
-            expect(vm.isSubmenu).toBe(navigationStateService.isSubmenu);
+            expect(this.vm.isSubmenu).toBe(this.navigationStateService.isSubmenu);
         });
 
         it('should expose navigationStateService.shouldDisplay method', function() {
-            initController();
+            this.initController();
 
-            expect(vm.shouldDisplay).toBe(navigationStateService.shouldDisplay);
+            expect(this.vm.shouldDisplay).toBe(this.navigationStateService.shouldDisplay);
         });
 
         it('should get root children if no root state or state list was given', function() {
-            initController();
+            this.initController();
 
-            expect(vm.states).toBe(mainRoot);
+            expect(this.vm.states).toBe(this.mainRoot);
         });
 
         it('should get state children if root states was given', function() {
-            scope.rootState = 'subRoot';
+            this.$scope.rootState = 'subRoot';
 
-            initController();
+            this.initController();
 
-            expect(vm.states).toBe(subRoot);
+            expect(this.vm.states).toBe(this.subRoot);
         });
 
         it('should expose states if the state list was given', function() {
-            scope.states = states;
+            this.$scope.states = this.states;
 
-            initController();
+            this.initController();
 
-            expect(vm.states).toBe(states);
+            expect(this.vm.states).toBe(this.states);
         });
 
     });
@@ -100,33 +101,24 @@ describe('NavigationController', function() {
     describe('hasChildren', function() {
 
         beforeEach(function() {
-            navigationStateService.hasChildren.andCallFake(function(state) {
-                return state === 'state';
-            });
 
-            initController();
+            this.initController();
         });
 
         it('should return visible children', function() {
-            var result = vm.hasChildren('state');
+            this.navigationStateService.hasChildren.andReturn(true);
+
+            var result = this.vm.hasChildren('state');
 
             expect(result).toBe(true);
         });
 
         it('should call navigationStateService.hasChildren', function() {
-            vm.hasChildren('state');
+            this.vm.hasChildren('state');
 
-            expect(navigationStateService.hasChildren).toHaveBeenCalledWith('state');
+            expect(this.navigationStateService.hasChildren).toHaveBeenCalledWith('state');
         });
 
     });
-
-    function initController() {
-        vm = $controller('NavigationController', {
-            $scope: scope,
-            navigationStateService: navigationStateService
-        });
-        vm.$onInit();
-    }
 
 });

@@ -15,96 +15,106 @@
 
 describe('openlmis-login.loginService', function() {
 
-    var authUrl, $rootScope, $httpBackend, loginService, offlineService, authorizationService, $q, authService;
-
     beforeEach(function() {
         module('openlmis-login');
 
         inject(function($injector) {
-            $q = $injector.get('$q');
-            authUrl = $injector.get('authUrl');
-            $rootScope = $injector.get('$rootScope');
-            authService = $injector.get('authService');
-            $httpBackend = $injector.get('$httpBackend');
-            loginService = $injector.get('loginService');
-            offlineService = $injector.get('offlineService');
-            authorizationService = $injector.get('authorizationService');
+            this.$q = $injector.get('$q');
+            this.authUrl = $injector.get('authUrl');
+            this.$rootScope = $injector.get('$rootScope');
+            this.authService = $injector.get('authService');
+            this.$httpBackend = $injector.get('$httpBackend');
+            this.loginService = $injector.get('loginService');
+            this.authorizationService = $injector.get('authorizationService');
+            this.offlineService = $injector.get('offlineService');
         });
 
-        $httpBackend.when('POST', authUrl('/api/oauth/token?grant_type=password'))
-            .respond(function(method, url, data) {
-                if (data.indexOf('bad-password') >= 0) {
-                    return [400];
-                }
-                return [200, {
+        spyOn(this.authorizationService, 'setAccessToken').andCallThrough();
+        spyOn(this.authorizationService, 'clearAccessToken').andCallThrough();
+        spyOn(this.authService, 'loginConfirmed').andCallThrough();
+
+        spyOn(this.authorizationService, 'setUser');
+        spyOn(this.authorizationService, 'clearUser');
+        spyOn(this.offlineService, 'isOffline').andReturn(false);
+
+        this.apiOauthTokenUrl = this.authUrl('/api/oauth/token?grant_type=password');
+
+        this.mock200Response = function() {
+            this.$httpBackend
+                .whenPOST(this.apiOauthTokenUrl)
+                .respond(200, {
                     //eslint-disable-next-line quote-props
                     'access_token': 'access_token',
                     referenceDataUserId: 'userId',
                     username: 'john'
-                }];
-            });
+                });
+        };
 
-        spyOn(authorizationService, 'setAccessToken').andCallThrough();
-        spyOn(authorizationService, 'clearAccessToken').andCallThrough();
-        spyOn(authService, 'loginConfirmed').andCallThrough();
-
-        spyOn(authorizationService, 'setUser');
-        spyOn(authorizationService, 'clearUser');
-        spyOn(offlineService, 'isOffline').andReturn(false);
+        this.mock400Response = function() {
+            this.$httpBackend
+                .whenPOST(this.apiOauthTokenUrl)
+                .respond(400);
+        };
     });
 
     describe('login', function() {
 
         it('should reject bad logins', function() {
+            this.mock400Response();
+
             var error = false;
-            loginService.login('john', 'bad-password')
+            this.loginService.login('john', 'bad-password')
                 .catch(function() {
                     error = true;
                 });
 
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(error).toBe(true);
         });
 
         it('returns an error message for bad logins', function() {
+            this.mock400Response();
+
             var message;
-            loginService.login('john', 'bad-password')
+            this.loginService.login('john', 'bad-password')
                 .catch(function(error) {
                     message = error;
                 });
 
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(message).toBe('openlmisLogin.invalidCredentials');
         });
 
         it('returns an error if offline', function() {
-            offlineService.isOffline.andReturn(true);
+            this.mock400Response();
+            this.offlineService.isOffline.andReturn(true);
 
             var message;
-            loginService.login('john', 'john-password')
+            this.loginService.login('john', 'john-password')
                 .catch(function(error) {
                     message = error;
                 });
 
-            $rootScope.$apply();
+            this.$rootScope.$apply();
 
             expect(message).toEqual('openlmisLogin.cannotConnectToServer');
         });
 
         it('should resolve successful logins', function() {
-            var result;
+            this.mock200Response();
 
-            loginService.login('john', 'john-password')
+            var result;
+            this.loginService.login('john', 'john-password')
                 .then(function(response) {
                     result = response;
                 });
 
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(result).toEqual({
                 userId: 'userId',
@@ -115,40 +125,46 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('should set access token when login is successful', function() {
-            loginService.login('john', 'john-password');
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.mock200Response();
 
-            expect(authorizationService.setAccessToken).toHaveBeenCalledWith('access_token');
+            this.loginService.login('john', 'john-password');
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
+
+            expect(this.authorizationService.setAccessToken).toHaveBeenCalledWith('access_token');
         });
 
         it('should set basic user data when login is successful', function() {
-            loginService.login('john', 'john-password');
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.mock200Response();
 
-            expect(authorizationService.setUser).toHaveBeenCalledWith('userId', 'john');
+            this.loginService.login('john', 'john-password');
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
+
+            expect(this.authorizationService.setUser).toHaveBeenCalledWith('userId', 'john');
         });
 
         it('should wait for post login actions', function() {
-            var postLoginActionDeferred = $q.defer();
+            this.mock200Response();
+
+            var postLoginActionDeferred = this.$q.defer();
             var postLoginAction = jasmine.createSpy('postLoginAction');
             postLoginAction.andReturn(postLoginActionDeferred.promise);
 
-            loginService.registerPostLoginAction(postLoginAction);
+            this.loginService.registerPostLoginAction(postLoginAction);
 
             var success;
-            loginService.login('john', 'john-password')
+            this.loginService.login('john', 'john-password')
                 .then(function() {
                     success = true;
                 });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(success).toBeFalsy();
 
             postLoginActionDeferred.resolve();
-            $rootScope.$apply();
+            this.$rootScope.$apply();
 
             expect(success).toBe(true);
             expect(postLoginAction).toHaveBeenCalledWith({
@@ -159,34 +175,38 @@ describe('openlmis-login.loginService', function() {
         });
 
         it('should inform authService about successful login before executing post login actions', function() {
-            var postLoginActionDeferred = $q.defer();
+            this.mock200Response();
+
+            var postLoginActionDeferred = this.$q.defer();
             var postLoginAction = jasmine.createSpy('postLoginAction');
             postLoginAction.andReturn(postLoginActionDeferred.promise);
 
-            loginService.registerPostLoginAction(postLoginAction);
+            this.loginService.registerPostLoginAction(postLoginAction);
 
             var success;
-            loginService.login('john', 'john-password')
+            this.loginService.login('john', 'john-password')
                 .then(function() {
                     success = true;
                 });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(authService.loginConfirmed).toHaveBeenCalled();
+            expect(this.authService.loginConfirmed).toHaveBeenCalled();
             expect(success).toBeUndefined();
         });
 
         it('should not inform authService if login failed', function() {
+            this.mock400Response();
+
             var error;
-            loginService.login('john', 'bad-password')
+            this.loginService.login('john', 'bad-password')
                 .catch(function() {
                     error = true;
                 });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(authService.loginConfirmed).not.toHaveBeenCalled();
+            expect(this.authService.loginConfirmed).not.toHaveBeenCalled();
             expect(error).toBe(true);
         });
     });
@@ -194,72 +214,74 @@ describe('openlmis-login.loginService', function() {
     describe('logout', function() {
 
         beforeEach(function() {
-            $httpBackend.when('POST', authUrl('/api/users/auth/logout'))
+            this.$httpBackend
+                .whenPOST(this.authUrl('/api/users/auth/logout'))
                 .respond(200);
         });
 
         it('always clears the access token', function() {
-            loginService.logout();
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.loginService.logout();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(authorizationService.clearAccessToken).toHaveBeenCalled();
+            expect(this.authorizationService.clearAccessToken).toHaveBeenCalled();
         });
 
         it('always clears user data', function() {
-            loginService.logout();
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.loginService.logout();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
-            expect(authorizationService.clearUser).toHaveBeenCalled();
+            expect(this.authorizationService.clearUser).toHaveBeenCalled();
         });
 
         it('should logout while offline', function() {
-            offlineService.isOffline.andReturn(true);
+            this.offlineService.isOffline.andReturn(true);
 
             var success = false;
-            loginService.logout().then(function() {
+            this.loginService.logout().then(function() {
                 success = true;
             });
-            $rootScope.$apply();
+            this.$rootScope.$apply();
 
             expect(success).toBe(true);
         });
 
-        it('should resolve promise if response status is 401', inject(function(authUrl) {
-            $httpBackend.when('POST', authUrl('/api/users/auth/logout'))
+        it('should resolve promise if response status is 401', function() {
+            this.$httpBackend
+                .whenPOST(this.authUrl('/api/users/auth/logout'))
                 .respond(401);
 
             var resolved = false;
-            loginService.logout().then(function() {
+            this.loginService.logout().then(function() {
                 resolved = true;
             });
 
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(resolved).toBe(true);
-        }));
+        });
 
         it('should wait for post logout actions', function() {
-            var postLogoutActionDeferred = $q.defer();
+            var postLogoutActionDeferred = this.$q.defer();
             var postLogoutAction = jasmine.createSpy('postLogoutAction');
             postLogoutAction.andReturn(postLogoutActionDeferred.promise);
 
-            loginService.registerPostLogoutAction(postLogoutAction);
+            this.loginService.registerPostLogoutAction(postLogoutAction);
 
             var success;
-            loginService.logout()
+            this.loginService.logout()
                 .then(function() {
                     success = true;
                 });
-            $httpBackend.flush();
-            $rootScope.$apply();
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
 
             expect(success).toBeFalsy();
 
             postLogoutActionDeferred.resolve();
-            $rootScope.$apply();
+            this.$rootScope.$apply();
 
             expect(success).toBe(true);
             expect(postLogoutAction).toHaveBeenCalled();
@@ -268,7 +290,7 @@ describe('openlmis-login.loginService', function() {
     });
 
     afterEach(function() {
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
+        this.$httpBackend.verifyNoOutstandingExpectation();
+        this.$httpBackend.verifyNoOutstandingRequest();
     });
 });
