@@ -54,6 +54,8 @@
          * @return {Promise} Returns promise from requestLogin
          */
         function login(username, password) {
+            clearAuthorizationService();
+
             return requestLogin(username, password)
                 .then(function(response) {
                     authorizationService.setAccessToken(response.accessToken);
@@ -216,6 +218,11 @@
             });
 
             return $q.all(promises);
+        }
+
+        function clearAuthorizationService() {
+            authorizationService.clearAccessToken();
+            authorizationService.clearUser();
         }
     }
 

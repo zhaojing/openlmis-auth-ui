@@ -209,6 +209,23 @@ describe('openlmis-login.loginService', function() {
             expect(this.authService.loginConfirmed).not.toHaveBeenCalled();
             expect(error).toBe(true);
         });
+
+        it('should clear authentication service data before', function() {
+            this.mock200Response();
+
+            this.loginService.login('john', 'john-password');
+
+            expect(this.authorizationService.clearAccessToken).toHaveBeenCalled();
+            expect(this.authorizationService.clearUser).toHaveBeenCalled();
+            expect(this.authorizationService.setAccessToken).not.toHaveBeenCalled();
+            expect(this.authorizationService.setUser).not.toHaveBeenCalled();
+
+            this.$httpBackend.flush();
+            this.$rootScope.$apply();
+
+            expect(this.authorizationService.setAccessToken).toHaveBeenCalled();
+            expect(this.authorizationService.setUser).toHaveBeenCalled();
+        });
     });
 
     describe('logout', function() {
