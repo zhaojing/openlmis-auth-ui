@@ -54,8 +54,6 @@
          * @return {Promise} Returns promise from requestLogin
          */
         function login(username, password) {
-            authorizationService.clearAccessToken();
-
             return requestLogin(username, password)
                 .then(function(response) {
                     authorizationService.setAccessToken(response.accessToken);
