@@ -6,6 +6,7 @@ New functionality added in backwards-compatible manner:
 
 Bug fixes which are backwards-compatible:
 * [OLMIS-5840](https://openlmis.atlassian.net/browse/OLMIS-5840): Fixed a bug with endless loading when trying to enter login page from the home page.
+* [OLMIS-6330](https://openlmis.atlassian.net/browse/OLMIS-6330): fixed trigerring reference-ui build.
 
 6.1.3 / 2018-12-12
 ==================
