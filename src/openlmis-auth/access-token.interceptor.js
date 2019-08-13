@@ -62,6 +62,7 @@
          */
         function request(config) {
             if (openlmisUrlService.check(config.url) && authorizationService.isAuthenticated()
+                    && !config.ignoreAuthModule
                     // we don't want to add the token to template requests
                     && !isHtml(config.url)
                     // we don't want to override the basic authorization when login in
@@ -84,6 +85,9 @@
          * @return {Promise}          Rejected promise
          */
         function responseError(response) {
+            if (response.config.ignoreAuthModule) {
+                return $q.reject(response);
+            }
             if (response.status === 401) {
                 authorizationService.clearAccessToken();
                 authorizationService.clearUser();
