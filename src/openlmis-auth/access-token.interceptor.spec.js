@@ -112,6 +112,7 @@ describe('accessTokenInterceptor', function() {
 
         beforeEach(function() {
             response = {};
+            response.config = {};
         });
 
         describe('on 401 status', function() {
