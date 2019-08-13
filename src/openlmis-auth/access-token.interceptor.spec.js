@@ -115,6 +115,38 @@ describe('accessTokenInterceptor', function() {
             response.config = {};
         });
 
+        describe('on 401 status and ignoreAuthModule flag', function() {
+            beforeEach(function() {
+                response.status = 401;
+                response.config.ignoreAuthModule = true;
+
+                this.accessTokenInterceptor.responseError(response);
+            });
+
+            it('should not clear access token', function() {
+                expect(this.authorizationService.clearAccessToken).not.toHaveBeenCalled();
+            });
+
+            it('should not clear user', function() {
+                expect(this.authorizationService.clearUser).not.toHaveBeenCalled();
+            });
+
+            it('should not clear rights', function() {
+                expect(this.authorizationService.clearRights).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should not show error.authorization alert on 403 status and ignoreAuthModule flag', function() {
+            response.status = 403;
+            response.config.ignoreAuthModule = true;
+
+            this.accessTokenInterceptor.responseError(response);
+
+            expect(this.alertService.error)
+                .not
+                .toHaveBeenCalled();
+        });
+
         describe('on 401 status', function() {
 
             beforeEach(function() {
