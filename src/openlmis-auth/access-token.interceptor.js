@@ -61,12 +61,7 @@
          * @return {Object}        A modified configuration object
          */
         function request(config) {
-            if (openlmisUrlService.check(config.url) && authorizationService.isAuthenticated()
-                    && !config.ignoreAuthModule
-                    // we don't want to add the token to template requests
-                    && !isHtml(config.url)
-                    // we don't want to override the basic authorization when login in
-                    && !config.headers.Authorization) {
+            if (openlmisUrlService.check(config.url) && shouldAddAuthHeader(config)) {
                 config.headers.Authorization = accessTokenFactory.authHeader();
             }
             return config;
@@ -103,6 +98,14 @@
                 }
             }
             return $q.reject(response);
+        }
+
+        function shouldAddAuthHeader(config) {
+            return authorizationService.isAuthenticated() && !config.ignoreAuthModule
+                    // we don't want to add the token to template requests
+                    && !isHtml(config.url)
+                    // we don't want to override the basic authorization when login in
+                    && !config.headers.Authorization;
         }
 
         function isHtml(url) {
