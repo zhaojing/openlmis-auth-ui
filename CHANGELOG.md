@@ -1,3 +1,10 @@
+6.2.1 / 2019-10-17
+==================
+
+Improvements:
+* Updated dev-ui version to 9.0.1.
+* Updated ui-components version to 7.2.0.
+
 6.2.0 / 2019-05-27
 ==================
 
