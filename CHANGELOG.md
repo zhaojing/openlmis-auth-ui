@@ -1,4 +1,4 @@
-6.2.2 / WIP
+6.2.2 / 2019-12-19
 ==================
 
 Bug fixes which are backwards-compatible:
