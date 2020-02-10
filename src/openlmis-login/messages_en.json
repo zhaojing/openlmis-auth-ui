@@ -1,11 +1,11 @@
 {
-  "openlmisLogin.appHeader": "Logistics Management Information System",
-  "openlmisLogin.forgotPassword": "Forgot password?",
-  "openlmisLogin.password": "Password",
-  "openlmisLogin.poweredBy": "Powered by ${openlmis}",
-  "openlmisLogin.signIn": "Sign In",
-  "openlmisLogin.username": "Username",
-  "openlmisLogin.invalidCredentials": "The username or password you entered is incorrect. Please try again.",
-  "openlmisLogin.cannotConnectToServer": "Could not connect to server. You must be online to log in. Please try again.",
-  "openlmisLogin.unknownServerError": "Unknown server error. Please contact your OpenLMIS administrator."
+  "openlmisLogin.appHeader": "物流管理信息系统",
+  "openlmisLogin.forgotPassword": "忘记密码？",
+  "openlmisLogin.password": "密码",
+  "openlmisLogin.poweredBy": "由${openlmis}提供支持",
+  "openlmisLogin.signIn": "登入",
+  "openlmisLogin.username": "用户名",
+  "openlmisLogin.invalidCredentials": "您输入的用户名或密码不正确。请再次输入：",
+  "openlmisLogin.cannotConnectToServer": "无法连接到服务器，请确认网络已连接并重试。",
+  "openlmisLogin.unknownServerError": "未知的服务器错误。请与系统管理员联系。"
 }

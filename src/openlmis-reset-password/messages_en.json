@@ -1,15 +1,15 @@
 {
-    "openlmisResetPassword.appHeader": "Logistics Management Information System",
-    "openlmisResetPassword.changePassword": "Change password",
-    "openlmisResetPassword.newPassword": "New password",
-    "openlmisResetPassword.passwordMismatch": "Passwords do not match",
-    "openlmisResetPassword.passwordMustContainNumber": "Password must contain at least 1 number",
-    "openlmisResetPassword.passwordRequirements": "A password must contain at least 8 characters and 1 number.",
-    "openlmisResetPassword.passwordReset.failure": "Failed to change password.",
-    "openlmisResetPassword.passwordReset.label": "Reset password",
-    "openlmisResetPassword.passwordReset.success": "Password has been reset successfully",
-    "openlmisResetPassword.passwordTooShort": "Password is too short. It must have at least 8 characters.",
-    "openlmisResetPassword.poweredBy": "Powered by ${openlmis}",
-    "openlmisResetPassword.reenterPassword": "Re-enter new password",
-    "openlmisResetPassword.showPassword": "Show password"
+    "openlmisResetPassword.appHeader": "物流管理信息系统",
+    "openlmisResetPassword.changePassword": "更改密码",
+    "openlmisResetPassword.newPassword": "新密码",
+    "openlmisResetPassword.passwordMismatch": "密码不匹配",
+    "openlmisResetPassword.passwordMustContainNumber": "密码必须至少包含1个数字",
+    "openlmisResetPassword.passwordRequirements": "密码必须至少包含8个英文字母和1个数字",
+    "openlmisResetPassword.passwordReset.failure": "更改密码失败",
+    "openlmisResetPassword.passwordReset.label": "重置密码",
+    "openlmisResetPassword.passwordReset.success": "密码已成功重置",
+    "openlmisResetPassword.passwordTooShort": "密码太短，密码必须包含至少8个字符",
+    "openlmisResetPassword.poweredBy": "由${openlmis}提供支持",
+    "openlmisResetPassword.reenterPassword": "请再次输入新密码",
+    "openlmisResetPassword.showPassword": "显示密码"
 }

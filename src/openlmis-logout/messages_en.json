@@ -1,4 +1,4 @@
 {
-    "openlmisLogout.logout": "Logout",
-    "openlmisLogout.offlineWarning": "Logging out while offline means you won't be able to login again until you are online."
+    "openlmisLogout.logout": "登出",
+    "openlmisLogout.offlineWarning": "离线登出后，只有连接网络后才能再次登入。"
 }

@@ -1,13 +1,13 @@
 {
-  "openlmisForgotPassword.appHeader": "Logistics Management Information System",
-  "openlmisForgotPassword.cancel": "Cancel",
-  "openlmisForgotPassword.email": "Email",
-  "openlmisForgotPassword.forgotPassword": "Forgot Password",
-  "openlmisForgotPassword.invalidEmail": "Invalid email address format",
-  "openlmisForgotPassword.passwordResetFailure": "Failed to reset password. No user with given email address assigned was found.",
-  "openlmisForgotPassword.poweredBy": "Powered by ${openlmis}",
-  "openlmisForgotPassword.resetPassword.label": "Reset Password",
-  "openlmisForgotPassword.resetPassword.message": "Please provide your email address and we will send you a reset password link on your registered email.",
-  "openlmisForgotPassword.resetPasswordAlert.message": "An email with a password reset token has been sent to the email address you provided.",
-  "openlmisForgotPassword.resetPasswordAlert.title": "Email sent!"
+  "openlmisForgotPassword.appHeader": "欢迎使用\\n仓鼠物流管理系统",
+  "openlmisForgotPassword.cancel": "取消",
+  "openlmisForgotPassword.email": "邮箱",
+  "openlmisForgotPassword.forgotPassword": "忘记密码",
+  "openlmisForgotPassword.invalidEmail": "电子邮件格式错误",
+  "openlmisForgotPassword.passwordResetFailure": "重置密码失败。您输入的邮箱地址未注册。",
+  "openlmisForgotPassword.poweredBy": "由${openlmis}提供支持",
+  "openlmisForgotPassword.resetPassword.label": "重置密码",
+  "openlmisForgotPassword.resetPassword.message": "请提供您的电子邮箱地址，我们将向您发送重置密码链接。",
+  "openlmisForgotPassword.resetPasswordAlert.message": "包含密码重置令牌的电子邮件已发送到您的邮箱。",
+  "openlmisForgotPassword.resetPasswordAlert.title": "邮件已发送！"
 }
