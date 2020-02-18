@@ -60,6 +60,7 @@
          */
         function onInit() {
             setStates();
+            hideState();
         }
 
         function setStates() {
@@ -69,6 +70,14 @@
                 vm.states = navigationStateService.roots[$scope.rootState];
             } else {
                 vm.states = $scope.states;
+            }
+        }
+
+        function hideState() {
+            if (vm.states) {
+                vm.states = vm.states.filter(function(state) {
+                    return state.url !== '/catalogItems/upload';
+                });
             }
         }
     }
